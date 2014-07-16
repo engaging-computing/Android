@@ -1,0 +1,6 @@
+include ':Apps:Data_Collector'
+include ':Apps:Car_Ramp_Physics'
+include ':Apps:DataWalk'
+include ':Apps:Canobie_Physics_v2'
+include ':Libs:iSENSE Imports'
+include ':Apps:Pictures'

@@ -4,29 +4,37 @@
 # Java class files
 *.class
 
+# built native files
+*.o
+*.so
+
 # generated files
-bin/
-gen/
+*bin/
+*gen/
 
 # Local configuration file (sdk path, etc)
-local.properties
+*local.properties
 
 # Eclipse project files
-.classpath
-.project
-.prefs
-.settings
+*.classpath
+*.project
+*.prefs
+*.settings
 
-# Mac Files
-.DS_Store
+# Mac OS X clutter
+*.DS_Store
+
+# Windows clutter
+*Thumbs.db
 
 # Android Studio
-.idea/
-.gradle
-/*/local.properties
-/*/out
-/*/*/build
-/*/*/production
+*.idea/
+*gradle*
+*.gradle
+*local.properties
+*out
+*build
+*production
 *.iml
 *.iws
 *.ipr
@@ -40,3 +48,9 @@ local.properties
 
 # Backup Merge Files
 *.orig
+
+# Intellij IDEA (see https://intellij-support.jetbrains.com/entries/23393067)
+*.idea/workspace.xml
+*.idea/tasks.xml
+*.idea/datasources.xml
+*.idea/dataSources.ids

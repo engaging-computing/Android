@@ -218,6 +218,7 @@ public class Datawalk_Service extends Service {
                     DataWalk.projectID,
                     null);
 
+            ds.setRequestDataLabelInOrder(true);
 
             Log.e("dataset: ", ds.getData());
 

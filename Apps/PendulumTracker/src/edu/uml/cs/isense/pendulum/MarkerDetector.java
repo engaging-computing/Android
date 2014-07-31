@@ -102,7 +102,7 @@ public class MarkerDetector {
         
         // Detect contours
         Imgproc.findContours(resultCopy, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        Log.e(TAG, "Contours count: " + contours.size());
+//        Log.e(TAG, "Contours count: " + contours.size());
 
         // Find max contour area
         List<MatOfPoint> mContours = new ArrayList<MatOfPoint>();

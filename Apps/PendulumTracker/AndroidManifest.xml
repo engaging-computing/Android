@@ -89,6 +89,10 @@
             android:name="edu.uml.cs.isense.queue.QueueSummary"
             android:label="Summary"
             android:theme="@style/AppThemeDialog"/>
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueDeleteSelected"
+            android:label="Delete Selected Data Sets"
+            android:theme="@style/AppThemeDialog"/>
         
     </application>
 

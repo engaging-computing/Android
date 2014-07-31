@@ -86,18 +86,19 @@ public class PendulumTrackerActivity extends Activity implements
 	private static final int CREDENTIAL_KEY_REQUESTED  = 1099;
 	private static final int LOGIN_REQUESTED  = 2000;
 	private final int QUEUE_UPLOAD_REQUESTED = 2001;
-
-
+	
+	//Project fields pulled from project when user starts recording
 	
 	Boolean sessionNameEntered = false;
 
 	private static String experimentNumber = "29"; // production = 29, dev = 39
 	
+	private static ArrayList<RProjectField> pf; //project fields
+	
 	private static String baseSessionUrl = "http://isenseproject.org/projects/"
 			+ experimentNumber + "data_sets/";
 	private static String baseSessionUrlDev = "http://rsense-dev.cs.uml.edu/projects/"
 			+ experimentNumber + "/data_sets/";
-	// private static String baseSessionUrlDev = "http://129.63.16.30/projects/"
 	private static String sessionUrl = "";
 	private String dateString;
 
@@ -178,8 +179,8 @@ public class PendulumTrackerActivity extends Activity implements
 		
 		// iSENSE network connectivity stuff
 		api = API.getInstance();
-		api.useDev(useDevSite);
-
+		api.useDev(false);
+		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
 
 		w = new Waffle(mContext); //Waffle is our version of android toast (message that pops up on screen)
 		
@@ -222,6 +223,10 @@ public class PendulumTrackerActivity extends Activity implements
 		// Jeremy Note: Actually the remembering happens automagically
 		// in the API calls
 		CredentialManager.login(mContext, api);
+		
+		//Pull fields from project that is selected
+		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
+
 		
 		// Event handler
 		mHandler = new Handler();
@@ -390,16 +395,19 @@ public class PendulumTrackerActivity extends Activity implements
 
 			if (mDataCollectionEnabled) {
 
-				this.addStatusOverlay(mRgba);
+				addStatusOverlay(mRgba);
 				// add data point to final data set
-
-				// yScale, -xScale
-				if (point.x != 0 && point.y != 0) {
-					// shift x-axis so center vertical axis is set to x=0 in
-					// pendulum coordinates
-					final int shiftX = (int) (mImgWidth / 2);
-					this.addDataPoint(point.x - shiftX, point.y);
-				}
+				
+				Point[] params = {point};
+				new RecordPointsTask().execute(params);
+				
+//				// yScale, -xScale
+//				if (point.x != 0 && point.y != 0) {
+//					// shift x-axis so center vertical axis is set to x=0 in
+//					// pendulum coordinates
+//					final int shiftX = (int) (mImgWidth / 2);
+//					this.addDataPoint(point.x - shiftX, point.y);
+//				}
 
 				// Make TextView disappear
 				mHandler.post(new Runnable() {
@@ -449,6 +457,38 @@ public class PendulumTrackerActivity extends Activity implements
 		return mRgba;
 	}
 
+	private class RecordPointsTask extends AsyncTask<Point, Void, String> {
+
+		ProgressDialog dia;
+
+		@Override
+		protected void onPreExecute() {
+		}
+		
+		@Override
+		protected String doInBackground(Point...params) {
+			Point point = params[0];
+			
+			// yScale, -xScale
+			if (point.x != 0 && point.y != 0) {
+				// shift x-axis so center vertical axis is set to x=0 in
+				// pendulum coordinates
+				final int shiftX = (int) (mImgWidth / 2);
+				if (mDataCollectionEnabled ) {
+					addDataPoint(point.x - shiftX, point.y);
+				}
+			}
+			return null; //strings[0];
+		}
+
+		@Override
+		protected void onPostExecute(String sdFileName) {
+
+			
+		}
+	}
+	
+	
 	@SuppressWarnings("unused")
 	private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
 		Mat pointMatRgba = new Mat();
@@ -553,7 +593,7 @@ public class PendulumTrackerActivity extends Activity implements
 			if (PendulumTrackerActivity.mDataCollectionEnabled == false) {
 				// be sure to disable data collection before uploading data to
 				// iSENSE
-				PendulumTrackerActivity.mDataCollectionEnabled = true;
+				mDataCollectionEnabled = true;
 
 				// set STOP button and text
 				item.setIcon(stopIcon);
@@ -561,15 +601,21 @@ public class PendulumTrackerActivity extends Activity implements
 
 			} else {
 				// enable data collection before uploading data to iSENSE
-				PendulumTrackerActivity.mDataCollectionEnabled = false;
+				mDataCollectionEnabled = false;
 
 				// set START button and text
 				item.setIcon(startIcon);
 				item.setTitle(R.string.startCollection);
 				
 				
+				if (mDataSet.length() > 0) {
+					new AddToQueueTask().execute();					
+				} else {
+					w.make("You must first START data collection to upload data.",
+							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
+				}
 				
-				LoginThenUpload(); //TODO was login then upload task
+				//LoginThenUpload(); //TODO was login then upload task
 
 			}
 			
@@ -665,94 +711,7 @@ public class PendulumTrackerActivity extends Activity implements
 		android.os.Process.killProcess(pid);
 	}
 
-//	private Runnable uploader = new Runnable() {
-//
-//		// @Override
-//		@SuppressLint("SimpleDateFormat")
-//		public void run() {
-//
-//			// Create location-less session (for now)
-//			int sessionId = -1;
-//			uploadInfo info = null;
-//			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
-//			Date dt = new Date();
-//			dateString = sdf.format(dt);
-//			
-//			final SharedPreferences mPrefs = getSharedPreferences(
-//							EnterName.PREFERENCES_KEY_USER_INFO,
-//							Context.MODE_PRIVATE);
-//		
-//			String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "") 
-//									+ mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL, "")
-//									+ " - " + dateString;
-//
-//			Log.i(TAG, "Uploading data set...");
-//
-//			JSONObject jobj = new JSONObject();
-//			try {
-//				jobj.put("data", mDataSet);
-//				jobj = api.rowsToCols(jobj);
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-//
-//			int projectID = Integer.parseInt(experimentNumber);
-//
-//			
-//			Log.i(TAG, "Uploading new dataset");
-//			info = UploadQueue.getAPI().uploadDataSet(projectID, jobj, nameOfSession);
-//
-//			
-//
-//			if (info.dataSetId == -1)
-//				Log.i(TAG, info.errorMessage);
-//			
-//			w.make(info.errorMessage,
-//					Waffle.LENGTH_SHORT, Waffle.IMAGE_X);
-//
-//			if (useDevSite) {
-//				sessionUrl = baseSessionUrlDev + sessionId;
-//				Log.i(TAG, sessionUrl);
-//			} else
-//				sessionUrl = baseSessionUrl + sessionId;
-//
-//		}
-//
-//	};
 
-//	// Task for uploading data to iSENSE
-//	public class AddToQueueTask extends AsyncTask<Void, Integer, Void> {
-//
-//		@Override
-//		protected void onPreExecute() {
-//
-//			dia = new ProgressDialog(PendulumTrackerActivity.this);
-//			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//			dia.setMessage("Please wait while your data is uploaded to iSENSE...");
-//			dia.setCancelable(false);
-//			dia.show();
-//		}
-//
-//		@Override
-//		protected Void doInBackground(Void... voids) {
-//
-//			uploader.run();
-//			publishProgress(100);
-//			return null;
-//		}
-//
-//		@Override
-//		protected void onPostExecute(Void voids) {
-//
-//			// reset data array
-//			mDataSet = new JSONArray();
-//
-//			dia.setMessage("Done");
-//			dia.cancel();
-//			Toast.makeText(PendulumTrackerActivity.this,
-//					"Data upload successful!", Toast.LENGTH_SHORT).show();
-//		}
-//	}
 
 	// HACKY test data
 	// ---- HACKY TEST DATA ----
@@ -760,15 +719,16 @@ public class PendulumTrackerActivity extends Activity implements
 		int i = 0;
 
 		while (i < 10) {
+			//TODO Make json array instead of json object
 			JSONObject dataJSON = new JSONObject();
 			Calendar c = Calendar.getInstance();
 			long currentTime = (long) (c.getTimeInMillis() /*- 14400000*/);
 
 			/* Convert floating point to String to send data via HTML */
 			try {
-				/* Posn-x */dataJSON.put("1", i);
-				/* Posn-y */dataJSON.put("2", i);
-				/* Time */dataJSON.put("0", "u " + currentTime);
+				/* Posn-x */dataJSON.put("172", i);
+				/* Posn-y */dataJSON.put("173", i);
+				/* Time */dataJSON.put("171", "u " + currentTime);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -783,7 +743,7 @@ public class PendulumTrackerActivity extends Activity implements
 
 	// ---- END HACKY TEST DATA -----
 
-	void addDataPoint(double x, double y) {
+	static void addDataPoint(double x, double y) {
 
 		JSONObject dataJSON = new JSONObject();
 		// Calendar c = Calendar.getInstance();
@@ -792,25 +752,25 @@ public class PendulumTrackerActivity extends Activity implements
 																// 14400000*/);
 
 		// new! works!
-		ArrayList<RProjectField> pf = api.getProjectFields(Integer.parseInt(experimentNumber));
+//		ArrayList<RProjectField> pf = api.getProjectFields(Integer.parseInt(experimentNumber));
+		
+			/* Convert floating point to String to send data via HTML */
+			try {
+				/* Posn-x */dataJSON.put( "1", x);
+				/* Posn-y */dataJSON.put( "2", y);
+				/* Time */dataJSON.put( "0", "u " + currentTime);
+				
+				
+				/* Posn-x *///dataJSON.put("1", x);
+				/* Posn-y *///dataJSON.put("2", y);
+				/* Time *///dataJSON.put("0", "u " + currentTime);
+				
+				
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		
 		
-		/* Convert floating point to String to send data via HTML */
-		try {
-			/* Posn-x */dataJSON.put( "" + pf.get(1).field_id, x);
-			/* Posn-y */dataJSON.put( "" + pf.get(2).field_id, y);
-			/* Time */dataJSON.put( "" + pf.get(0).field_id , "u " + currentTime);
-			
-			
-			/* Posn-x *///dataJSON.put("1", x);
-			/* Posn-y *///dataJSON.put("2", y);
-			/* Time *///dataJSON.put("0", "u " + currentTime);
-			
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
 		mDataSet.put(dataJSON);
 
 		Log.i(TAG, "--------------- ADDING DATA POINT ---------------");
@@ -874,9 +834,6 @@ public class PendulumTrackerActivity extends Activity implements
 				return;
 			}
 
-			
-
-			
 
 	}
 	

@@ -74,6 +74,7 @@ public class PendulumTrackerActivity extends Activity implements
 	// iSENSE member variables
 	// use development site
 	Boolean useDevSite = false;
+	
 	// iSENSE uploader
 	API api;
 	
@@ -83,7 +84,6 @@ public class PendulumTrackerActivity extends Activity implements
 	static String firstName = "";
 	static String lastInitial = "";
 	private static final int ENTERNAME_REQUEST = 1098;
-	private static final int CREDENTIAL_KEY_REQUESTED  = 1099;
 	private static final int LOGIN_REQUESTED  = 2000;
 	private final int QUEUE_UPLOAD_REQUESTED = 2001;
 	
@@ -92,14 +92,7 @@ public class PendulumTrackerActivity extends Activity implements
 	Boolean sessionNameEntered = false;
 
 	private static String experimentNumber = "29"; // production = 29, dev = 39
-	
-	private static ArrayList<RProjectField> pf; //project fields
-	
-	private static String baseSessionUrl = "http://isenseproject.org/projects/"
-			+ experimentNumber + "data_sets/";
-	private static String baseSessionUrlDev = "http://rsense-dev.cs.uml.edu/projects/"
-			+ experimentNumber + "/data_sets/";
-	private static String sessionUrl = "";
+		
 	private String dateString;
 
 	// upload progress dialogue
@@ -219,7 +212,7 @@ public class PendulumTrackerActivity extends Activity implements
 		CredentialManager.login(mContext, api);
 		
 		//Pull fields from project that is selected
-		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
+//		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
 	
 		// Event handler
 		mHandler = new Handler();
@@ -398,7 +391,7 @@ public class PendulumTrackerActivity extends Activity implements
 			if (point.x != 0 && point.y != 0) {
 				// shift x-axis so center vertical axis is set to x=0 in
 				// pendulum coordinates
-				final int shiftX = (int) (mImgWidth / 2);
+				final int shiftX = (int) mImgWidth / 2;
 				if (mDataCollectionEnabled ) {
 					addDataPoint(point.x - shiftX, point.y);
 				}

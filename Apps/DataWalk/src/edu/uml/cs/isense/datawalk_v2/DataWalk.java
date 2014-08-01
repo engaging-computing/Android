@@ -1,6 +1,7 @@
 package edu.uml.cs.isense.datawalk_v2;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -22,6 +23,7 @@ import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
@@ -98,8 +100,8 @@ public class DataWalk extends Activity implements LocationListener,
 	private Waffle w;
 
 	/* iSENSE API Globals and Constants */
-	private final String DEFAULT_PROJECT = "13";
-	private final String DEFAULT_PROJECT_DEV = "13";
+	private final String DEFAULT_PROJECT = "614";
+	private final String DEFAULT_PROJECT_DEV = "614";
 
 	private int actionBarTapCount = 0;
 	public static boolean useDev = false;
@@ -402,7 +404,8 @@ public class DataWalk extends Activity implements LocationListener,
     /**
      * Set layout up for not recording
      */
-    void setLayoutNotRecording() {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	void setLayoutNotRecording() {
         // Swap the layouts below the recording button
         nameAndLoginRL.setVisibility(View.VISIBLE);
         recordingExtrasLL.setVisibility(View.GONE);
@@ -422,7 +425,8 @@ public class DataWalk extends Activity implements LocationListener,
     /**
      * Set layout up for recording
      */
-    void setLayoutRecording() {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	void setLayoutRecording() {
         //Swap the layouts below the recording button
         nameAndLoginRL.setVisibility(View.GONE);
         recordingExtrasLL.setVisibility(View.VISIBLE);

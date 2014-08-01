@@ -491,8 +491,7 @@ public class PendulumTrackerActivity extends Activity implements
 		 * new LoginBeforeUploadTask().execute(); return true;
 		 */
 		// START experiment and data collection
-		case R.id.menu_start:
-
+		case R.id.menu_start:			
 			// Selected item becomes start/stop button (for onActivityResult())
 			startStopButton = item;
 
@@ -511,6 +510,8 @@ public class PendulumTrackerActivity extends Activity implements
 			if (PendulumTrackerActivity.mDataCollectionEnabled == false) {
 				// be sure to disable data collection before uploading data to
 				// iSENSE
+				 mDataSet = new JSONArray();
+				
 				mDataCollectionEnabled = true;
 
 				// set STOP button and text

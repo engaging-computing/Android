@@ -37,7 +37,7 @@ import edu.uml.cs.isense.proj.Setup;
 public class DataFieldManager extends Application {
 	private float rawAccel[] = new float[4];
 	private float rawMag[] = new float[3];
-	private float accel[] = new float[3];
+	private float accel[] = new float[4];
 	private float orientation[] = new float[3];
 	private float mag[] = new float[3];
 	private String temperature = "";
@@ -105,7 +105,9 @@ public class DataFieldManager extends Application {
 		this.f = f;
 		
 		if (projID == -1) {
-			setUpDFMWithAllFields();
+			setUpDFMWithAllFields(mContext);
+		} else {
+			//TODO setup dfm with needed fields
 		}
 
 	}
@@ -344,7 +346,6 @@ public class DataFieldManager extends Application {
 		System.out.println("Data line: " + dataJSON.toString());
 
 		return dataJSON;
-
 	}
 
 	/**
@@ -936,7 +937,7 @@ public class DataFieldManager extends Application {
 	/**
 	 * Setter for the project ID this DataFieldManager instance operates on.
 	 * 
-	 * NOTE: If you call this function, be sure you call
+	 * NOTE: This will also call 
 	 * {@link edu.uml.cs.isense.dfm.DataFieldManager#getOrder()} to update which
 	 * fields this DataFieldManager instance records for.
 	 * 
@@ -945,6 +946,7 @@ public class DataFieldManager extends Application {
 	 */
 	public void setProjID(int projectID) {
 		this.projID = projectID;
+		getOrder();
 	}
 
 	/**
@@ -1279,8 +1281,10 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.ACCEL_TOTAL])
                 f.accel_total = toThou.format(accel[3]);
         if (enabledFields[Fields.LATITUDE])
+        	if(loc != null)
                 f.latitude = loc.getLatitude();
         if (enabledFields[Fields.LONGITUDE])
+        	if(loc != null)
                 f.longitude = loc.getLongitude();
         if (enabledFields[Fields.HEADING_DEG])
 				 f.angle_deg = toThou.format(orientation[0]);
@@ -1317,6 +1321,7 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.PRESSURE])
                 f.pressure = pressure;
         if (enabledFields[Fields.ALTITUDE])
+        	if(loc != null)
                 f.altitude = "" + loc.getAltitude();
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
@@ -1324,8 +1329,8 @@ public class DataFieldManager extends Application {
 	}
 	
 	
-	public void setUpDFMWithAllFields() {
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+	public void setUpDFMWithAllFields(Context appContext) {
+		SharedPreferences mPrefs = appContext.getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 		SharedPreferences.Editor mEdit = mPrefs.edit();
 		mEdit.putString(Setup.PROJECT_ID, "-1").commit();
 
@@ -1336,25 +1341,25 @@ public class DataFieldManager extends Application {
 
 		enableAllFields();
 
-		String acceptedFields = getResources().getString(R.string.time) + ","
-				+ getResources().getString(R.string.accel_x) + ","
-				+ getResources().getString(R.string.accel_y) + ","
-				+ getResources().getString(R.string.accel_z) + ","
-				+ getResources().getString(R.string.accel_total) + ","
-				+ getResources().getString(R.string.latitude) + ","
-				+ getResources().getString(R.string.longitude) + ","
-				+ getResources().getString(R.string.magnetic_x) + ","
-				+ getResources().getString(R.string.magnetic_y) + ","
-				+ getResources().getString(R.string.magnetic_z) + ","
-				+ getResources().getString(R.string.magnetic_total) + ","
-				+ getResources().getString(R.string.heading_deg) + ","
-				+ getResources().getString(R.string.heading_rad) + ","
-				+ getResources().getString(R.string.temperature_c) + ","
-				+ getResources().getString(R.string.pressure) + ","
-				+ getResources().getString(R.string.altitude) + ","
-				+ getResources().getString(R.string.luminous_flux) + ","
-				+ getResources().getString(R.string.temperature_f) + ","
-				+ getResources().getString(R.string.temperature_k);
+		String acceptedFields = appContext.getResources().getString(R.string.time) + ","
+				+ appContext.getResources().getString(R.string.accel_x) + ","
+				+ appContext.getResources().getString(R.string.accel_y) + ","
+				+ appContext.getResources().getString(R.string.accel_z) + ","
+				+ appContext.getResources().getString(R.string.accel_total) + ","
+				+ appContext.getResources().getString(R.string.latitude) + ","
+				+ appContext.getResources().getString(R.string.longitude) + ","
+				+ appContext.getResources().getString(R.string.magnetic_x) + ","
+				+ appContext.getResources().getString(R.string.magnetic_y) + ","
+				+ appContext.getResources().getString(R.string.magnetic_z) + ","
+				+ appContext.getResources().getString(R.string.magnetic_total) + ","
+				+ appContext.getResources().getString(R.string.heading_deg) + ","
+				+ appContext.getResources().getString(R.string.heading_rad) + ","
+				+ appContext.getResources().getString(R.string.temperature_c) + ","
+				+ appContext.getResources().getString(R.string.pressure) + ","
+				+ appContext.getResources().getString(R.string.altitude) + ","
+				+ appContext.getResources().getString(R.string.luminous_flux) + ","
+				+ appContext.getResources().getString(R.string.temperature_f) + ","
+				+ appContext.getResources().getString(R.string.temperature_k);
 
 		mEdit.putString("accepted_fields", acceptedFields).commit();
 	}

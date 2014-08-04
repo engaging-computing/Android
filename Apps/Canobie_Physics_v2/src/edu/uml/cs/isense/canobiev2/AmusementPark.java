@@ -182,7 +182,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 
 		// Initialize everything you're going to need
 		initVars();
-
+		
 		enableAllFields();
 		
 		// Main Layout Button for Recording Data
@@ -313,6 +313,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 						new TimeElapsedTask().execute();
 						
 						initDfm();
+						//TODO clear data in dfm
 						recordingTimer = new Timer();
 						recordingTimer.scheduleAtFixedRate(new TimerTask() {
 							public void run() {
@@ -559,7 +560,11 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		dfm.updateValues(event);
+		if (dfm != null) {
+			dfm.updateValues(event);
+		} else {
+			Log.e("onSensorChanged ", "dfm is null");
+		}
 		if (isRunning) {
 			if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
 				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
@@ -579,7 +584,9 @@ public class AmusementPark extends Activity implements SensorEventListener,
 
 	@Override
 	public void onLocationChanged(Location location) {
-		dfm.updateLoc(location);
+		if (dfm != null) {
+			dfm.updateLoc(location);
+		}
 	}
 
 	@Override
@@ -614,9 +621,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 				w.make("Could not re-build queue from file!", Waffle.IMAGE_X);
 			}
 		} else if (requestCode == CHOOSE_SENSORS_REQUESTED) {
-			startStop.setEnabled(true);
 			dfm.setEnabledFields(acceptedFields);
-			
 		} else if (requestCode == SETUP_REQUESTED) {
 				rideName.setText("Ride: " + rideNameString);
 				
@@ -626,6 +631,8 @@ public class AmusementPark extends Activity implements SensorEventListener,
 				mEdit.putString(Setup.PROJECT_ID, Integer.toString(projectNum));
 				mEdit.commit();
 				
+				//change fields for new project
+				dfm.setProjID(projectNum);
 				
 		} else if (requestCode == LOGIN_REQUESTED) {
 			
@@ -771,6 +778,9 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		api = API.getInstance();
 		api.useDev(useDev);
 		
+		// Initialize DataFieldManager
+		initDfm();
+		
 		// Initialize action bar customization for API >= 11
 				if (android.os.Build.VERSION.SDK_INT >= 11) {
 					ActionBar bar = getActionBar();
@@ -818,14 +828,12 @@ public class AmusementPark extends Activity implements SensorEventListener,
 
 	
 
-	/**
-	 * Set all dfm's fields to enabled. 
-	 */
-	private void enableAllFields() {
-		dfm.setUpDFMWithAllFields();
-	}
+	
 	
 	//set up GPS
+	/**
+	 * Initialize the location manager
+	 */
 	private void initLocManager() {
 		Criteria c = new Criteria();
 		c.setAccuracy(Criteria.ACCURACY_FINE);
@@ -845,17 +853,19 @@ public class AmusementPark extends Activity implements SensorEventListener,
 			
 		}
 		
-		// This is the location we will get back from GPS
 		dfm.updateLoc(new Location(mLocationManager.getBestProvider(c, true)));
 		
 	}
 	
 	
-
+/**
+ * Initialize DataFieldManager Object
+ */
 	private void initDfm() {
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, -1);
-		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "");
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
 		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext, f);
+		dfm.enableAllFields();
 	}
 	
 	
@@ -889,9 +899,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		 * Everybody likes strings.
 		 * 
 		 * @param seconds
-		 */
-		
-		
+		 */		
 		ElapsedTime(int seconds) {
 			int minutes;
 			
@@ -949,6 +957,13 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		 dataPointCount++;
          dfm.recordData();
          dataSet.put(dfm.putData());
+	}
+	
+	/**
+	 * Set all dfm's fields to enabled. 
+	 */
+	private void enableAllFields() {
+		dfm.setUpDFMWithAllFields(mContext);
 	}
 
 }

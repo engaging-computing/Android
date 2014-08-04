@@ -4,6 +4,11 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -18,6 +24,7 @@ import java.util.Locale;
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.objects.RProjectField;
+import edu.uml.cs.isense.proj.Setup;
 
 /**
  * The DataFieldManager class is designed to, as its name implies, manage how
@@ -28,6 +35,17 @@ import edu.uml.cs.isense.objects.RProjectField;
  * @author iSENSE Android Development Team
  */
 public class DataFieldManager extends Application {
+	private float rawAccel[] = new float[4];
+	private float rawMag[] = new float[3];
+	private float accel[] = new float[3];
+	private float orientation[] = new float[3];
+	private float mag[] = new float[3];
+	private String temperature = "";
+	private String pressure = "";
+	private String light = "";
+	private Location loc;
+	
+	private LinkedList<String> acceptedFields;
 
 	private int projID;
 	private API api;
@@ -85,6 +103,11 @@ public class DataFieldManager extends Application {
 		this.fieldIDs = new LinkedList<Long>();
 		this.mContext = mContext;
 		this.f = f;
+		
+		if (projID == -1) {
+			setUpDFMWithAllFields();
+		}
+
 	}
 
 	/**
@@ -1173,5 +1196,304 @@ public class DataFieldManager extends Application {
 
 		return newData;
 	}
+	
+	public void updateLoc(Location l) {
+		loc = l;
+	}
+	
+	public void updateValues(SensorEvent event) {
+		DecimalFormat toThou = new DecimalFormat("######0.000");
+		//DecimalFormat threeDigit = new DecimalFormat("#,##0.000");
+		DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
+		
+		
 
+		if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
+				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+			
+			if (enabledFields[Fields.ACCEL_X]
+					|| enabledFields[Fields.ACCEL_Y]
+					|| enabledFields[Fields.ACCEL_Z]
+					|| enabledFields[Fields.ACCEL_TOTAL]) {
+
+				rawAccel = event.values.clone();
+				accel[0] = event.values[0];
+				accel[1] = event.values[1];
+				accel[2] = event.values[2];
+
+				String xPrepend = accel[0] > 0 ? "+" : "";
+				String yPrepend = accel[1] > 0 ? "+" : "";
+				String zPrepend = accel[2] > 0 ? "+" : "";
+
+				accel[3] = (float) Math.sqrt((float) ((Math.pow(accel[0], 2)
+						+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2))));
+
+			}
+
+		} else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+			if (enabledFields[Fields.MAG_X]
+					|| enabledFields[Fields.MAG_Y]
+					|| enabledFields[Fields.MAG_Z]
+					|| enabledFields[Fields.MAG_TOTAL]
+					|| enabledFields[Fields.HEADING_DEG]
+					|| enabledFields[Fields.HEADING_RAD]) {
+
+				rawMag = event.values.clone();
+
+				mag[0] = event.values[0];
+				mag[1] = event.values[1];
+				mag[2] = event.values[2];
+
+				float rotation[] = new float[9];
+
+				if (SensorManager.getRotationMatrix(rotation, null, rawAccel,
+						rawMag)) {
+					orientation = new float[3];
+					SensorManager.getOrientation(rotation, orientation);
+				}
+			}
+
+		} else if (event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
+			if (enabledFields[Fields.TEMPERATURE_C]
+					|| enabledFields[Fields.TEMPERATURE_F]
+					|| enabledFields[Fields.TEMPERATURE_K])
+				temperature = toThou.format(event.values[0]);
+		} else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
+			if (enabledFields[Fields.PRESSURE])
+				pressure = toThou.format(event.values[0]);
+		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+			if (enabledFields[Fields.LIGHT])
+				light = toThou.format(event.values[0]);
+		}
+	}
+	
+	public void recordData() {
+		DecimalFormat toThou = new DecimalFormat("######0.000");
+
+        if (enabledFields[Fields.ACCEL_X])
+                f.accel_x = toThou.format(accel[0]);
+        if (enabledFields[Fields.ACCEL_Y])
+                f.accel_y = toThou.format(accel[1]);
+        if (enabledFields[Fields.ACCEL_Z])
+                f.accel_z = toThou.format(accel[2]);
+        if (enabledFields[Fields.ACCEL_TOTAL])
+                f.accel_total = toThou.format(accel[3]);
+        if (enabledFields[Fields.LATITUDE])
+                f.latitude = loc.getLatitude();
+        if (enabledFields[Fields.LONGITUDE])
+                f.longitude = loc.getLongitude();
+        if (enabledFields[Fields.HEADING_DEG])
+				 f.angle_deg = toThou.format(orientation[0]);
+        if (enabledFields[Fields.HEADING_RAD])
+       	 if (!f.angle_deg.equals(""))
+				f.angle_rad = toThou
+						.format((Double.parseDouble(f.angle_deg) * (Math.PI / 180)));
+			else
+				f.angle_rad = "";
+        if (enabledFields[Fields.MAG_X])
+                f.mag_x = "" + mag[0];
+        if (enabledFields[Fields.MAG_Y])
+                f.mag_y = "" + mag[1];
+        if (enabledFields[Fields.MAG_Z])
+                f.mag_z = "" + mag[2];
+        if (enabledFields[Fields.MAG_TOTAL])
+                f.mag_total = "" + Math.sqrt(Math.pow(Double.parseDouble(f.mag_x), 2)
+		                                 + Math.pow(Double.parseDouble(f.mag_y), 2)
+		                                 + Math.pow(Double.parseDouble(f.mag_z), 2));
+        if (enabledFields[Fields.TIME])
+                f.timeMillis = System.currentTimeMillis();         
+        if (enabledFields[Fields.TEMPERATURE_C])
+                f.temperature_c = temperature;
+        if (enabledFields[Fields.TEMPERATURE_F])
+                if (temperature.equals(""))
+                        f.temperature_f = temperature;
+                else
+                        f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
+        if (enabledFields[Fields.TEMPERATURE_K])
+                if (temperature.equals(""))
+                        f.temperature_k = temperature;
+                else
+                        f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
+        if (enabledFields[Fields.PRESSURE])
+                f.pressure = pressure;
+        if (enabledFields[Fields.ALTITUDE])
+                f.altitude = "" + loc.getAltitude();
+        if (enabledFields[Fields.LIGHT])
+                f.lux = light;
+
+	}
+	
+	
+	public void setUpDFMWithAllFields() {
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		SharedPreferences.Editor mEdit = mPrefs.edit();
+		mEdit.putString(Setup.PROJECT_ID, "-1").commit();
+
+//		dfm = new DataFieldManager(Integer.parseInt(mPrefs.getString(
+//				Setup.PROJECT_ID, "-1")), api, mContext, f);
+		
+		getOrder();
+
+		enableAllFields();
+
+		String acceptedFields = getResources().getString(R.string.time) + ","
+				+ getResources().getString(R.string.accel_x) + ","
+				+ getResources().getString(R.string.accel_y) + ","
+				+ getResources().getString(R.string.accel_z) + ","
+				+ getResources().getString(R.string.accel_total) + ","
+				+ getResources().getString(R.string.latitude) + ","
+				+ getResources().getString(R.string.longitude) + ","
+				+ getResources().getString(R.string.magnetic_x) + ","
+				+ getResources().getString(R.string.magnetic_y) + ","
+				+ getResources().getString(R.string.magnetic_z) + ","
+				+ getResources().getString(R.string.magnetic_total) + ","
+				+ getResources().getString(R.string.heading_deg) + ","
+				+ getResources().getString(R.string.heading_rad) + ","
+				+ getResources().getString(R.string.temperature_c) + ","
+				+ getResources().getString(R.string.pressure) + ","
+				+ getResources().getString(R.string.altitude) + ","
+				+ getResources().getString(R.string.luminous_flux) + ","
+				+ getResources().getString(R.string.temperature_f) + ","
+				+ getResources().getString(R.string.temperature_k);
+
+		mEdit.putString("accepted_fields", acceptedFields).commit();
+	}
+
+	// (currently 2 of these methods exist - one also in step1setup)
+		private void getEnabledFields() {
+			try {
+				for (String s : acceptedFields) {
+					if (s.length() != 0)
+						break;
+				}
+			} catch (NullPointerException e) {
+				SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
+				String fields = mPrefs.getString("accepted_fields", "");
+				getFieldsFromPrefsString(fields);
+			}
+
+			for (String s : acceptedFields) {
+				if (s.equals(getString(R.string.time)))
+					enabledFields[Fields.TIME] = true;
+
+				else if (s.equals(getString(R.string.accel_x)))
+					enabledFields[Fields.ACCEL_X] = true;
+
+				else if (s.equals(getString(R.string.accel_y)))
+					enabledFields[Fields.ACCEL_Y] = true;
+
+				else if (s.equals(getString(R.string.accel_z)))
+					enabledFields[Fields.ACCEL_Z] = true;
+
+				else if (s.equals(getString(R.string.accel_total)))
+					enabledFields[Fields.ACCEL_TOTAL] = true;
+
+				else if (s.equals(getString(R.string.latitude)))
+					enabledFields[Fields.LATITUDE] = true;
+
+				else if (s.equals(getString(R.string.longitude)))
+					enabledFields[Fields.LONGITUDE] = true;
+
+				else if (s.equals(getString(R.string.magnetic_x)))
+					enabledFields[Fields.MAG_X] = true;
+
+				else if (s.equals(getString(R.string.magnetic_y)))
+					enabledFields[Fields.MAG_Y] = true;
+
+				else if (s.equals(getString(R.string.magnetic_z)))
+					enabledFields[Fields.MAG_Z] = true;
+
+				else if (s.equals(getString(R.string.magnetic_total)))
+					enabledFields[Fields.MAG_TOTAL] = true;
+
+				else if (s.equals(getString(R.string.heading_deg)))
+					enabledFields[Fields.HEADING_DEG] = true;
+
+				else if (s.equals(getString(R.string.heading_rad)))
+					enabledFields[Fields.HEADING_RAD] = true;
+
+				else if (s.equals(getString(R.string.temperature_c)))
+					enabledFields[Fields.TEMPERATURE_C] = true;
+
+				else if (s.equals(getString(R.string.temperature_f)))
+					enabledFields[Fields.TEMPERATURE_F] = true;
+
+				else if (s.equals(getString(R.string.temperature_k)))
+					enabledFields[Fields.TEMPERATURE_K] = true;
+
+				else if (s.equals(getString(R.string.pressure)))
+					enabledFields[Fields.PRESSURE] = true;
+
+				else if (s.equals(getString(R.string.altitude)))
+					enabledFields[Fields.ALTITUDE] = true;
+
+				else if (s.equals(getString(R.string.luminous_flux)))
+					enabledFields[Fields.LIGHT] = true;
+			}
+		}
+
+		private void getFieldsFromPrefsString(String fieldList) {
+
+			String[] fields = fieldList.split(",");
+			acceptedFields = new LinkedList<String>();
+
+			for (String f : fields) {
+				acceptedFields.add(f);
+			}
+		}
+		
+		public void registerSensors(SensorManager mSensorManager, SensorEventListener appContext) {
+			if (enabledFields[Fields.ACCEL_X]
+					|| enabledFields[Fields.ACCEL_Y]
+					|| enabledFields[Fields.ACCEL_Z]
+					|| enabledFields[Fields.ACCEL_TOTAL]) {
+				mSensorManager.registerListener(appContext,
+						mSensorManager
+								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
+			if (enabledFields[Fields.MAG_X]
+					|| enabledFields[Fields.MAG_Y]
+					|| enabledFields[Fields.MAG_Z]
+					|| enabledFields[Fields.MAG_TOTAL]
+					|| enabledFields[Fields.HEADING_DEG]
+					|| enabledFields[Fields.HEADING_RAD]) {
+				mSensorManager.registerListener(appContext,
+						mSensorManager
+								.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
+			if (enabledFields[Fields.TEMPERATURE_C]
+					|| enabledFields[Fields.TEMPERATURE_F]
+					|| enabledFields[Fields.TEMPERATURE_K]
+					|| enabledFields[Fields.ALTITUDE]) {
+				if (getApiLevel() >= 14) {
+					mSensorManager.registerListener(
+									appContext,
+									mSensorManager
+											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
+									SensorManager.SENSOR_DELAY_FASTEST);
+				}
+			}
+
+			if (enabledFields[Fields.PRESSURE]
+					|| enabledFields[Fields.ALTITUDE]) {
+				mSensorManager.registerListener(appContext,
+						mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
+			if (enabledFields[Fields.LIGHT]) {
+				mSensorManager.registerListener(appContext,
+						mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+		}
+		
+		// Assists with differentiating between displays for dialogues
+		private int getApiLevel() {
+			return android.os.Build.VERSION.SDK_INT;
+		}
 }

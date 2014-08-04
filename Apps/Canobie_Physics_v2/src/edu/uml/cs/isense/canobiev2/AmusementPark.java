@@ -115,7 +115,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
 	private LocationManager mRoughLocManager;
-	private Location loc;
 	private Timer recordingTimer;
 	public static UploadQueue uq;
 	private Vibrator vibrator;
@@ -123,7 +122,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	/* Other Important Objects */
 	private LinkedList<String> acceptedFields;
 	private Fields f;
-	private String dataToBeWrittenToFile;
+//	private String dataToBeWrittenToFile;
 	private MediaPlayer mMediaPlayer;
 	private API api;
 	public static Context mContext;
@@ -137,14 +136,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	
 
 	/* Recording Variables */
-	private float rawAccel[];
-	private float rawMag[];
-	private float accel[];
-	private float orientation[];
-	private float mag[];
-	private String temperature = "";
-	private String pressure = "";
-	private String light = "";
 	private long srate = SAMPLE_INTERVAL;
 	private boolean includeGravity = true;
 
@@ -314,8 +305,8 @@ public class AmusementPark extends Activity implements SensorEventListener,
 											SensorManager.SENSOR_DELAY_FASTEST);
 						}
 
-						dataToBeWrittenToFile = "Accel-X, Accel-Y, Accel-Z, Accel-Total, Mag-X, Mag-Y, Mag-Z, Mag-Total"
-								+ "Latitude, Longitude, Time\n";
+//						dataToBeWrittenToFile = "Accel-X, Accel-Y, Accel-Z, Accel-Total, Mag-X, Mag-Y, Mag-Z, Mag-Total"
+//								+ "Latitude, Longitude, Time\n";
 						startStop.setText(getResources().getString(R.string.stopString));
 						startStop.setBackgroundResource(R.drawable.button_rsense_green);						
 						
@@ -568,79 +559,27 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		DecimalFormat toThou = new DecimalFormat("######0.000");
-		//DecimalFormat threeDigit = new DecimalFormat("#,##0.000");
-		DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
-
-		if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
+		dfm.updateValues(event);
+		if (isRunning) {
+			if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
 				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+				
+			DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
+			String xPrepend = event.values[0] > 0 ? "+" : "";
+			String yPrepend = event.values[1] > 0 ? "+" : "";
+			String zPrepend = event.values[2] > 0 ? "+" : "";
 			
-			if (dfm.enabledFields[Fields.ACCEL_X]
-					|| dfm.enabledFields[Fields.ACCEL_Y]
-					|| dfm.enabledFields[Fields.ACCEL_Z]
-					|| dfm.enabledFields[Fields.ACCEL_TOTAL]) {
-
-				rawAccel = event.values.clone();
-				accel[0] = event.values[0];
-				accel[1] = event.values[1];
-				accel[2] = event.values[2];
-
-				String xPrepend = accel[0] > 0 ? "+" : "";
-				String yPrepend = accel[1] > 0 ? "+" : "";
-				String zPrepend = accel[2] > 0 ? "+" : "";
-
-				if (isRunning) {
-					values.setText("Ax: " + xPrepend
-							+ oneDigit.format(accel[0]) + " " + "m/s^2" + "\nAy: " + yPrepend
-							+ oneDigit.format(accel[1]) + " " + "m/s^2" + "\nAz: " + zPrepend
-							+ oneDigit.format(accel[2]) + " " + "m/s^2");
-				}
-
-				accel[3] = (float) Math.sqrt((float) ((Math.pow(accel[0], 2)
-						+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2))));
-
+			values.setText("Ax: " + xPrepend
+					+ oneDigit.format(event.values[0]) + " " + "m/s^2" + "\nAy: " + yPrepend
+					+ oneDigit.format(event.values[1]) + " " + "m/s^2" + "\nAz: " + zPrepend
+					+ oneDigit.format(event.values[2]) + " " + "m/s^2");
 			}
-
-		} else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-			if (dfm.enabledFields[Fields.MAG_X]
-					|| dfm.enabledFields[Fields.MAG_Y]
-					|| dfm.enabledFields[Fields.MAG_Z]
-					|| dfm.enabledFields[Fields.MAG_TOTAL]
-					|| dfm.enabledFields[Fields.HEADING_DEG]
-					|| dfm.enabledFields[Fields.HEADING_RAD]) {
-
-				rawMag = event.values.clone();
-
-				mag[0] = event.values[0];
-				mag[1] = event.values[1];
-				mag[2] = event.values[2];
-
-				float rotation[] = new float[9];
-
-				if (SensorManager.getRotationMatrix(rotation, null, rawAccel,
-						rawMag)) {
-					orientation = new float[3];
-					SensorManager.getOrientation(rotation, orientation);
-				}
-			}
-
-		} else if (event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
-			if (dfm.enabledFields[Fields.TEMPERATURE_C]
-					|| dfm.enabledFields[Fields.TEMPERATURE_F]
-					|| dfm.enabledFields[Fields.TEMPERATURE_K])
-				temperature = toThou.format(event.values[0]);
-		} else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
-			if (dfm.enabledFields[Fields.PRESSURE])
-				pressure = toThou.format(event.values[0]);
-		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-			if (dfm.enabledFields[Fields.LIGHT])
-				light = toThou.format(event.values[0]);
 		}
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		loc = location;
+		dfm.updateLoc(location);
 	}
 
 	@Override
@@ -868,13 +807,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		w = new Waffle(this);
 		f = new Fields();
 
-		// These are arrays that store values we may record. Who knows, maybe we'll use them.
-		accel = new float[4];
-		orientation = new float[3];
-		rawAccel = new float[3];
-		rawMag = new float[3];
-		mag = new float[3];
-		
 		// Fire up the GPS chip (not literally)
 		initLocManager();
 
@@ -890,7 +822,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	 * Set all dfm's fields to enabled. 
 	 */
 	private void enableAllFields() {
-		setUpDFMWithAllFields();
+		dfm.setUpDFMWithAllFields();
 	}
 	
 	//set up GPS
@@ -914,148 +846,20 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		}
 		
 		// This is the location we will get back from GPS
-		loc = new Location(mLocationManager.getBestProvider(c, true));
+		dfm.updateLoc(new Location(mLocationManager.getBestProvider(c, true)));
 		
 	}
 	
 	
 
 	private void initDfm() {
-
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, -1);
 		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "");
-
-		if (projectInput.equals("-1")) {
-			setUpDFMWithAllFields();
-		} else {
-			dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-					mContext, f);
-			dfm.getOrder();
-
-			String fields = mPrefs.getString("accepted_fields", "");
-			getFieldsFromPrefsString(fields);
-			getEnabledFields();
-
-		}
+		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext, f);
 	}
 	
-	private void setUpDFMWithAllFields() {
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-		SharedPreferences.Editor mEdit = mPrefs.edit();
-		mEdit.putString(Setup.PROJECT_ID, "-1").commit();
-
-		dfm = new DataFieldManager(Integer.parseInt(mPrefs.getString(
-				Setup.PROJECT_ID, "-1")), api, mContext, f);
-		dfm.getOrder();
-
-		dfm.enableAllFields();
-
-		String acceptedFields = getResources().getString(R.string.time) + ","
-				+ getResources().getString(R.string.accel_x) + ","
-				+ getResources().getString(R.string.accel_y) + ","
-				+ getResources().getString(R.string.accel_z) + ","
-				+ getResources().getString(R.string.accel_total) + ","
-				+ getResources().getString(R.string.latitude) + ","
-				+ getResources().getString(R.string.longitude) + ","
-				+ getResources().getString(R.string.magnetic_x) + ","
-				+ getResources().getString(R.string.magnetic_y) + ","
-				+ getResources().getString(R.string.magnetic_z) + ","
-				+ getResources().getString(R.string.magnetic_total) + ","
-				+ getResources().getString(R.string.heading_deg) + ","
-				+ getResources().getString(R.string.heading_rad) + ","
-				+ getResources().getString(R.string.temperature_c) + ","
-				+ getResources().getString(R.string.pressure) + ","
-				+ getResources().getString(R.string.altitude) + ","
-				+ getResources().getString(R.string.luminous_flux) + ","
-				+ getResources().getString(R.string.temperature_f) + ","
-				+ getResources().getString(R.string.temperature_k);
-
-		mEdit.putString("accepted_fields", acceptedFields).commit();
-	}
-
-	// (currently 2 of these methods exist - one also in step1setup)
-		private void getEnabledFields() {
-			try {
-				for (String s : acceptedFields) {
-					if (s.length() != 0)
-						break;
-				}
-			} catch (NullPointerException e) {
-				SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
-				String fields = mPrefs.getString("accepted_fields", "");
-				getFieldsFromPrefsString(fields);
-			}
-
-			for (String s : acceptedFields) {
-				if (s.equals(getString(R.string.time)))
-					dfm.enabledFields[Fields.TIME] = true;
-
-				else if (s.equals(getString(R.string.accel_x)))
-					dfm.enabledFields[Fields.ACCEL_X] = true;
-
-				else if (s.equals(getString(R.string.accel_y)))
-					dfm.enabledFields[Fields.ACCEL_Y] = true;
-
-				else if (s.equals(getString(R.string.accel_z)))
-					dfm.enabledFields[Fields.ACCEL_Z] = true;
-
-				else if (s.equals(getString(R.string.accel_total)))
-					dfm.enabledFields[Fields.ACCEL_TOTAL] = true;
-
-				else if (s.equals(getString(R.string.latitude)))
-					dfm.enabledFields[Fields.LATITUDE] = true;
-
-				else if (s.equals(getString(R.string.longitude)))
-					dfm.enabledFields[Fields.LONGITUDE] = true;
-
-				else if (s.equals(getString(R.string.magnetic_x)))
-					dfm.enabledFields[Fields.MAG_X] = true;
-
-				else if (s.equals(getString(R.string.magnetic_y)))
-					dfm.enabledFields[Fields.MAG_Y] = true;
-
-				else if (s.equals(getString(R.string.magnetic_z)))
-					dfm.enabledFields[Fields.MAG_Z] = true;
-
-				else if (s.equals(getString(R.string.magnetic_total)))
-					dfm.enabledFields[Fields.MAG_TOTAL] = true;
-
-				else if (s.equals(getString(R.string.heading_deg)))
-					dfm.enabledFields[Fields.HEADING_DEG] = true;
-
-				else if (s.equals(getString(R.string.heading_rad)))
-					dfm.enabledFields[Fields.HEADING_RAD] = true;
-
-				else if (s.equals(getString(R.string.temperature_c)))
-					dfm.enabledFields[Fields.TEMPERATURE_C] = true;
-
-				else if (s.equals(getString(R.string.temperature_f)))
-					dfm.enabledFields[Fields.TEMPERATURE_F] = true;
-
-				else if (s.equals(getString(R.string.temperature_k)))
-					dfm.enabledFields[Fields.TEMPERATURE_K] = true;
-
-				else if (s.equals(getString(R.string.pressure)))
-					dfm.enabledFields[Fields.PRESSURE] = true;
-
-				else if (s.equals(getString(R.string.altitude)))
-					dfm.enabledFields[Fields.ALTITUDE] = true;
-
-				else if (s.equals(getString(R.string.luminous_flux)))
-					dfm.enabledFields[Fields.LIGHT] = true;
-
-			}
-		}
-
-		private void getFieldsFromPrefsString(String fieldList) {
-
-			String[] fields = fieldList.split(",");
-			acceptedFields = new LinkedList<String>();
-
-			for (String f : fields) {
-				acceptedFields.add(f);
-			}
-		}
+	
+		
 	
 
 	/**
@@ -1134,56 +938,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	@SuppressLint("InlinedApi")
 	private void registerSensors() {
 		if (mSensorManager != null && setupDone && dfm != null) {
-
-			if (dfm.enabledFields[Fields.ACCEL_X]
-					|| dfm.enabledFields[Fields.ACCEL_Y]
-					|| dfm.enabledFields[Fields.ACCEL_Z]
-					|| dfm.enabledFields[Fields.ACCEL_TOTAL]) {
-				mSensorManager.registerListener(AmusementPark.this,
-						mSensorManager
-								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-						SensorManager.SENSOR_DELAY_FASTEST);
-			}
-
-			if (dfm.enabledFields[Fields.MAG_X]
-					|| dfm.enabledFields[Fields.MAG_Y]
-					|| dfm.enabledFields[Fields.MAG_Z]
-					|| dfm.enabledFields[Fields.MAG_TOTAL]
-					|| dfm.enabledFields[Fields.HEADING_DEG]
-					|| dfm.enabledFields[Fields.HEADING_RAD]) {
-				mSensorManager.registerListener(AmusementPark.this,
-						mSensorManager
-								.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-						SensorManager.SENSOR_DELAY_FASTEST);
-			}
-
-			if (dfm.enabledFields[Fields.TEMPERATURE_C]
-					|| dfm.enabledFields[Fields.TEMPERATURE_F]
-					|| dfm.enabledFields[Fields.TEMPERATURE_K]
-					|| dfm.enabledFields[Fields.ALTITUDE]) {
-				if (getApiLevel() >= 14) {
-					mSensorManager
-							.registerListener(
-									AmusementPark.this,
-									mSensorManager
-											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
-									SensorManager.SENSOR_DELAY_FASTEST);
-				}
-			}
-
-			if (dfm.enabledFields[Fields.PRESSURE]
-					|| dfm.enabledFields[Fields.ALTITUDE]) {
-				mSensorManager.registerListener(AmusementPark.this,
-						mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
-						SensorManager.SENSOR_DELAY_FASTEST);
-			}
-
-			if (dfm.enabledFields[Fields.LIGHT]) {
-				mSensorManager.registerListener(AmusementPark.this,
-						mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-						SensorManager.SENSOR_DELAY_FASTEST);
-			}
-
+			dfm.registerSensors(mSensorManager, AmusementPark.this);
 		}
 	}
 
@@ -1192,62 +947,8 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	 */
 	private void recordData() {
 		 dataPointCount++;
-         DecimalFormat toThou = new DecimalFormat("######0.000");
-
-         if (dfm.enabledFields[Fields.ACCEL_X])
-                 f.accel_x = toThou.format(accel[0]);
-         if (dfm.enabledFields[Fields.ACCEL_Y])
-                 f.accel_y = toThou.format(accel[1]);
-         if (dfm.enabledFields[Fields.ACCEL_Z])
-                 f.accel_z = toThou.format(accel[2]);
-         if (dfm.enabledFields[Fields.ACCEL_TOTAL])
-                 f.accel_total = toThou.format(accel[3]);
-         if (dfm.enabledFields[Fields.LATITUDE])
-                 f.latitude = loc.getLatitude();
-         if (dfm.enabledFields[Fields.LONGITUDE])
-                 f.longitude = loc.getLongitude();
-         if (dfm.enabledFields[Fields.HEADING_DEG])
- 				 f.angle_deg = toThou.format(orientation[0]);
-         if (dfm.enabledFields[Fields.HEADING_RAD])
-        	 if (!f.angle_deg.equals(""))
- 				f.angle_rad = toThou
- 						.format((Double.parseDouble(f.angle_deg) * (Math.PI / 180)));
- 			else
- 				f.angle_rad = "";
-         if (dfm.enabledFields[Fields.MAG_X])
-                 f.mag_x = "" + mag[0];
-         if (dfm.enabledFields[Fields.MAG_Y])
-                 f.mag_y = "" + mag[1];
-         if (dfm.enabledFields[Fields.MAG_Z])
-                 f.mag_z = "" + mag[2];
-         if (dfm.enabledFields[Fields.MAG_TOTAL])
-                 f.mag_total = "" + Math.sqrt(Math.pow(Double.parseDouble(f.mag_x), 2)
-		                                 + Math.pow(Double.parseDouble(f.mag_y), 2)
-		                                 + Math.pow(Double.parseDouble(f.mag_z), 2));
-         if (dfm.enabledFields[Fields.TIME])
-                 f.timeMillis = System.currentTimeMillis();         
-         if (dfm.enabledFields[Fields.TEMPERATURE_C])
-                 f.temperature_c = temperature;
-         if (dfm.enabledFields[Fields.TEMPERATURE_F])
-                 if (temperature.equals(""))
-                         f.temperature_f = temperature;
-                 else
-                         f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
-         if (dfm.enabledFields[Fields.TEMPERATURE_K])
-                 if (temperature.equals(""))
-                         f.temperature_k = temperature;
-                 else
-                         f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
-         if (dfm.enabledFields[Fields.PRESSURE])
-                 f.pressure = pressure;
-         if (dfm.enabledFields[Fields.ALTITUDE])
-                 f.altitude = "" + loc.getAltitude();
-         if (dfm.enabledFields[Fields.LIGHT])
-                 f.lux = light;
-
+         dfm.recordData();
          dataSet.put(dfm.putData());
-         dataToBeWrittenToFile = dfm.writeSdCardLine();
-
 	}
 
 }

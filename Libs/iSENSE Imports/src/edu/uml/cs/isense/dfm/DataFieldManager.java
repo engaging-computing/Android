@@ -110,7 +110,7 @@ public class DataFieldManager extends Application {
 		this.f = f;
 		
 		if (projID == -1) {
-			setUpDFMWithAllFields(mContext);
+			setUpDFMWithAllSensorFields(mContext);
 		} else {
 			//TODO setup dfm with needed fields
 		}
@@ -810,6 +810,9 @@ public class DataFieldManager extends Application {
 
 	}
 
+	/**
+	 * 
+	 */
 	private void getProjectFieldOrder() {
 		this.order = new LinkedList<String>();
 		this.realOrder = new LinkedList<String>();
@@ -925,9 +928,7 @@ public class DataFieldManager extends Application {
 				break;
 
 			}
-
 		}
-
 	}
 
 	/**
@@ -1100,7 +1101,7 @@ public class DataFieldManager extends Application {
 	/**
 	 * Enables all fields for recording data
 	 */
-	public void enableAllFields() {
+	public void enableAllSensorFields() {
 		enabledFields[Fields.TIME] = true;
 		enabledFields[Fields.ACCEL_X] = true;
 		enabledFields[Fields.ACCEL_Y] = true;
@@ -1129,7 +1130,7 @@ public class DataFieldManager extends Application {
 	 *            LinkedList of field strings
 	 */
 	public void setEnabledFields(LinkedList<String> acceptedFields) {
-
+		//Can't use switch on strings below java 1.7, Android uses 1.6 :(
 		for (String s : acceptedFields) {
 			if (s.equals(getString(R.string.time)))
 				enabledFields[Fields.TIME] = true;
@@ -1372,14 +1373,14 @@ public class DataFieldManager extends Application {
         dataSet.put(putData());
 	}
 	
-	public void setUpDFMWithAllFields(Context appContext) {
+	public void setUpDFMWithAllSensorFields(Context appContext) {
 		SharedPreferences mPrefs = appContext.getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 		SharedPreferences.Editor mEdit = mPrefs.edit();
 		mEdit.putString(Setup.PROJECT_ID, "-1").commit();
 		
 		getOrder();
 
-		enableAllFields();
+		enableAllSensorFields();
 
 		String acceptedFields = appContext.getResources().getString(R.string.time) + ","
 				+ appContext.getResources().getString(R.string.accel_x) + ","

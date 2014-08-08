@@ -32,7 +32,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -58,13 +57,10 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.uml.cs.isense.carphysicsv2.dialogs.About;
-import edu.uml.cs.isense.carphysicsv2.dialogs.ContributorKeyDialog;
 import edu.uml.cs.isense.carphysicsv2.dialogs.Help;
 import edu.uml.cs.isense.comm.API;
-import edu.uml.cs.isense.comm.Connection;
 import edu.uml.cs.isense.comm.uploadInfo;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
@@ -128,7 +124,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	private static final int ALTER_DATA_PROJ_REQUESTED = 6698;
 
 	private boolean timeHasElapsed = false;
-	private boolean usedHomeButton = false;
 
 	private MediaPlayer mMediaPlayer;
 
@@ -181,11 +176,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	/* Make sure url is updated when useDev is set. */
 	void setUseDev(boolean useDev) {
 		api.useDev(useDev);
-		if (useDev) {
-			baseDataSetUrl = VIS_URL_DEV;
-		} else {
-			baseDataSetUrl = VIS_URL_PROD;
-		}
 	}
 
 	@SuppressLint("NewApi")
@@ -245,19 +235,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			}
 		}
 
-		SharedPreferences prefs2 = getSharedPreferences("PROJID", 0);
-		projectNumber = prefs2.getString("project_id", null);
-		if (projectNumber == null) {
-			projectNumber = DEFAULT_PROJ;
-		}
-
-		if (!Connection.hasConnectivity(mContext)) {
-			projectNumber = "-1";
-		}
-
-		dfm = new DataFieldManager(Integer.parseInt(projectNumber), api,
-				mContext, f);
-		dfm.getOrder();
+		initDfm();
 
 		new DecimalFormat("#,##0.0");
 
@@ -265,16 +243,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 			@Override
 			public boolean onLongClick(View arg0) {
-				 
-				SharedPreferences prefs = getSharedPreferences("PROJID", 0);
-				projectNumber = prefs.getString("project_id", "-1");
 
-                if (projectNumber.equals("-1")) {
-                    setUpNoProject();
-                }
-
-				//if (!projectNumber.equals("-1")) {
-					mMediaPlayer.setLooping(false);
+				mMediaPlayer.setLooping(false);
 					mMediaPlayer.start();
 	
 					if (running) {
@@ -307,30 +277,12 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 								w.make("There are no data to upload!", Waffle.LENGTH_LONG,
 										Waffle.IMAGE_X);
 								OrientationManager.enableRotation(CarRampPhysicsV2.this);
+							} else {
+								String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+								nameOfDataSet = firstName + " " + lastInitial;			
+								uq.addToQueue(nameOfDataSet, currentDateTimeString, QDataSet.Type.DATA, dataSet, null, projectNumber, null);
 							}
-							else{
-								new AddToQueueTask().execute(); 
 
-								
-							}
-						} else if (usedHomeButton) {
-							setupDone = false;
-							timeHasElapsed = false;
-							useMenu = true;
-							countdown = length;
-	
-							running = false;
-							startStop.setText("Hold to Start");
-	
-							timeTimer.cancel();
-							choiceViaMenu = false;
-	
-							startStop.setEnabled(true);
-							startStop
-									.setBackgroundResource(R.drawable.button_rsense);
-	
-						}
-	
 					} else {
 	
 						OrientationManager.disableRotation(CarRampPhysicsV2.this);
@@ -347,21 +299,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 						len2 = 0;
 						i = 0;
 						currentTime = getUploadTime(0);
-	
-						setEnabledFields();
-	
-//						if (saveMode) {
-//							dfm.getOrder();
-//						}
+						
+						dfm.setUpDFMWithAllSensorFields(mContext);
 
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							w.make("Data recording has offset 100 milliseconds due to an error.",
-									Waffle.LENGTH_SHORT);
-							e.printStackTrace();
-						}
-	
 						useMenu = false;
 	
 						SharedPreferences prefs2 = getSharedPreferences(
@@ -387,83 +327,12 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 						running = true;
 						startStop.setText("" + countdown);
 	
-						timeTimer = new Timer();
-						timeTimer.scheduleAtFixedRate(new TimerTask() {
-	
-							public void run() {
-	
-								elapsedMillis += INTERVAL;
-	
-								if (i >= (length * (1000 / INTERVAL))) {
-	
-									timeTimer.cancel();
-									timeHasElapsed = true;
-	
-									mHandler.post(new Runnable() {
-										@Override
-										public void run() {
-											startStop.performLongClick();
-										}
-									});
-	
-								} else {
-	
-									i++;
-									len++;
-									len2++;
-	
-									if (i % (1000 / INTERVAL) == 0) {
-										mHandler.post(new Runnable() {
-											@Override
-											public void run() {
-												startStop.setText("" + countdown);
-											}
-										});
-										countdown--;
-									}
-	
-									f.timeMillis = currentTime + elapsedMillis;
-	
-									if (dfm.getOrderList().contains(
-											mContext.getString(R.string.accel_x))) {
-										f.accel_x = toThou.format(accel[0]);
-									}
-									if (dfm.getOrderList().contains(
-											mContext.getString(R.string.accel_y))) {
-										f.accel_y = toThou.format(accel[1]);
-									}
-									if (dfm.getOrderList().contains(
-											mContext.getString(R.string.accel_z))) {
-										f.accel_z = toThou.format(accel[2]);
-									}
-									if (dfm.getOrderList()
-											.contains(
-													mContext.getString(R.string.accel_total))) {
-										f.accel_total = toThou.format(accel[3]);
-									}
-	
-									dataSet.put(dfm.putData());
-	
-								}
-	
-							}
-						}, 0, INTERVAL);
-	
-					}
-	
-					if (android.os.Build.VERSION.SDK_INT >= 11) {
-						CarRampPhysicsV2.this.invalidateOptionsMenu();
-					}
-	
-					return running;
-				
-	
-//				} else {
-//					w.make("No Project Selected",Waffle.LENGTH_LONG, Waffle.IMAGE_X);
-//					return timeHasElapsed;
-//				}
+
+				}
 			}
-		});
+					return running;
+		}
+	});
 
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -542,7 +411,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			// If the device isn't on Jelly Bean
 			on = ((ToggleButton) view).isChecked();
 		} else {
-			// the device is on Jelly Bean
+			// the device is on Jelly Bean or later
 			on = ((Switch) view).isChecked();
 		}
 
@@ -564,19 +433,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		editor.putBoolean("LINEAR_ACCEL", on);
 		editor.commit();
 
-	}
-
-	private void setEnabledFields() {
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_x)))
-			dfm.enabledFields[Fields.ACCEL_X] = true;
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_y)))
-			dfm.enabledFields[Fields.ACCEL_Y] = true;
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_z)))
-			dfm.enabledFields[Fields.ACCEL_Z] = true;
-		if (dfm.getOrderList().contains(
-				mContext.getString(R.string.accel_total)))
-			dfm.enabledFields[Fields.ACCEL_TOTAL] = true;
-		dfm.enabledFields[Fields.TIME] = true;
 	}
 
 	long getUploadTime(int millisecond) {
@@ -607,10 +463,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 	}
 
-	public void onUserLeaveHint() {
-		super.onUserLeaveHint();
-		usedHomeButton = true;
-	}
 
 	@Override
 	public void onStart() {
@@ -633,97 +485,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	@Override
 	public void onResume() {
 		super.onResume();
-		inPausedState = false;
-		getSharedPreferences(RECORD_SETTINGS, 0);
-
-		if (usedHomeButton && running) {
-			setupDone = false;
-			timeHasElapsed = false;
-			useMenu = true;
-			countdown = length;
-
-			running = false;
-			startStop.setText("Hold to Start");
-			startStop.setEnabled(true);
-			startStop.setBackgroundResource(R.drawable.button_rsense);
-
-			timeTimer.cancel();
-			choiceViaMenu = false;
-			startStop.setEnabled(true);
-			dataSet = new JSONArray();
-			OrientationManager.enableRotation(CarRampPhysicsV2.this);
-
-			menu.setGroupVisible(0, true);
-			useMenu = true;
-
-			w.make("Data recording halted.", Waffle.LENGTH_SHORT,
-					Waffle.IMAGE_X);
-		}
-
-		if (uq != null)
-			uq.buildQueueFromFile();
-
-		SharedPreferences prefs2 = getSharedPreferences("PROJID", 0);
-		projectNumber = prefs2.getString("project_id", null);
-		if (projectNumber == null) {
-				projectNumber = DEFAULT_PROJ;
-		}
-
-		if (!Connection.hasConnectivity(mContext)) {
-			projectNumber = "-1";
-		}
-
-		dfm = new DataFieldManager(Integer.parseInt(projectNumber), api,
-				mContext, f);
-		dfm.getOrder();
-
-		new DecimalFormat("#,##0.0");
-
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_x))) {
-			values.setText("X: ");
-		}
-
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_y))) {
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))) {
-				values.setText(values.getText() + " Y: ");
-			} else {
-				values.setText("Y: ");
-			}
-		}
-
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_z))) {
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))
-					|| dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_y))) {
-				values.setText(values.getText() + " Z: ");
-			} else {
-				values.setText("Z: ");
-			}
-
-		}
-
-		if (dfm.getOrderList().contains(
-				mContext.getString(R.string.accel_total))) {
-
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))
-					|| dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_y))
-					|| dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_z))) {
-				values.setText(values.getText() + " Magnitude: ");
-			} else {
-				values.setText("Magnitude: ");
-			}
-
-		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
 	}
 
 	@Override
@@ -810,16 +571,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				if (cdt != null)
 					cdt.cancel();
 
-				if (api.getCurrentUser() != null) {
-					Runnable r = new Runnable() {
-						public void run() {
-							api.deleteSession();
-							api.useDev(useDev);
-						}
-					};
-					new Thread(r).start();
-				} else
-					setUseDev(useDev);
+				setUseDev(useDev);
 
 				actionBarTapCount = 0;
 				break;
@@ -833,58 +585,27 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-
-		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-
-		if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION
-				|| event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-
-			accel[0] = event.values[0];
-			accel[1] = event.values[1];
-			accel[2] = event.values[2];
-			accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-					+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-			String xPrepend, yPrepend, zPrepend, data = "";
-
-			xPrepend = accel[0] > 0 ? "+" : "";
-			yPrepend = accel[1] > 0 ? "+" : "";
-			zPrepend = accel[2] > 0 ? "+" : "";
-
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))) {
-				data = "X: " + xPrepend + oneDigit.format(accel[0]);
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_y))) {
-				if (!data.equals("")) {
-					data += " , Y: " + yPrepend + oneDigit.format(accel[1]);
-				} else {
-					data += "Y: " + yPrepend + oneDigit.format(accel[1]);
-				}
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_z))) {
-				if (!data.equals("")) {
-					data += " , Z: " + zPrepend + oneDigit.format(accel[2]);
-				} else {
-					data += "Z: " + zPrepend + oneDigit.format(accel[2]);
-				}
-			}
-
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_total))) {
-
-				if (!data.equals("")) {
-					data += " , Magnitude: " + oneDigit.format(accel[3]);
-				} else {
-					data += "Magnitude: " + oneDigit.format(accel[3]);
-				}
-
-			}
-
-			values.setText(data);
-
+		if (dfm != null) {
+			dfm.updateValues(event);
+		} else {
+			Log.e("onSensorChanged ", "dfm is null");
 		}
+		if (running) {
+			if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
+				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+				
+			DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
+			String xPrepend = event.values[0] > 0 ? "+" : "";
+			String yPrepend = event.values[1] > 0 ? "+" : "";
+			String zPrepend = event.values[2] > 0 ? "+" : "";
+			
+			values.setText("Ax: " + xPrepend
+					+ oneDigit.format(event.values[0]) + " " + "m/s^2" + "\nAy: " + yPrepend
+					+ oneDigit.format(event.values[1]) + " " + "m/s^2" + "\nAz: " + zPrepend
+					+ oneDigit.format(event.values[2]) + " " + "m/s^2");
+			}
+		}
+
 	}
 
 	@Override
@@ -905,129 +626,22 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			if (resultCode == RESULT_OK) {
 				SharedPreferences prefs = getSharedPreferences("PROJID", 0);
 				projectNumber = prefs.getString("project_id", null);
+				
 				if (projectNumber == null) {
 					projectNumber = DEFAULT_PROJ;
 				}
-				dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-						api, mContext, f);
-				dfm.getOrder();
-
-				DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))) {
-					values.setText("X: " + oneDigit.format(accel[0]));
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_y))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))) {
-						values.setText(values.getText() + " Y: "
-								+ oneDigit.format(accel[1]));
-					} else {
-						values.setText("Y: " + oneDigit.format(accel[1]));
-					}
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_z))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))) {
-						values.setText(values.getText() + " Z: "
-								+ oneDigit.format(accel[2]));
-					} else {
-						values.setText("Z: " + oneDigit.format(accel[2]));
-					}
-
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_total))) {
-					accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-							+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_z))) {
-						values.setText(values.getText() + " Magnitude: "
-								+ oneDigit.format(accel[3]));
-					} else {
-						values.setText("Magnitude: "
-								+ oneDigit.format(accel[3]));
-					}
-
-				}
+				
+				dfm.setProjID(Integer.parseInt(projectNumber));
 			}
 
 		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
 			uq.buildQueueFromFile();
 
-		} /*else if (reqCode == UPLOAD_OK_REQUESTED) {
-				if (len == 0 || len2 == 0) {
-					w.make("There are no data to upload!", Waffle.LENGTH_LONG,
-							Waffle.IMAGE_X);
-					OrientationManager.enableRotation(CarRampPhysicsV2.this);
-				}
-
-				else
-					new UploadTask().execute();
-			 
-		}*/ else if (reqCode == LOGIN_STATUS_REQUESTED) {
+		} else if (reqCode == LOGIN_STATUS_REQUESTED) {
 			if (resultCode == RESULT_OK) {
 
 			}
 
-			dfm = new DataFieldManager(Integer.parseInt(projectNumber), api,
-					mContext, f);
-			dfm.getOrder();
-			DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))) {
-				values.setText("X: " + oneDigit.format(accel[0]));
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_y))) {
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))) {
-					values.setText(values.getText() + " Y: "
-							+ oneDigit.format(accel[1]));
-				} else {
-					values.setText("Y: " + oneDigit.format(accel[1]));
-				}
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_z))) {
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))
-						|| dfm.getOrderList().contains(
-								mContext.getString(R.string.accel_y))) {
-					values.setText(values.getText() + " Z: "
-							+ oneDigit.format(accel[2]));
-				} else {
-					values.setText("Z: " + oneDigit.format(accel[2]));
-				}
-
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_total))) {
-				accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-						+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))
-						|| dfm.getOrderList().contains(
-								mContext.getString(R.string.accel_y))
-						|| dfm.getOrderList().contains(
-								mContext.getString(R.string.accel_z))) {
-					values.setText(values.getText() + " Magnitude: "
-							+ oneDigit.format(accel[3]));
-				} else {
-					values.setText("Magnitude: " + oneDigit.format(accel[3]));
-				}
-
-			}
 
 		} else if (reqCode == RECORDING_LENGTH_REQUESTED) {
 			if (resultCode == RESULT_OK) {
@@ -1090,57 +704,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				editor.commit();
 				INTERVAL = 50;
 
-				dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-						api, mContext, f);
-				dfm.getOrder();
-
-				DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))) {
-					values.setText("X: " + oneDigit.format(accel[0]));
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_y))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))) {
-						values.setText(values.getText() + " Y: "
-								+ oneDigit.format(accel[1]));
-					} else {
-						values.setText("Y: " + oneDigit.format(accel[1]));
-					}
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_z))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))) {
-						values.setText(values.getText() + " Z: "
-								+ oneDigit.format(accel[2]));
-					} else {
-						values.setText("Z: " + oneDigit.format(accel[2]));
-					}
-
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_total))) {
-					accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-							+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_z))) {
-						values.setText(values.getText() + " Magnitude: "
-								+ oneDigit.format(accel[3]));
-					} else {
-						values.setText("Magnitude: "
-								+ oneDigit.format(accel[3]));
-					}
-
-				}
+				dfm.setUpDFMWithAllSensorFields(mContext);
 				
 				Intent iEnterName = new Intent(mContext, EnterName.class);
 				SharedPreferences classPrefs = getSharedPreferences(
@@ -1151,6 +715,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				startActivityForResult(iEnterName, RESULT_GOT_NAME);
 
 			}
+			
 		} else if (reqCode == FIELD_MATCHING_REQUESTED) {
             if (resultCode == RESULT_OK) {
                 if (FieldMatching.acceptedFields.isEmpty()) {
@@ -1167,99 +732,11 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
                 iProj.putExtra("from_where", "main");
                 startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
             }
-//		} else if (reqCode == SAVE_MODE_REQUESTED) {
-//			if (resultCode == RESULT_OK) {
-//				saveMode = true;
-//
-//				CarRampPhysicsV2.projectNumber = "-1";
-//				dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-//						api, mContext, f);
-//				dfm.getOrder();
-//				DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_x))) {
-//					values.setText("X: " + oneDigit.format(accel[0]));
-//				}
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_y))) {
-//					if (dfm.getOrderList().contains(
-//							mContext.getString(R.string.accel_x))) {
-//						values.setText(values.getText() + " Y: "
-//						values.setText(values.getText() + " Y: "
-//								+ oneDigit.format(accel[1]));
-//					} else {
-//						values.setText("Y: " + oneDigit.format(accel[1]));
-//					}
-//				}
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_z))) {
-//					if (dfm.getOrderList().contains(
-//							mContext.getString(R.string.accel_x))
-//							|| dfm.getOrderList().contains(
-//									mContext.getString(R.string.accel_y))) {
-//						values.setText(values.getText() + " Z: "
-//								+ oneDigit.format(accel[2]));
-//					} else {
-//						values.setText("Z: " + oneDigit.format(accel[2]));
-//					}
-//
-//				}
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_total))) {
-//					accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-//							+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-//
-//					if (dfm.getOrderList().contains(
-//							mContext.getString(R.string.accel_x))
-//							|| dfm.getOrderList().contains(
-//									mContext.getString(R.string.accel_y))
-//							|| dfm.getOrderList().contains(
-//									mContext.getString(R.string.accel_z))) {
-//						values.setText(values.getText() + " Magnitude: "
-//								+ oneDigit.format(accel[3]));
-//					} else {
-//						values.setText("Magnitude: "
-//								+ oneDigit.format(accel[3]));
-//					}
-//
-//				}
-//			} else {
-//				if (!Connection.hasConnectivity(mContext)) {
-//					startActivityForResult(new Intent(mContext,
-//							SaveModeDialog.class), SAVE_MODE_REQUESTED);
-//				} else {
-//					saveMode = false;
-//				}
-//			}
+
         }
 	}
 
-	private Runnable uploader = new Runnable() {
-
-		@SuppressLint("NewApi")
-		@Override
-		public void run() {
-
-			int dataSetID = -1;
-			
-			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
-
-			nameOfDataSet = firstName + " " + lastInitial;
-		
-			uploadSuccessful = false;
-			QDataSet ds = new QDataSet(nameOfDataSet + " Gravity: " + ((switchGravity.isChecked()) ? "Included" : "Not Included"),
-                    currentDateTimeString,
-					QDataSet.Type.DATA, dataSet.toString(), null,
-					projectNumber, null);
-
-			CarRampPhysicsV2.uq.addDataSetToQueue(ds);
-				
-			return;
-
-		}
-
-	};
+	
 	public boolean uploadSuccessful;
 
 	/**
@@ -1323,98 +800,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		return dataSetID;
 	}
 
-	public class UploadTask extends AsyncTask<Void, Integer, Void> {
 
-		@Override
-		protected void onPreExecute() {
-
-			dia = new ProgressDialog(mContext);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setCancelable(false);
-			dia.show();
-
-		}
-
-		@Override
-		protected Void doInBackground(Void... voids) {
-
-			uploader.run();
-			publishProgress(100);
-			return null;
-
-		}
-
-		@Override
-		protected void onPostExecute(Void voids) {
-
-			dia.setMessage("Done");
-			if (dia != null && dia.isShowing())
-				dia.dismiss();
-
-			len = 0;
-			len2 = 0;
-
-			if (uploadSuccessful) {
-				w.make("Data upload successful.", Waffle.LENGTH_SHORT,
-						Waffle.IMAGE_CHECK);
-			} else {
-				if (api.getCurrentUser() != null) {
-					w.make("Data saved.", Waffle.LENGTH_LONG, Waffle.IMAGE_CHECK);
-				} else {
-					Intent i = new Intent(mContext, ContributorKeyDialog.class);
-					i.putExtra("ID", Integer.parseInt(CarRampPhysicsV2.projectNumber));
-					i.putExtra("data", CarRampPhysicsV2.dataToUpload.toString());
-					i.putExtra("name", nameOfDataSet);
-					startActivity(i);
-				}
-			}
-
-			OrientationManager.enableRotation(CarRampPhysicsV2.this);
-
-		}
-	}
-	
-	/**
-	 * Uploads data to iSENSE or something.
-	 * 
-	 * @author jpoulin
-	 */
-	private class AddToQueueTask extends AsyncTask<String, Void, String> {
-
-		ProgressDialog dia;
-
-		@Override
-		protected void onPreExecute() {
-
-			dia = new ProgressDialog(CarRampPhysicsV2.this);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setMessage("Please wait while your data and media saved to Queue");
-			dia.setCancelable(false);
-			dia.show();
-
-		}
-		
-		@Override
-		protected String doInBackground(String... strings) {
-			uploader.run();
-			return null; //strings[0];
-		}
-
-		@Override
-		protected void onPostExecute(String sdFileName) {
-
-			dia.setMessage("Done");
-			dia.dismiss();
-			
-			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
-					Waffle.IMAGE_CHECK);
-			manageUploadQueue();
-			
-
-			Date date = new Date();
-
-		}
-	}
 
 
 
@@ -1431,13 +817,11 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	}
 
 	public void createMessageDialog(String title, String message, int reqCode) {
-
 		Intent i = new Intent(mContext, MessageDialogTemplate.class);
 		i.putExtra("title", title);
 		i.putExtra("message", message);
 
 		startActivityForResult(i, reqCode);
-
 	}
 
 	public void createSingleInputDialog(String title, String message,
@@ -1451,63 +835,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 	}
 
-    /**
-     *
-     */
-    private void setUpNoProject() {
-        CarRampPhysicsV2.projectNumber = "-1";
-        dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-                api, mContext, f);
-        dfm.getOrder();
-        DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_x))) {
-            values.setText("X: " + oneDigit.format(accel[0]));
-        }
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_y))) {
-            if (dfm.getOrderList().contains(
-                    mContext.getString(R.string.accel_x))) {
-                values.setText(values.getText() + " Y: "
-                        + oneDigit.format(accel[1]));
-            } else {
-                values.setText("Y: " + oneDigit.format(accel[1]));
-            }
-        }
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_z))) {
-            if (dfm.getOrderList().contains(
-                    mContext.getString(R.string.accel_x))
-                    || dfm.getOrderList().contains(
-                            mContext.getString(R.string.accel_y))) {
-                values.setText(values.getText() + " Z: "
-                        + oneDigit.format(accel[2]));
-            } else {
-                values.setText("Z: " + oneDigit.format(accel[2]));
-            }
-
-        }
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_total))) {
-            accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-                    + Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-            if (dfm.getOrderList().contains(
-                    mContext.getString(R.string.accel_x))
-                    || dfm.getOrderList().contains(
-                            mContext.getString(R.string.accel_y))
-                    || dfm.getOrderList().contains(
-                            mContext.getString(R.string.accel_z))) {
-                values.setText(values.getText() + " Magnitude: "
-                        + oneDigit.format(accel[3]));
-            } else {
-                values.setText("Magnitude: "
-                        + oneDigit.format(accel[3]));
-            }
-
-        }
-
-    }
 
 	@Override
 	public void onProviderDisabled(String arg0) {
@@ -1524,5 +851,17 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
 	}
+	
+	
+/**
+ * Initialize DataFieldManager Object
+ */
+	private void initDfm() {
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
+		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext, f);
+		dfm.enableAllSensorFields();
+	}
+	
 
 }

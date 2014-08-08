@@ -167,7 +167,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		initVars();
 		
 		//setupDataFieldManager with all fields
-		dfm.setUpDFMWithAllFields(mContext);
+		dfm.setUpDFMWithAllSensorFields(mContext);
 		
 		// Main Layout Button for Recording Data
 		startStop.setOnLongClickListener(new OnLongClickListener() {
@@ -250,7 +250,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 						// (projectNum is -1) enable all fields for recording.
 						
 						if (projectNum == -1) {
-							dfm.setUpDFMWithAllFields(mContext);
+							dfm.setUpDFMWithAllSensorFields(mContext);
 						}
 
 						// Create a file so that we can write results to the
@@ -468,11 +468,8 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		}
 	}
 	
-	
-	
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
-		
 	}
 
 	/**
@@ -710,7 +707,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
 		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext, f);
-		dfm.enableAllFields();
+		dfm.enableAllSensorFields();
 	}
 	
 	

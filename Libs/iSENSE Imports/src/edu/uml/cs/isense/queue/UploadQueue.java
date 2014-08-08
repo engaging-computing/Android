@@ -12,10 +12,17 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.json.JSONArray;
+
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Environment;
 import edu.uml.cs.isense.comm.API;
+import edu.uml.cs.isense.queue.QDataSet.Type;
+import edu.uml.cs.isense.waffle.Waffle;
 
 /**
  * Class that represents the queue of data sets.  This object
@@ -38,6 +45,7 @@ public class UploadQueue implements Serializable {
 	private static String parentName;
 	private static Context mContext;
 	private static API api;
+	private QDataSet ds = null;
 
 	/**
 	 * This is the constructor for an UploadQueue object.
@@ -296,5 +304,73 @@ public class UploadQueue implements Serializable {
 	public int queueSize() {
 		return (queue.size());
 	}
+	
+	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields) {	
+		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields);
+		
+		//Add data to Queue to be uploaded
+		new AddToQueueTask().execute(); 
+	}
+	
+	/**
+	 * Saves Data to upload Queue
+	 * 
+	 * @author jpoulin
+	 * moved to UploadQueue - BDonald
+	 */
+	class AddToQueueTask extends AsyncTask<String, Void, String> {
+
+		ProgressDialog dia;
+
+		@Override
+		protected void onPreExecute() {
+
+			dia = new ProgressDialog(mContext);
+			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			dia.setMessage("Please wait while your data and media saved to Queue");
+			dia.setCancelable(false);
+			dia.show();
+
+		}
+		
+		@Override
+		protected String doInBackground(String... strings) {
+			uploader.run();
+			return null; //strings[0];
+		}
+
+		@Override
+		protected void onPostExecute(String sdFileName) {
+
+			dia.setMessage("Done");
+			dia.dismiss();
+			Waffle w = new Waffle(mContext);
+			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
+					Waffle.IMAGE_CHECK);
+			
+			Intent i = new Intent().setClass(mContext, QueueLayout.class);
+			i.putExtra(QueueLayout.PARENT_NAME, getParentName());
+			mContext.startActivity(i);
+			
+//			showUploadQueue();
+//
+//			Date date = new Date();
+//			showSummary(date, sdFileName);
+
+		}
+	}
+	
+	// Calls the api primitives for actual uploading
+		private Runnable uploader = new Runnable() {
+
+			@Override
+			public void run() {
+	
+				addDataSetToQueue(ds);
+			}
+
+		};
+
+	
 	
 }

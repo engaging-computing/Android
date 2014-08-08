@@ -1,5 +1,6 @@
 package edu.uml.cs.isense.dfm;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -20,6 +21,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
@@ -45,8 +48,6 @@ public class DataFieldManager extends Application {
 	private String light = "";
 	private Location loc;
 	
-	private LinkedList<String> acceptedFields;
-
 	private int projID;
 	private API api;
 	private Context mContext;
@@ -59,6 +60,10 @@ public class DataFieldManager extends Application {
 	private Fields f;
 
 	private String CSV_DELIMITER = "-:;_--:-;-;_::-;";
+	
+	public static JSONArray dataSet;
+	private Timer recordingTimer;
+	
 
 	/**
 	 * Boolean array of size 19 containing a list of fields enabled for
@@ -1058,8 +1063,9 @@ public class DataFieldManager extends Application {
 
 	}
 
-	/*
-	 * Checks if project contains a timestamp
+	/**
+	 * Checks if project contains timestamp
+	 * @return True if project has a timestamp. False if it does not.
 	 */
 
 	public boolean projectContainsTimeStamp() {
@@ -1074,10 +1080,10 @@ public class DataFieldManager extends Application {
 		return false;
 	}
 
-	/*
-	 * Checks if project contains a location (latitude and longitude)
+	/**
+	 * Checks to see if project uses location
+	 * @return True if project contains lat or long fields. False if it does not.
 	 */
-
 	public boolean projectContainsLocation() {
 		ArrayList<Integer> fields = this.getFieldTypes();
 
@@ -1199,17 +1205,23 @@ public class DataFieldManager extends Application {
 		return newData;
 	}
 	
-	public void updateLoc(Location l) {
-		loc = l;
+	/**
+	 * Called from apps on Location change method to update current location
+	 * @param location
+	 */
+	public void updateLoc(Location location) {
+		loc = location;
 	}
 	
+	
+	
+	/**
+	 * Called from onSensorChangedEvent to set the current values. 
+	 * @param event
+	 */
 	public void updateValues(SensorEvent event) {
 		DecimalFormat toThou = new DecimalFormat("######0.000");
-		//DecimalFormat threeDigit = new DecimalFormat("#,##0.000");
-		DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
 		
-		
-
 		if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
 				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
 			
@@ -1222,11 +1234,6 @@ public class DataFieldManager extends Application {
 				accel[0] = event.values[0];
 				accel[1] = event.values[1];
 				accel[2] = event.values[2];
-
-				String xPrepend = accel[0] > 0 ? "+" : "";
-				String yPrepend = accel[1] > 0 ? "+" : "";
-				String zPrepend = accel[2] > 0 ? "+" : "";
-
 				accel[3] = (float) Math.sqrt((float) ((Math.pow(accel[0], 2)
 						+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2))));
 
@@ -1269,7 +1276,42 @@ public class DataFieldManager extends Application {
 		}
 	}
 	
-	public void recordData() {
+	
+	
+	/**
+	 * Starts recording data into a JSONArray. 
+	 * To stop recording, the method stopRecording() should be called.
+	 * @param srate
+	 * @return void
+	 */
+	public void recordData(long srate) {
+		//Clears Data from last recording
+		dataSet = new JSONArray();
+		
+		recordingTimer = new Timer();
+		recordingTimer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				recordDataPoint();
+			}
+		}, srate, srate);
+	}
+	
+	
+	/**
+	 * Stops recording data and returns the data in the form of a JSONArray.
+	 * The JSONArray can be added to the uploadQueue or be uploaded directly to iSENSE.
+	 * @return JSONArray
+	 */
+	public JSONArray stopRecording() {
+		recordingTimer.cancel();
+		return dataSet;
+	}
+	
+	
+	/**
+	 * This adds the current data from the sensors to our dataSet. 
+	 */
+	private void recordDataPoint() {
 		DecimalFormat toThou = new DecimalFormat("######0.000");
 
         if (enabledFields[Fields.ACCEL_X])
@@ -1325,17 +1367,15 @@ public class DataFieldManager extends Application {
                 f.altitude = "" + loc.getAltitude();
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
-
+        
+        
+        dataSet.put(putData());
 	}
-	
 	
 	public void setUpDFMWithAllFields(Context appContext) {
 		SharedPreferences mPrefs = appContext.getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 		SharedPreferences.Editor mEdit = mPrefs.edit();
 		mEdit.putString(Setup.PROJECT_ID, "-1").commit();
-
-//		dfm = new DataFieldManager(Integer.parseInt(mPrefs.getString(
-//				Setup.PROJECT_ID, "-1")), api, mContext, f);
 		
 		getOrder();
 
@@ -1363,90 +1403,13 @@ public class DataFieldManager extends Application {
 
 		mEdit.putString("accepted_fields", acceptedFields).commit();
 	}
-
-	// (currently 2 of these methods exist - one also in step1setup)
-		private void getEnabledFields() {
-			try {
-				for (String s : acceptedFields) {
-					if (s.length() != 0)
-						break;
-				}
-			} catch (NullPointerException e) {
-				SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
-				String fields = mPrefs.getString("accepted_fields", "");
-				getFieldsFromPrefsString(fields);
-			}
-
-			for (String s : acceptedFields) {
-				if (s.equals(getString(R.string.time)))
-					enabledFields[Fields.TIME] = true;
-
-				else if (s.equals(getString(R.string.accel_x)))
-					enabledFields[Fields.ACCEL_X] = true;
-
-				else if (s.equals(getString(R.string.accel_y)))
-					enabledFields[Fields.ACCEL_Y] = true;
-
-				else if (s.equals(getString(R.string.accel_z)))
-					enabledFields[Fields.ACCEL_Z] = true;
-
-				else if (s.equals(getString(R.string.accel_total)))
-					enabledFields[Fields.ACCEL_TOTAL] = true;
-
-				else if (s.equals(getString(R.string.latitude)))
-					enabledFields[Fields.LATITUDE] = true;
-
-				else if (s.equals(getString(R.string.longitude)))
-					enabledFields[Fields.LONGITUDE] = true;
-
-				else if (s.equals(getString(R.string.magnetic_x)))
-					enabledFields[Fields.MAG_X] = true;
-
-				else if (s.equals(getString(R.string.magnetic_y)))
-					enabledFields[Fields.MAG_Y] = true;
-
-				else if (s.equals(getString(R.string.magnetic_z)))
-					enabledFields[Fields.MAG_Z] = true;
-
-				else if (s.equals(getString(R.string.magnetic_total)))
-					enabledFields[Fields.MAG_TOTAL] = true;
-
-				else if (s.equals(getString(R.string.heading_deg)))
-					enabledFields[Fields.HEADING_DEG] = true;
-
-				else if (s.equals(getString(R.string.heading_rad)))
-					enabledFields[Fields.HEADING_RAD] = true;
-
-				else if (s.equals(getString(R.string.temperature_c)))
-					enabledFields[Fields.TEMPERATURE_C] = true;
-
-				else if (s.equals(getString(R.string.temperature_f)))
-					enabledFields[Fields.TEMPERATURE_F] = true;
-
-				else if (s.equals(getString(R.string.temperature_k)))
-					enabledFields[Fields.TEMPERATURE_K] = true;
-
-				else if (s.equals(getString(R.string.pressure)))
-					enabledFields[Fields.PRESSURE] = true;
-
-				else if (s.equals(getString(R.string.altitude)))
-					enabledFields[Fields.ALTITUDE] = true;
-
-				else if (s.equals(getString(R.string.luminous_flux)))
-					enabledFields[Fields.LIGHT] = true;
-			}
-		}
-
-		private void getFieldsFromPrefsString(String fieldList) {
-
-			String[] fields = fieldList.split(",");
-			acceptedFields = new LinkedList<String>();
-
-			for (String f : fields) {
-				acceptedFields.add(f);
-			}
-		}
 		
+		/**
+		 * Called from an app to enable sensors based upon what the fields are of the project.
+		 * @param mSensorManager
+		 * @param appContext
+		 */
+		@SuppressLint("InlinedApi")
 		public void registerSensors(SensorManager mSensorManager, SensorEventListener appContext) {
 			if (enabledFields[Fields.ACCEL_X]
 					|| enabledFields[Fields.ACCEL_Y]

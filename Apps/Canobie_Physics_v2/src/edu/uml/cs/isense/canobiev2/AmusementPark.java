@@ -22,14 +22,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.json.JSONArray;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -66,7 +63,7 @@ import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.dfm.Fields;
 import edu.uml.cs.isense.proj.Setup;
-import edu.uml.cs.isense.queue.QDataSet;
+import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -97,7 +94,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	
 	/* Recording Constants */
 	private final int SAMPLE_INTERVAL = 200;
-	private final int DATA_POINT_LIMIT = 3000;
 	
 	/*Values obtained from Configuration*/
 	public static int projectNum = -1;
@@ -115,14 +111,12 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
 	private LocationManager mRoughLocManager;
-	private Timer recordingTimer;
 	public static UploadQueue uq;
 	private Vibrator vibrator;
 
 	/* Other Important Objects */
 	private LinkedList<String> acceptedFields;
 	private Fields f;
-//	private String dataToBeWrittenToFile;
 	private MediaPlayer mMediaPlayer;
 	private API api;
 	public static Context mContext;
@@ -138,16 +132,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	/* Recording Variables */
 	private long srate = SAMPLE_INTERVAL;
 	private boolean includeGravity = true;
-
-	/* Menu Items */
-	private final int MENU_ITEM_SETUP = 0;
-	private final int MENU_ITEM_LOGIN = 1;
-	private final int MENU_ITEM_UPLOAD = 2;
-	//private final int MENU_ITEM_TIME = 3;
-	//private final int MENU_ITEM_MEDIA = 4;
-	// TODO Rajia
-	private final int MENU_ITEM_ABOUT = 3;
-	private final int MENU_ITEM_HELP = 4;
 	
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
@@ -160,7 +144,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	private final int SETUP_REQUESTED = 5;
 	private final int LOGIN_REQUESTED = 6;
 	
-	private int dataPointCount = 0;
 	private int elapsedSecs;
 
 	/* Used with Sync Time */
@@ -183,7 +166,8 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		// Initialize everything you're going to need
 		initVars();
 		
-		enableAllFields();
+		//setupDataFieldManager with all fields
+		dfm.setUpDFMWithAllFields(mContext);
 		
 		// Main Layout Button for Recording Data
 		startStop.setOnLongClickListener(new OnLongClickListener() {
@@ -228,13 +212,21 @@ public class AmusementPark extends Activity implements SensorEventListener,
 						//enable gravity togglebutton
 						gravity.setEnabled(true);
 						
-						// Cancel the recording timer
-						recordingTimer.cancel();
+						/* Cancel the Recording and add to queue*/
+						dataSet = dfm.stopRecording();
+						int dataPointCount = dataSet.length();
 						
-						//Add data to Queue to be uploaded
-						new AddToQueueTask().execute(); 
+						SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+						String projId = mPrefs.getString(Setup.PROJECT_ID, "");
+						Date date = new Date();
 						
+						String name = dataName + rideNameString + " Gravity: " + ((includeGravity) ? "Included" : "Not Included");
+						String description = "Time: " + getNiceDateString(date) + "\n" + "Number of Data Points: " + dataPointCount;
+						Type type = Type.DATA;
 
+						uq.addToQueue(name, description, type, dataSet, null, projId, null);
+					
+						showSummary(date);
 						return isRunning;
 
 						// Start the recording
@@ -258,7 +250,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 						// (projectNum is -1) enable all fields for recording.
 						
 						if (projectNum == -1) {
-							enableAllFields();
+							dfm.setUpDFMWithAllFields(mContext);
 						}
 
 						// Create a file so that we can write results to the
@@ -268,68 +260,17 @@ public class AmusementPark extends Activity implements SensorEventListener,
 						//enable sensors needed
 						registerSensors();
 
-						dataSet = new JSONArray();
 						elapsedSecs = 0;
-						dataPointCount = 0;
 
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							w.make("Data recording interrupted! Time values may be inconsistent.",
-									Waffle.LENGTH_SHORT, Waffle.IMAGE_X);
-							e.printStackTrace();
-						}
-
-						if (mSensorManager != null) {
-							if (gravity.isChecked() == true) {
-								mSensorManager
-								.registerListener(
-										AmusementPark.this,
-										mSensorManager
-												.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-										SensorManager.SENSOR_DELAY_FASTEST);
-							} else {
-								mSensorManager
-								.registerListener(
-										AmusementPark.this,
-										mSensorManager
-												.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-										SensorManager.SENSOR_DELAY_FASTEST);
-							}
-							
-							mSensorManager
-									.registerListener(
-											AmusementPark.this,
-											mSensorManager
-													.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-											SensorManager.SENSOR_DELAY_FASTEST);
-						}
-
-//						dataToBeWrittenToFile = "Accel-X, Accel-Y, Accel-Z, Accel-Total, Mag-X, Mag-Y, Mag-Z, Mag-Total"
-//								+ "Latitude, Longitude, Time\n";
 						startStop.setText(getResources().getString(R.string.stopString));
 						startStop.setBackgroundResource(R.drawable.button_rsense_green);						
 						
 						new TimeElapsedTask().execute();
 						
 						initDfm();
-						//TODO clear data in dfm
-						recordingTimer = new Timer();
-						recordingTimer.scheduleAtFixedRate(new TimerTask() {
-							public void run() {
-								if(dataPointCount > DATA_POINT_LIMIT - 2) {
-									AmusementPark.this.runOnUiThread(new Runnable(){
-									    public void run(){
-											startStop.performLongClick();
-									    }
-									});
-								}
-								recordData();
-							}
-						}, srate, srate);
+						dfm.recordData(srate);
+						
 					}
-					
-					
 					
 					return isRunning;
 				}
@@ -465,10 +406,11 @@ public class AmusementPark extends Activity implements SensorEventListener,
 			Intent iSetup = new Intent(AmusementPark.this, Configuration.class);
 			startActivityForResult(iSetup, SETUP_REQUESTED);
 			return true;
-		//*************Rajia ******************	
+			
 		case R.id.MENU_ITEM_UPLOAD:
-			manageUploadQueue();
+			showUploadQueue();
 			return true;
+			
 		case R.id.MENU_ITEM_ABOUT:
 			// Shows the about dialog
 			startActivity(new Intent(this, About.class));
@@ -478,26 +420,12 @@ public class AmusementPark extends Activity implements SensorEventListener,
 			// Shows the about dialog
 			startActivity(new Intent(this, Help.class));
 			return true;
-		//***************************************	
 			
 		case R.id.MENU_ITEM_LOGIN:
 			startActivityForResult(new Intent(getApplicationContext(),
 					CredentialManager.class), LOGIN_REQUESTED);
 			return true;
-		
-//		case R.id.MENU_ITEM_TIME:
-//			startActivityForResult(new Intent(getApplicationContext(),
-//					SyncTime.class), SYNC_TIME_REQUESTED);
-//			return true;
-//		case R.id.MENU_ITEM_MEDIA:
-//			if ((!setupDone)) {
-//				w.make("You must setup before using Media Manager.",
-//						Waffle.LENGTH_LONG, Waffle.IMAGE_WARN);
-//			} else {
-//				Intent iMedia = new Intent(AmusementPark.this, MediaManager.class);
-//				startActivity(iMedia);
-//			}
-//			return true;
+			
 		case android.R.id.home:
 			CountDownTimer cdt = null;
 
@@ -512,9 +440,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 					}
 				}.start();
 			}
-
 			String other = (useDev) ? "production" : "dev";
-
 			switch (++actionBarTapCount) {
 			case 5:
 				w.make(getResources().getString(R.string.two_more_taps) + other
@@ -527,21 +453,14 @@ public class AmusementPark extends Activity implements SensorEventListener,
 			case 7:
 				w.make(getResources().getString(R.string.now_in_mode) + other
 						+ getResources().getString(R.string.mode_type));
-				useDev = !useDev;
-				
+				useDev = !useDev;				
 				api.useDev(useDev);
-
 				if (cdt != null)
 					cdt.cancel();
-
 				CredentialManager.login(this, api);
 				actionBarTapCount = 0;
-				
-				
-				
 				break;
 			}
-
 			return true;
 		
 		default:
@@ -553,6 +472,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
+		
 	}
 
 	/**
@@ -639,81 +559,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 			
 		}
 
-	}
-
-	// Assists with differentiating between displays for dialogues
-	private int getApiLevel() {
-		return android.os.Build.VERSION.SDK_INT;
-	}
-
-	// Calls the api primitives for actual uploading
-	private Runnable uploader = new Runnable() {
-
-		@Override
-		public void run() {
-
-			// Create name from time stamp
-			String name = dataName;
-
-			// Retrieve project id
-			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-			String projId = mPrefs.getString(Setup.PROJECT_ID, "");
-			
-			Log.e("DATASET", dataSet.toString());
-			
-			Date date = new Date();
-			
-			// Saves data to queue for later upload
-			QDataSet ds = new QDataSet(name + " Ride: " + rideNameString + " Gravity: " + ((includeGravity) ? "Included" : "Not Included"), "Time: " + getNiceDateString(date) 
-					+ "\n" + "Number of Data Points: " + dataPointCount, QDataSet.Type.DATA,
-					dataSet.toString(), null, projId, null);
-			
-			uq.addDataSetToQueue(ds);
-		}
-
-	};
-
-	/**
-	 * Uploads data to iSENSE or something.
-	 * 
-	 * @author jpoulin
-	 */
-	private class AddToQueueTask extends AsyncTask<String, Void, String> {
-
-		ProgressDialog dia;
-
-		@Override
-		protected void onPreExecute() {
-
-			dia = new ProgressDialog(AmusementPark.this);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setMessage("Please wait while your data and media saved to Queue");
-			dia.setCancelable(false);
-			dia.show();
-
-		}
-		
-		@Override
-		protected String doInBackground(String... strings) {
-			uploader.run();
-			return null; //strings[0];
-		}
-
-		@Override
-		protected void onPostExecute(String sdFileName) {
-
-			dia.setMessage("Done");
-			dia.dismiss();
-			
-			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
-					Waffle.IMAGE_CHECK);
-			manageUploadQueue();
-			
-
-			Date date = new Date();
-			showSummary(date, sdFileName);
-
-		}
 	}
 
 	/**
@@ -869,14 +714,11 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	}
 	
 	
-		
-	
-
 	/**
 	 * Prompts the user to upload the rest of their content
 	 * upon successful upload of data.
 	 */
-	private void manageUploadQueue() {
+	private void showUploadQueue() {
 		if (!uq.emptyQueue()) {
 			Intent i = new Intent().setClass(mContext, QueueLayout.class);
 			i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
@@ -927,14 +769,14 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	 * @param date Time of upload
 	 * @param sdFileName Name of the written csv
 	 */
-	private void showSummary(Date date, String sdFileName) {
+	private void showSummary(Date date) {
 		ElapsedTime time = new ElapsedTime(elapsedSecs);
 		
 		Intent iSummary = new Intent(mContext, Summary.class);
 		iSummary.putExtra("seconds", time.elapsedSeconds)
 				.putExtra("minutes", time.elapsedMinutes)
 				.putExtra("date", getNiceDateString(date))
-				.putExtra("points", "" + dataPointCount);
+				.putExtra("points", "" + dataSet.length());
 
 		startActivity(iSummary);
 
@@ -948,22 +790,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		if (mSensorManager != null && setupDone && dfm != null) {
 			dfm.registerSensors(mSensorManager, AmusementPark.this);
 		}
-	}
-
-	/**
-	 * Records a data point, puts it into the dataSet object, and writes it to a csv string.
-	 */
-	private void recordData() {
-		 dataPointCount++;
-         dfm.recordData();
-         dataSet.put(dfm.putData());
-	}
-	
-	/**
-	 * Set all dfm's fields to enabled. 
-	 */
-	private void enableAllFields() {
-		dfm.setUpDFMWithAllFields(mContext);
 	}
 
 }

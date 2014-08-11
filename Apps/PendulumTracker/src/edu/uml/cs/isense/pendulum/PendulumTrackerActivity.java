@@ -48,17 +48,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.Connection;
+import edu.uml.cs.isense.comm.uploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
-import edu.uml.cs.isense.credentials.CredentialManagerKey;
 import edu.uml.cs.isense.credentials.EnterName;
 import edu.uml.cs.isense.objects.RProjectField;
+import edu.uml.cs.isense.queue.QDataSet;
+import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
+import edu.uml.cs.isense.waffle.Waffle;
 
 public class PendulumTrackerActivity extends Activity implements
 // OnTouchListener, CvCameraViewListener2 {
 		OnLongClickListener, CvCameraViewListener2 {
 
 	private static final String TAG = "PendulumTracker::Activity";
+	
+	private Waffle w;
+
+	public static UploadQueue uq;
 
 	Paint paint;
 
@@ -67,29 +74,25 @@ public class PendulumTrackerActivity extends Activity implements
 	// iSENSE member variables
 	// use development site
 	Boolean useDevSite = false;
+	
 	// iSENSE uploader
 	API api;
-
+	
 	private TextView initInstr;
 
 	// create session name based upon first name and last initial user enters
 	static String firstName = "";
 	static String lastInitial = "";
-	public static final int ENTERNAME_REQUEST = 1098;
-	public static final int CREDENTIAL_KEY_REQUESTED  = 1099;
-	public static final int LOGIN_REQUESTED  = 2000;
-
+	private static final int ENTERNAME_REQUEST = 1098;
+	private static final int LOGIN_REQUESTED  = 2000;
+	private final int QUEUE_UPLOAD_REQUESTED = 2001;
+	
+	//Project fields pulled from project when user starts recording
 	
 	Boolean sessionNameEntered = false;
 
 	private static String experimentNumber = "29"; // production = 29, dev = 39
-	
-	private static String baseSessionUrl = "http://isenseproject.org/projects/"
-			+ experimentNumber + "data_sets/";
-	private static String baseSessionUrlDev = "http://rsense-dev.cs.uml.edu/projects/"
-			+ experimentNumber + "/data_sets/";
-	// private static String baseSessionUrlDev = "http://129.63.16.30/projects/"
-	private static String sessionUrl = "";
+		
 	private String dateString;
 
 	// upload progress dialogue
@@ -166,7 +169,19 @@ public class PendulumTrackerActivity extends Activity implements
 
 		// set context (for starting new Intents,etc)
 		mContext = this;
+		
+		// iSENSE network connectivity stuff
+		api = API.getInstance();
+		api.useDev(false);
+//		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
 
+		w = new Waffle(mContext); //Waffle is our version of android toast (message that pops up on screen)
+		
+		// Create a new upload queue
+		uq = new UploadQueue("PendulumTrackerActivity", mContext, api);
+		uq.buildQueueFromFile();
+
+		
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		// set CBD activity content from xml layout file.
 		// all Views, e.g. JavaCameraView will be inflated (e.g. created)
@@ -183,9 +198,7 @@ public class PendulumTrackerActivity extends Activity implements
 		// mOpenCvCameraView.setMaxFrameSize(640, 480); // debug!
 		mOpenCvCameraView.setMaxFrameSize(320, 240);
 
-		// iSENSE network connectivity stuff
-		api = API.getInstance();
-		api.useDev(useDevSite);
+		
 
 		// TextView for instruction overlay
 		initInstr = (TextView) findViewById(R.id.instructions);
@@ -194,18 +207,24 @@ public class PendulumTrackerActivity extends Activity implements
 		// set start and stop icons for data collections
 		startIcon = getResources().getDrawable(R.drawable.start_icon);
 		stopIcon = getResources().getDrawable(R.drawable.stop_icon);
-
-		startStopButton = (MenuItem) findViewById(R.id.menu_start);
-		//Menu menu = (Menu) findViewById(R.layout.menu);
-		//startStopButton = menu.getItem(R.id.menu_start);
 		
-		// TODO: add remembe-me login stuff here!
-		// Jeremy Note: Actually the remembering happens automagically
-		// in the API calls
+		//Loggin to api if info is saved in prefs
 		CredentialManager.login(mContext, api);
 		
+		//Pull fields from project that is selected
+//		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
+	
 		// Event handler
 		mHandler = new Handler();
+		
+		// Create session with first name/last initial
+		if (PendulumTrackerActivity.mSessionCreated == false) {
+			if (firstName.length() == 0 || lastInitial.length() == 0) {
+				// Boolean dontPromptMeTwice = true;
+				startActivityForResult(new Intent(mContext, EnterName.class), // used to be login activity
+						ENTERNAME_REQUEST);
+			}
+		}
 	}
 
 	@Override
@@ -221,6 +240,9 @@ public class PendulumTrackerActivity extends Activity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		if (uq != null)
+			uq.buildQueueFromFile();
 
 		Log.i(TAG, "Trying to load OpenCV library");
 		if (!OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_5, this,
@@ -257,83 +279,6 @@ public class PendulumTrackerActivity extends Activity implements
 
 	@Override
 	public boolean onLongClick(View v) {
-
-		// public boolean onTouch(View v, MotionEvent event) {
-
-		/*
-		if(this.mSessionCreated)
-		{
-	
-			if(!this.mDataCollectionEnabled)
-			{	
-				this.mDataCollectionEnabled = true;
-				Toast.makeText(PendulumTrackerActivity.this,
-						"STARTING Data Collection", Toast.LENGTH_SHORT).show();
-				
-				startStopButton.setVisible(false);
-			}
-			else if(this.mDataCollectionEnabled)
-			{	
-				this.mDataCollectionEnabled = false;
-				Toast.makeText(PendulumTrackerActivity.this,
-						"STOPPING Data Collection", Toast.LENGTH_SHORT).show();
-				
-				startStopButton.setVisible(true);
-			}
-		}
-		
-		*/
-		
-		/*
-		 * int cols = mRgba.cols(); int rows = mRgba.rows();
-		 * 
-		 * int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2; int yOffset
-		 * = (mOpenCvCameraView.getHeight() - rows) / 2;
-		 * 
-		 * int x = (int) event.getX() - xOffset; int y = (int) event.getY() -
-		 * yOffset;
-		 * 
-		 * Log.i(TAG, "Touch image coordinates: (" + x + ", " + y + ")");
-		 * 
-		 * if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
-		 * 
-		 * Rect touchedRect = new Rect();
-		 * 
-		 * touchedRect.x = (x > 4) ? x - 4 : 0; touchedRect.y = (y > 4) ? y - 4
-		 * : 0;
-		 * 
-		 * touchedRect.width = (x + 4 < cols) ? x + 4 - touchedRect.x : cols -
-		 * touchedRect.x; touchedRect.height = (y + 4 < rows) ? y + 4 -
-		 * touchedRect.y : rows - touchedRect.y;
-		 * 
-		 * Mat touchedRegionRgba = mRgba.submat(touchedRect);
-		 * 
-		 * Mat touchedRegionHsv = new Mat(); Imgproc.cvtColor(touchedRegionRgba,
-		 * touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
-		 * 
-		 * // Calculate average color of touched region mBlobColorHsv =
-		 * Core.sumElems(touchedRegionHsv); int pointCount = touchedRect.width *
-		 * touchedRect.height; for (int i = 0; i < mBlobColorHsv.val.length;
-		 * i++) mBlobColorHsv.val[i] /= pointCount;
-		 * 
-		 * mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
-		 * 
-		 * Log.i(TAG, "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " +
-		 * mBlobColorRgba.val[1] + ", " + mBlobColorRgba.val[2] + ", " +
-		 * mBlobColorRgba.val[3] + ")");
-		 * 
-		 * mDetector.setHsvColor(mBlobColorHsv);
-		 * 
-		 * Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE);
-		 * 
-		 * mIsColorSelected = true;
-		 * 
-		 * touchedRegionRgba.release(); touchedRegionHsv.release();
-		 * 
-		 * return false; // allows subsequent touch events
-		 */
-
-		// return true;
 		return false;
 	}
 
@@ -368,16 +313,19 @@ public class PendulumTrackerActivity extends Activity implements
 
 			if (mDataCollectionEnabled) {
 
-				this.addStatusOverlay(mRgba);
+				addStatusOverlay(mRgba);
 				// add data point to final data set
-
-				// yScale, -xScale
-				if (point.x != 0 && point.y != 0) {
-					// shift x-axis so center vertical axis is set to x=0 in
-					// pendulum coordinates
-					final int shiftX = (int) (mImgWidth / 2);
-					this.addDataPoint(point.x - shiftX, point.y);
-				}
+				
+				Point[] params = {point};
+				new RecordPointsTask().execute(params);
+				
+//				// yScale, -xScale
+//				if (point.x != 0 && point.y != 0) {
+//					// shift x-axis so center vertical axis is set to x=0 in
+//					// pendulum coordinates
+//					final int shiftX = (int) (mImgWidth / 2);
+//					this.addDataPoint(point.x - shiftX, point.y);
+//				}
 
 				// Make TextView disappear
 				mHandler.post(new Runnable() {
@@ -399,7 +347,6 @@ public class PendulumTrackerActivity extends Activity implements
 			}
 
 			// TODO: fix flipping of y-axis
-			Log.i(TAG, "(x,y) = (" + point.x + "," + -point.y + ")");
 			Core.circle(mRgba, new Point(point.x, -point.y), 7, new Scalar(255,
 					0, 0, 255), 2);
 
@@ -428,6 +375,38 @@ public class PendulumTrackerActivity extends Activity implements
 		return mRgba;
 	}
 
+	private class RecordPointsTask extends AsyncTask<Point, Void, String> {
+
+		ProgressDialog dia;
+
+		@Override
+		protected void onPreExecute() {
+		}
+		
+		@Override
+		protected String doInBackground(Point...params) {
+			Point point = params[0];
+			
+			// yScale, -xScale
+			if (point.x != 0 && point.y != 0) {
+				// shift x-axis so center vertical axis is set to x=0 in
+				// pendulum coordinates
+				final int shiftX = (int) mImgWidth / 2;
+				if (mDataCollectionEnabled ) {
+					addDataPoint(point.x - shiftX, point.y);
+				}
+			}
+			return null; //strings[0];
+		}
+
+		@Override
+		protected void onPostExecute(String sdFileName) {
+
+			
+		}
+	}
+	
+	
 	@SuppressWarnings("unused")
 	private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
 		Mat pointMatRgba = new Mat();
@@ -442,8 +421,6 @@ public class PendulumTrackerActivity extends Activity implements
 	void drawDetectedContours(int contourSize) {
 		// if contourSize = -1, contour will be filled
 		List<MatOfPoint> contours = mDetector.getContours();
-		;
-		Log.e(TAG, "Contours count: " + contours.size());
 		Imgproc.drawContours(mRgba, contours, contourSize, CONTOUR_COLOR);
 	}
 
@@ -495,7 +472,7 @@ public class PendulumTrackerActivity extends Activity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.layout.menu, menu);
-
+		
 		return true;
 	}
 
@@ -514,8 +491,7 @@ public class PendulumTrackerActivity extends Activity implements
 		 * new LoginBeforeUploadTask().execute(); return true;
 		 */
 		// START experiment and data collection
-		case R.id.menu_start:
-
+		case R.id.menu_start:			
 			// Selected item becomes start/stop button (for onActivityResult())
 			startStopButton = item;
 
@@ -534,7 +510,9 @@ public class PendulumTrackerActivity extends Activity implements
 			if (PendulumTrackerActivity.mDataCollectionEnabled == false) {
 				// be sure to disable data collection before uploading data to
 				// iSENSE
-				PendulumTrackerActivity.mDataCollectionEnabled = true;
+				 mDataSet = new JSONArray();
+				
+				mDataCollectionEnabled = true;
 
 				// set STOP button and text
 				item.setIcon(stopIcon);
@@ -542,50 +520,30 @@ public class PendulumTrackerActivity extends Activity implements
 
 			} else {
 				// enable data collection before uploading data to iSENSE
-				PendulumTrackerActivity.mDataCollectionEnabled = false;
+				mDataCollectionEnabled = false;
 
 				// set START button and text
 				item.setIcon(startIcon);
 				item.setTitle(R.string.startCollection);
 				
 				
+				if (mDataSet.length() > 0) {
+					Log.e("Start Stop button pressed", "About to try and add to queue");
+					new AddToQueueTask().execute();					
+				} else {
+					w.make("You must first START data collection to upload data.",
+							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
+				}
 				
-				LoginThenUpload(); //TODO was login then upload task
-
 			}
 			
 			return true;
-
-		// BETA/Experimental touch screen mode using onLongClick
-/*		case R.id.menu_touchmode:
 			
-			
-			//mEnableTouchMode = (mDataCollectionEnabled && mEnableTouchMode) ? false : true; 
-			
-			// only enable mode if not in data collection mode (e.g., mDataCollectionEnable = true;
-			if(!this.mDataCollectionEnabled)
-			{	
-				if(!this.mEnableTouchMode)
-				{
-					this.mEnableTouchMode = true;
-				
-					startStopButton.setVisible(false);
-					
-					Toast.makeText(PendulumTrackerActivity.this,
-							"Touch screen mode enabled.", Toast.LENGTH_SHORT).show();
-				
-				}
-				else 
-				{
-					this.mEnableTouchMode = false;
-					startStopButton.setVisible(true);
-					
-					Toast.makeText(PendulumTrackerActivity.this,
-							"Touch screen mode disabled.", Toast.LENGTH_SHORT).show();
-				}
-			}
-			return true;
-*/			
+		case R.id.menu_upload:
+		//Show upload queue
+		manageUploadQueue();
+		
+		return true;
 		case R.id.menu_login:
 			startActivityForResult(new Intent(getApplicationContext(),
 					CredentialManager.class), LOGIN_REQUESTED);
@@ -645,23 +603,14 @@ public class PendulumTrackerActivity extends Activity implements
 						PendulumTrackerActivity.this,
 						"Session created. Press 'Start Data Collection' to begin!",
 						Toast.LENGTH_SHORT).show();
-
-				// set START button and text
-				startStopButton.setIcon(startIcon);
-				startStopButton.setTitle(R.string.startCollection);
-
-				// how come this doesn't work???
-				// menu.getItem(R.id.menu_start).setIcon(startIcon);
-				// startStopButton = (MenuItem)menu.findItem(R.id.menu_start);
-
 			}
-		} else if (reqCode == CREDENTIAL_KEY_REQUESTED) {
+		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
+			uq.buildQueueFromFile();
+		} else if (reqCode == LOGIN_REQUESTED) {
+		
+		} else {
 			if (resultCode == RESULT_OK) {
-				new uploadTask().execute();
-			}
-		} else if(reqCode == LOGIN_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-				
+				new AddToQueueTask().execute();
 			}
 		}
 	}
@@ -673,218 +622,127 @@ public class PendulumTrackerActivity extends Activity implements
 		android.os.Process.killProcess(pid);
 	}
 
-	private Runnable uploader = new Runnable() {
 
-		// @Override
-		@SuppressLint("SimpleDateFormat")
-		public void run() {
 
-			// Create location-less session (for now)
-			int sessionId = -1;
-			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
-			Date dt = new Date();
-			dateString = sdf.format(dt);
-			
-			final SharedPreferences mPrefs = getSharedPreferences(
-							EnterName.PREFERENCES_KEY_USER_INFO,
-							Context.MODE_PRIVATE);
-		
-			String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "") 
-									+ mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL, "")
-									+ " - " + dateString;
 
-			Log.i(TAG, "Uploading data set...");
 
-			JSONObject jobj = new JSONObject();
-			try {
-				jobj.put("data", mDataSet);
-				jobj = api.rowsToCols(jobj);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+	static void addDataPoint(double x, double y) {
 
-			int projectID = Integer.parseInt(experimentNumber);
-
-			
-			
-			if (UploadQueue.getAPI().getCurrentUser() != null) {
-				Log.i(TAG, "Uploading new dataset");
-				sessionId = UploadQueue.getAPI().uploadDataSet(projectID, jobj, nameOfSession);
-			}else{
-				String key = CredentialManagerKey.getKey();
-				String conName = CredentialManagerKey.getName();
-				sessionId = UploadQueue.getAPI().uploadDataSet(projectID, jobj, nameOfSession, key, conName);
-			}
-			
-
-			if (sessionId == -1)
-				Log.i(TAG, "Dataset failed to upload!");
-
-			if (useDevSite) {
-				sessionUrl = baseSessionUrlDev + sessionId;
-				Log.i(TAG, sessionUrl);
-			} else
-				sessionUrl = baseSessionUrl + sessionId;
-
-		}
-
-	};
-
-	// Task for uploading data to iSENSE
-	public class uploadTask extends AsyncTask<Void, Integer, Void> {
-
-		@Override
-		protected void onPreExecute() {
-
-			dia = new ProgressDialog(PendulumTrackerActivity.this);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setMessage("Please wait while your data is uploaded to iSENSE...");
-			dia.setCancelable(false);
-			dia.show();
-		}
-
-		@Override
-		protected Void doInBackground(Void... voids) {
-
-			uploader.run();
-			publishProgress(100);
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void voids) {
-
-			// reset data array
-			mDataSet = new JSONArray();
-
-			dia.setMessage("Done");
-			dia.cancel();
-			Toast.makeText(PendulumTrackerActivity.this,
-					"Data upload successful!", Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	// HACKY test data
-	// ---- HACKY TEST DATA ----
-	void addTestPoint(JSONArray dataSet) {
-		int i = 0;
-
-		while (i < 10) {
-			JSONObject dataJSON = new JSONObject();
-			Calendar c = Calendar.getInstance();
-			long currentTime = (long) (c.getTimeInMillis() /*- 14400000*/);
-
-			/* Convert floating point to String to send data via HTML */
-			try {
-				/* Posn-x */dataJSON.put("1", i);
-				/* Posn-y */dataJSON.put("2", i);
-				/* Time */dataJSON.put("0", "u " + currentTime);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-			dataSet.put(dataJSON);
-			i++;
-
-			Log.i(TAG, "--------------- ADDING DATA POINT ---------------");
-		}
-
-	}
-
-	// ---- END HACKY TEST DATA -----
-
-	void addDataPoint(double x, double y) {
-
-		JSONObject dataJSON = new JSONObject();
+		JSONArray dataPoint = new JSONArray();
 		// Calendar c = Calendar.getInstance();
 		long currentTime = (long) System.currentTimeMillis(); // (c.getTimeInMillis()
 																// /*-
 																// 14400000*/);
-
-		// new! works!
-		ArrayList<RProjectField> pf = api.getProjectFields(Integer.parseInt(experimentNumber));
+		
+			/* Convert floating point to String to send data via HTML */
+			try {
+				/* Time */dataPoint.put("u " + currentTime);
+				/* Posn-x */dataPoint.put(x);
+				/* Posn-y */dataPoint.put(y);
+				
+				//TODO Hardcoding fields is bad. This app needs to use dfm
+				
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		
 		
-		/* Convert floating point to String to send data via HTML */
-		try {
-			/* Posn-x */dataJSON.put( "" + pf.get(1).field_id, x);
-			/* Posn-y */dataJSON.put( "" + pf.get(2).field_id, y);
-			/* Time */dataJSON.put( "" + pf.get(0).field_id , "u " + currentTime);
-			
-			
-			/* Posn-x *///dataJSON.put("1", x);
-			/* Posn-y *///dataJSON.put("2", y);
-			/* Time *///dataJSON.put("0", "u " + currentTime);
-			
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		mDataSet.put(dataJSON);
+		mDataSet.put(dataPoint);
 
 		Log.i(TAG, "--------------- ADDING DATA POINT ---------------");
 
 	}
 
 
+	// Calls the api primitives for actual uploading
+				private Runnable uploader = new Runnable() {
 
-	void LoginThenUpload() { //TODO
+					@Override
+					public void run() {
 
-			// am i connected to the internet?
-			boolean connect = Connection.hasConnectivity(mContext);
-			boolean loginStatus = CredentialManager.isLoggedIn();
-
-			if (connect) {
-
-				// check to see if a session name has been created before we
-				// start collecting data.
-				if (!PendulumTrackerActivity.mSessionCreated) {
-
-					Toast.makeText(
-							PendulumTrackerActivity.this,
-							"You must first START data collection to create session name.",
-							Toast.LENGTH_LONG).show();
-					return;
-				}
-				
-				/*try to login if successful upload if not prompt for key*/
-				CredentialManager.login(mContext, api);
-				
-
-				// am I logged in/session created to iSENSE?
-					// yes! yes! yes! so upload my data
-					if (!mDataCollectionEnabled && mDataSet.length() > 0) {
-
-						if (CredentialManager.isLoggedIn() == true) {
-							/*logged in so upload*/
-							new uploadTask().execute();
-						}else{
-							/*start dialog activity to ask for key and upload using key in onActivityResult*/
-							Intent key_intent = new Intent().setClass(mContext, CredentialManagerKey.class);
-							startActivityForResult(key_intent, CREDENTIAL_KEY_REQUESTED);
-						}					
+						SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
+						Date dt = new Date();
+						dateString = sdf.format(dt);
 						
-					} else {
-						Toast.makeText(
-								PendulumTrackerActivity.this,
-								"You must first START data collection to upload data.",
-								Toast.LENGTH_LONG).show();
-					}
-				
-
+						final SharedPreferences mPrefs = getSharedPreferences(
+										EnterName.PREFERENCES_KEY_USER_INFO,
+										Context.MODE_PRIVATE);
+					
+						String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "") 
+												+ mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL, "")
+												+ " - " + dateString;
 			
-			// I am not connected to the internet - oops.
-			} else {
-				Toast.makeText(
-						PendulumTrackerActivity.this,
-						"You are not connected to the Intertubes. Check connectivity and try again (previously recorded data will be saved).",
-						Toast.LENGTH_LONG).show();
-				return;
-			}
+						// Create name from time stamp
+						String name = "Test Name";//dataName;
+						
+						Log.e("DATASET", mDataSet.toString());
+						
+						Date date = new Date();
+						
+						// Saves data to queue for later upload
+						QDataSet ds = new QDataSet(nameOfSession, "Pendulum Tracker",QDataSet.Type.DATA,
+								mDataSet.toString(), null, experimentNumber, null);
 
+			            ds.setRequestDataLabelInOrder(true);
+
+						uq.addDataSetToQueue(ds);
+					}
+
+				};
+
+				
 	
-
+	/**
+	 * Prompts the user to upload the rest of their content
+	 * upon successful upload of data.
+	 */
+	private void manageUploadQueue() {
+		if (!uq.emptyQueue()) {
+			Intent i = new Intent().setClass(mContext, QueueLayout.class);
+			i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
+			startActivityForResult(i, QUEUE_UPLOAD_REQUESTED);
+		} else {
+			w.make("No data to upload!", Waffle.IMAGE_X);
+		}
 	}
+	
+	/**
+	 * Uploads data to iSENSE or something.
+	 * 
+	 * @author jpoulin
+	 */
+	private class AddToQueueTask extends AsyncTask<String, Void, String> {
 
+		ProgressDialog dia;
+
+		@Override
+		protected void onPreExecute() {
+
+			dia = new ProgressDialog(PendulumTrackerActivity.this);
+			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			dia.setMessage("Please wait while your data and media saved to Queue");
+			dia.setCancelable(false);
+			dia.show();
+
+		}
+		
+		@Override
+		protected String doInBackground(String... strings) {
+			uploader.run();
+			return null; //strings[0];
+		}
+
+		@Override
+		protected void onPostExecute(String sdFileName) {
+
+			dia.setMessage("Done");
+			dia.dismiss();
+			
+			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
+					Waffle.IMAGE_CHECK);
+			manageUploadQueue();
+			
+		}
+	}
 }
+

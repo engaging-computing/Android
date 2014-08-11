@@ -486,7 +486,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				
 			} else {
 				switchGravity = (Switch) findViewById(R.id.switch1);
-				switchGravity.setChecked(isLinear);
+				switchGravity.setChecked(!isLinear);
 				
 				switchGravity.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 

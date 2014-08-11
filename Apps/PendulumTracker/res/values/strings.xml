@@ -7,4 +7,5 @@
     <string name="startHere">Start here!</string>
     <string name="startCollection">Start data collection</string>
     <string name="stopCollection">Stop data collection</string>
+    <string name="login">Login</string>
 </resources>

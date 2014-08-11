@@ -380,7 +380,7 @@ public class Datawalk_Service extends Service {
 
             try {
 
-                // Store new values into JSON Object
+                // Store new values into JSON Array
                 dataJSON.put("u " + time);
                 dataJSON.put(accel[3]);
                 dataJSON.put(velocity);

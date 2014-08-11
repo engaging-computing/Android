@@ -72,7 +72,7 @@ public class Main extends Activity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
-	public static final int project_REQUESTED = 104;
+	private static final int project_REQUESTED = 104;
 	private static final int QUEUE_UPLOAD_REQUESTED = 105;
 	private static final int DESCRIPTION_REQUESTED = 106;
 	private static final int SELECT_PICTURE_REQUESTED = 107;

@@ -28,7 +28,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.media.MediaPlayer;
@@ -42,37 +41,29 @@ import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import edu.uml.cs.isense.carphysicsv2.dialogs.About;
 import edu.uml.cs.isense.carphysicsv2.dialogs.Help;
 import edu.uml.cs.isense.comm.API;
-import edu.uml.cs.isense.comm.uploadInfo;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.EnterName;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.dfm.FieldMatching;
-import edu.uml.cs.isense.dfm.Fields;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.proj.Setup;
-import edu.uml.cs.isense.queue.QDataSet;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
+import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
@@ -97,13 +88,11 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 	private SensorManager mSensorManager;
 
-	public static Location loc;
-	private float accel[];
+	
 	private Timer timeTimer;
 	private int INTERVAL = 50;
 
-	public DataFieldManager dfm;
-	public Fields f;
+	private DataFieldManager dfm;
 	public API api;
 
 	private int countdown;
@@ -120,14 +109,12 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public static final int RESET_REQUESTED = 6003;
 	public static final int SAVE_MODE_REQUESTED = 10005;
 	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
-	private static final int FIELD_MATCHING_REQUESTED = 7498;
-	private static final int ALTER_DATA_PROJ_REQUESTED = 6698;
 
-	private boolean timeHasElapsed = false;
+//	private boolean timeHasElapsed = false;
 
 	private MediaPlayer mMediaPlayer;
 
-	private int elapsedMillis = 0;
+//	private int elapsedMillis = 0;
 
 	DecimalFormat toThou = new DecimalFormat("######0.000");
 
@@ -148,8 +135,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	static boolean dontToastMeTwice = false;
 	static boolean exitAppViaBack = false;
 	static boolean dontPromptMeTwice = false;
-
-	private static JSONObject dataToUpload;
 	
 	private Handler mHandler;
 	public static JSONArray dataSet;
@@ -168,7 +153,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 	public static Menu menu;
 	
-	private Switch switchGravity;
 
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
@@ -185,6 +169,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		setContentView(R.layout.main);
 		saved = savedInstanceState;
 		mContext = this;
+		
 
 		api = API.getInstance();
 		setUseDev(useDev);
@@ -207,7 +192,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
 		
-		f = new Fields();
 		uq = new UploadQueue("carrampphysics", mContext, api);
 		uq.buildQueueFromFile();
 
@@ -248,199 +232,104 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 					mMediaPlayer.start();
 	
 					if (running) {
-	
-						if (timeHasElapsed) {
-	
+							running = false;
+							try{
 							getWindow().clearFlags(
 									WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+							} catch (Exception e){
+								Log.e("onButtonPress", "Failed to remove layoutParams.FLAG_KEEP_SCREEN_ON");
+							}
+							
+							dfm.stopRecording();
+							int dataPointCount = dataSet.length();
+							
+							SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+							String projId = mPrefs.getString(Setup.PROJECT_ID, "");
+							
+							String dataName = firstName + " " + lastInitial;;
+							String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+							String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataPointCount;
+							Type type = Type.DATA;
+
+							uq.addToQueue(dataName, description, type, dataSet, null, projId, null);
 	
 							setupDone = false;
-							timeHasElapsed = false;
 							useMenu = true;
 							countdown = length;
 	
-							running = false;
 							startStop.setText("Hold to Start");
 	
 							timeTimer.cancel();
 							choiceViaMenu = false;
 	
-							startStop.setEnabled(true);
-							startStop
-									.setBackgroundResource(R.drawable.button_rsense);
+							startStop.setBackgroundResource(R.drawable.button_rsense);
 	
-							/*Intent dataIntent = new Intent(mContext,
-									DataActivity.class);
-							startActivityForResult(dataIntent, UPLOAD_OK_REQUESTED);
-							 */
-							if (len == 0 || len2 == 0) {
-								w.make("There are no data to upload!", Waffle.LENGTH_LONG,
-										Waffle.IMAGE_X);
-								OrientationManager.enableRotation(CarRampPhysicsV2.this);
-							} else {
-								String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-								nameOfDataSet = firstName + " " + lastInitial;			
-								uq.addToQueue(nameOfDataSet, currentDateTimeString, QDataSet.Type.DATA, dataSet, null, projectNumber, null);
-							}
-
 					} else {
 	
 						OrientationManager.disableRotation(CarRampPhysicsV2.this);
 						getWindow().addFlags(
 								WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	
-						startStop.setEnabled(false);
-						startStop
-								.setBackgroundResource(R.drawable.button_rsense_green);
+						startStop.setBackgroundResource(R.drawable.button_rsense_green);
 	
 						dataSet = new JSONArray();
-						elapsedMillis = 0;
 						len = 0;
 						len2 = 0;
 						i = 0;
-						currentTime = getUploadTime(0);
 						
-						dfm.setUpDFMWithAllSensorFields(mContext);
+						initDfm();
+						dfm.recordData(INTERVAL);
 
 						useMenu = false;
 	
-						SharedPreferences prefs2 = getSharedPreferences(
-								ACCEL_SETTINGS, 0);
-						if (mSensorManager != null) {
-							boolean isLinear = prefs2.getBoolean("LINEAR_ACCEL",
-									false);
-							if (isLinear) {
-								mSensorManager.registerListener(
-										CarRampPhysicsV2.this,
-										mSensorManager
-												.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-										SensorManager.SENSOR_DELAY_FASTEST);
-							} else {
-								mSensorManager.registerListener(
-										CarRampPhysicsV2.this,
-										mSensorManager
-												.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-										SensorManager.SENSOR_DELAY_FASTEST);
-							}
-						}
-	
 						running = true;
 						startStop.setText("" + countdown);
+						
+						timeTimer = new Timer();
+						timeTimer.scheduleAtFixedRate(new TimerTask() {
 	
-
+							public void run() {
+	
+								if (i >= (length * (1000 / INTERVAL))) {
+	
+									timeTimer.cancel();
+									
+									CarRampPhysicsV2.this.runOnUiThread(new Runnable() {
+									    public void run() {
+											startStop.performLongClick();
+									    }
+									});
+	
+								} else {
+	
+									i++;
+									len++;
+									len2++;
+	
+									if (i % (1000 / INTERVAL) == 0) {
+										mHandler.post(new Runnable() {
+											@Override
+											public void run() {
+												startStop.setText("" + countdown);
+											}
+										});
+										countdown--;
+									}
+									//TODO look into timestamp
+									//f.timeMillis = currentTime + elapsedMillis;
+		
+								}
+	
+							}
+						}, 0, INTERVAL);
+						
 				}
-			}
+			
 					return running;
 		}
 	});
 
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-		SharedPreferences prefs3 = getSharedPreferences(ACCEL_SETTINGS, 0);
-		if (mSensorManager != null) {
-			boolean isLinear = prefs3.getBoolean("LINEAR_ACCEL", false);
-			if (CarRampPhysicsV2.getApiLevel() < 14) {
-				// If the device isn't on Jelly Bean
-				ToggleButton button = (ToggleButton) findViewById(R.id.toggleButton1);
-				button.setChecked(isLinear);
-				button.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView,
-							boolean isChecked) {
-						changeSensors(buttonView);
-					}
-					
-				});
-				
-			} else {
-				switchGravity = (Switch) findViewById(R.id.switch1);
-				switchGravity.setChecked(!isLinear);
-				
-				switchGravity.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView,
-							boolean isChecked) {
-						changeSensors(buttonView);						
-					}
-					
-				});
-				
-				
-			}
-			if (isLinear) {
-				mSensorManager
-						.registerListener(
-								CarRampPhysicsV2.this,
-								mSensorManager
-										.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-								SensorManager.SENSOR_DELAY_FASTEST);
-
-			} else {
-				mSensorManager.registerListener(CarRampPhysicsV2.this,
-						mSensorManager
-								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-						SensorManager.SENSOR_DELAY_FASTEST);
-			}
-			mSensorManager
-					.registerListener(CarRampPhysicsV2.this, mSensorManager
-							.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-							SensorManager.SENSOR_DELAY_FASTEST);
-		}
-
-		Criteria c = new Criteria();
-		c.setAccuracy(Criteria.ACCURACY_FINE);
-
-		accel = new float[4];
-		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
 		
-
-	}
-
-	@SuppressLint("NewApi")
-	public void changeSensors(CompoundButton view) {
-		mSensorManager.unregisterListener(CarRampPhysicsV2.this, mSensorManager
-				.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
-		mSensorManager.unregisterListener(CarRampPhysicsV2.this,
-				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
-
-		boolean on;
-
-		if (CarRampPhysicsV2.getApiLevel() < 14) {
-			// If the device isn't on Jelly Bean
-			on = ((ToggleButton) view).isChecked();
-		} else {
-			// the device is on Jelly Bean or later
-			on = ((Switch) view).isChecked();
-		}
-
-		// Determine if normal or linear acceleration
-		if (on) {
-            mSensorManager.registerListener(CarRampPhysicsV2.this,
-                    mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_FASTEST);
-		} else {
-            mSensorManager.registerListener(CarRampPhysicsV2.this,
-                    mSensorManager
-                            .getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-                    SensorManager.SENSOR_DELAY_FASTEST);
-		}
-
-		SharedPreferences prefs = getSharedPreferences(ACCEL_SETTINGS, 0);
-
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean("LINEAR_ACCEL", on);
-		editor.commit();
-
-	}
-
-	long getUploadTime(int millisecond) {
-
-		Calendar c = Calendar.getInstance();
-
-		return (long) (c.getTimeInMillis());
-
 	}
 
 	@Override
@@ -449,7 +338,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		if (timeTimer != null)
 			timeTimer.cancel();
 		inPausedState = true;
-
+		if (running) {
+			startStop.performLongClick();
+		}
 	}
 
 	@Override
@@ -458,9 +349,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		if (timeTimer != null)
 			timeTimer.cancel();
 		inPausedState = true;
-		mSensorManager.unregisterListener(CarRampPhysicsV2.this, mSensorManager
-				.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
-
 	}
 
 
@@ -468,18 +356,10 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public void onStart() {
 		super.onStart();
 		inPausedState = false;
-		SharedPreferences prefs3 = getSharedPreferences(ACCEL_SETTINGS, 0);
-		boolean isLinear = prefs3.getBoolean("LINEAR_ACCEL", false);
-		if (isLinear) {
-			mSensorManager.registerListener(CarRampPhysicsV2.this,
-					mSensorManager
-							.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-					SensorManager.SENSOR_DELAY_FASTEST);
-		} else {
-			mSensorManager.registerListener(CarRampPhysicsV2.this,
-					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-					SensorManager.SENSOR_DELAY_FASTEST);
-		}
+
+		mSensorManager.registerListener(CarRampPhysicsV2.this,
+				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+				SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
 	@Override
@@ -545,7 +425,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				cdt = new CountDownTimer(5000, 5000) {
 					public void onTick(long millisUntilFinished) {
 					}
-
 					public void onFinish() {
 						actionBarTapCount = 0;
 					}
@@ -590,27 +469,27 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		} else {
 			Log.e("onSensorChanged ", "dfm is null");
 		}
-		if (running) {
-			if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
-				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
-				
-			DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
-			String xPrepend = event.values[0] > 0 ? "+" : "";
-			String yPrepend = event.values[1] > 0 ? "+" : "";
-			String zPrepend = event.values[2] > 0 ? "+" : "";
+		
+		if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
+			event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
 			
-			values.setText("Ax: " + xPrepend
-					+ oneDigit.format(event.values[0]) + " " + "m/s^2" + "\nAy: " + yPrepend
-					+ oneDigit.format(event.values[1]) + " " + "m/s^2" + "\nAz: " + zPrepend
-					+ oneDigit.format(event.values[2]) + " " + "m/s^2");
-			}
+		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
+		String xPrepend = event.values[0] > 0 ? "+" : "";
+		String yPrepend = event.values[1] > 0 ? "+" : "";
+		String zPrepend = event.values[2] > 0 ? "+" : "";
+		
+		values.setText("Ax: " + xPrepend
+				+ oneDigit.format(event.values[0]) + " " + "Ay: " + yPrepend
+				+ oneDigit.format(event.values[1]) + " " + "Az: " + zPrepend
+				+ oneDigit.format(event.values[2]) + " ");
 		}
+		
 
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		loc = location;
+		dfm.updateLoc(location);
 	}
 
 	public static int getApiLevel() {
@@ -651,12 +530,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 						0);
 				SharedPreferences.Editor editor = prefs.edit();
 				editor.putInt("length", length);
-				// Below is a math fail
-				// if (length <= 25) {
-				// INTERVAL = 50;
-				// } else {
-				// INTERVAL = 2 * length;
-				// }
 				editor.putInt("Interval", INTERVAL);
 				editor.commit();
 			}
@@ -664,7 +537,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			if (resultCode == RESULT_OK) {
 				SharedPreferences namePrefs = getSharedPreferences(
 						EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
-				
 				
 				if (namePrefs
 						.getBoolean(
@@ -675,7 +547,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 					firstName = user.name;
 					lastInitial = "";
 
-
 				} else {
 					firstName = namePrefs.getString(
 							EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME,
@@ -684,8 +555,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 							.getString(
 									EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
 									"");
-
-					
 				}
 
 			}
@@ -716,89 +585,71 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 			}
 			
-		} else if (reqCode == FIELD_MATCHING_REQUESTED) {
-            if (resultCode == RESULT_OK) {
-                if (FieldMatching.acceptedFields.isEmpty()) {
-                    Intent iProj = new Intent(mContext, Setup.class);
-                    iProj.putExtra("from_where", "main");
-                    startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
-                } else if (!FieldMatching.compatible) {
-                    Intent iProj = new Intent(mContext, Setup.class);
-                    iProj.putExtra("from_where", "main");
-                    startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                Intent iProj = new Intent(mContext, Setup.class);
-                iProj.putExtra("from_where", "main");
-                startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
-            }
-
-        }
+		} 
 	}
 
 	
-	public boolean uploadSuccessful;
+//
+//	/**
+//	 * Upload function specifically for when projID = -1 initially.
+//	 * 
+//	 * In this scenario, you'll need to provide an
+//	 * {@link edu.uml.cs.isense.comm.API API} instance along with an activity
+//	 * context.
+//	 * 
+//	 * @param api
+//	 *            - An instance of API
+//	 * @param c
+//	 *            - The context of the calling activity
+//	 * 
+//	 * @return The ID of the data set created on iSENSE, or -1 if the upload
+//	 *         failed
+//	 */
+//	public static int upload(API api, Context c) {
+//		if (CarRampPhysicsV2.projectNumber.equals("-1"))
+//			return -1;
+//
+//		return upload(DataFieldManager.reOrderData(dataSet,
+//				CarRampPhysicsV2.projectNumber, mContext, null, null));
+//	}
 
-	/**
-	 * Upload function specifically for when projID = -1 initially.
-	 * 
-	 * In this scenario, you'll need to provide an
-	 * {@link edu.uml.cs.isense.comm.API API} instance along with an activity
-	 * context.
-	 * 
-	 * @param api
-	 *            - An instance of API
-	 * @param c
-	 *            - The context of the calling activity
-	 * 
-	 * @return The ID of the data set created on iSENSE, or -1 if the upload
-	 *         failed
-	 */
-	public static int upload(API api, Context c) {
-		if (CarRampPhysicsV2.projectNumber.equals("-1"))
-			return -1;
-
-		return upload(DataFieldManager.reOrderData(dataSet,
-				CarRampPhysicsV2.projectNumber, mContext, null, null));
-	}
-
-	/**
-	 * Attempts to upload data with the given information passed in through the
-	 * QDataSet constructor
-	 * 
-	 * @return The ID of the data set created on iSENSE, or -1 if the upload
-	 *         failed
-	 */
-	public static int upload(String obj) {
-
-		int dataSetID = -1;
-
-		try {
-			JSONArray dataJSON = new JSONArray(obj);
-			if (!(dataJSON.isNull(0))) {
-
-				dataToUpload = new JSONObject();
-				try {
-					dataToUpload.put("data", dataJSON);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				dataToUpload = UploadQueue.getAPI().rowsToCols(dataToUpload);
-
-				System.out.println("JOBJ: " + dataToUpload.toString());
-
-                uploadInfo info = UploadQueue.getAPI().uploadDataSet(
-						Integer.parseInt(projectNumber), dataToUpload, nameOfDataSet);
-                dataSetID = info.dataSetId;
-				System.out.println("Data set ID from Upload is: " + dataSetID);
-
-			}
-		} catch (JSONException e) {
-
-		}
-
-		return dataSetID;
-	}
+//	/**
+//	 * Attempts to upload data with the given information passed in through the
+//	 * QDataSet constructor
+//	 * 
+//	 * @return The ID of the data set created on iSENSE, or -1 if the upload
+//	 *         failed
+//	 */
+//	public static int upload(String obj) {
+//
+//		int dataSetID = -1;
+//
+//		try {
+//			JSONArray dataJSON = new JSONArray(obj);
+//			if (!(dataJSON.isNull(0))) {
+//
+//				dataToUpload = new JSONObject();
+//				try {
+//					dataToUpload.put("data", dataJSON);
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//				dataToUpload = UploadQueue.getAPI().rowsToCols(dataToUpload);
+//
+//				System.out.println("JOBJ: " + dataToUpload.toString());
+//
+//                uploadInfo info = UploadQueue.getAPI().uploadDataSet(
+//						Integer.parseInt(projectNumber), dataToUpload, nameOfDataSet);
+//                dataSetID = info.dataSetId;
+//				System.out.println("Data set ID from Upload is: " + dataSetID);
+//
+//			}
+//		} catch (JSONException e) {
+//
+//		}
+//
+//		return dataSetID;
+//	}
 
 
 
@@ -830,7 +681,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		Intent i = new Intent(mContext, SingleInputDialogTemplate.class);
 		i.putExtra("title", title);
 		i.putExtra("message", message);
-
 		startActivityForResult(i, reqCode);
 
 	}
@@ -859,7 +709,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	private void initDfm() {
 		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
-		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext, f);
+		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
 		dfm.enableAllSensorFields();
 	}
 	

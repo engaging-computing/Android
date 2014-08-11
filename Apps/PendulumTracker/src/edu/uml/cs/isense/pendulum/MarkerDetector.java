@@ -13,8 +13,6 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import android.util.Log;
-
 public class MarkerDetector {
 	
 	private static final String  TAG = "PendulumTracker::MarkerDetector";

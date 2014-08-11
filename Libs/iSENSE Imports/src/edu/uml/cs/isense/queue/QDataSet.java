@@ -172,7 +172,7 @@ public class QDataSet implements Serializable {
 					// if we got here, the data is a JSONArray of JSONArrays:
 					// convert it
 					DataFieldManager dfm = new DataFieldManager(
-							Integer.parseInt(this.projID), api, c, null);
+							Integer.parseInt(this.projID), api, c);
 					this.data = dfm.convertInternalDataToJSONObject(ja)
 							.toString();
                     requestDataLabelInOrder = false;

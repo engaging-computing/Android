@@ -100,14 +100,14 @@ public class DataFieldManager extends Application {
 	 *            class.
 	 * @return An instance of DataFieldManager.
 	 */
-	public DataFieldManager(int projID, API api, Context mContext, Fields f) {
+	public DataFieldManager(int projID, API api, Context mContext) {
 		this.projID = projID;
 		this.api = api;
 		this.order = new LinkedList<String>();
 		this.realOrder = new LinkedList<String>();
 		this.fieldIDs = new LinkedList<Long>();
 		this.mContext = mContext;
-		this.f = f;
+		this.f = new Fields();
 		
 		if (projID == -1) {
 			setUpDFMWithAllSensorFields(mContext);
@@ -600,15 +600,16 @@ public class DataFieldManager extends Application {
 
 		// if the field order is null, set up the fieldOrder/fieldIDs.
 		// otherwise, just get fieldIDs
+		//TODO
 		if (fieldOrder == null || fieldOrder.size() == 0) {
 			DataFieldManager d = new DataFieldManager(Integer.parseInt(projID),
-					api, c, null);
+					api, c);
 			d.getOrderWithExternalAsyncTask();
 			fieldOrder = d.getOrderList();
 			fieldIDs = d.getFieldIDs();
 		} else if (fieldIDs == null || fieldIDs.size() == 0) {
 			DataFieldManager d = new DataFieldManager(Integer.parseInt(projID),
-					api, c, null);
+					api, c);
 			d.getOrderWithExternalAsyncTask();
 			fieldIDs = d.getFieldIDs();
 		}

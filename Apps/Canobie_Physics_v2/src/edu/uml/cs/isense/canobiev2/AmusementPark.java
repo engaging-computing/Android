@@ -61,7 +61,6 @@ import android.widget.ToggleButton;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.dfm.Fields;
 import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
@@ -116,7 +115,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 
 	/* Other Important Objects */
 	private LinkedList<String> acceptedFields;
-	private Fields f;
 	private MediaPlayer mMediaPlayer;
 	private API api;
 	public static Context mContext;
@@ -288,8 +286,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 		});
 		
 	}
-	
-
 	
 	private void enableMainButton(boolean enable) {
 		if (enable) {
@@ -657,7 +653,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 
 		// Waffles ares UI messages, and fields are used in recording
 		w = new Waffle(this);
-		f = new Fields();
 
 		// Fire up the GPS chip (not literally)
 		initLocManager();
@@ -706,7 +701,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	private void initDfm() {
 		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
-		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext, f);
+		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
 		dfm.enableAllSensorFields();
 	}
 	

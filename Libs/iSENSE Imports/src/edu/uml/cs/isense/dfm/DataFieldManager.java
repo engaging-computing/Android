@@ -5,18 +5,23 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -37,6 +42,7 @@ import edu.uml.cs.isense.proj.Setup;
  * 
  * @author iSENSE Android Development Team
  */
+@SuppressLint("UseValueOf")
 public class DataFieldManager extends Application {
 	private float rawAccel[] = new float[4];
 	private float rawMag[] = new float[3];
@@ -1133,44 +1139,44 @@ public class DataFieldManager extends Application {
 	public void setEnabledFields(LinkedList<String> acceptedFields) {
 		//Can't use switch on strings below java 1.7, Android uses 1.6 :(
 		for (String s : acceptedFields) {
-			if (s.equals(getString(R.string.time)))
+			if (s.equals(mContext.getString(R.string.time)))
 				enabledFields[Fields.TIME] = true;
-			if (s.equals(getString(R.string.accel_x)))
+			if (s.equals(mContext.getString(R.string.accel_x)))
 				enabledFields[Fields.ACCEL_X] = true;
-			if (s.equals(getString(R.string.accel_y)))
+			if (s.equals(mContext.getString(R.string.accel_y)))
 				enabledFields[Fields.ACCEL_Y] = true;
-			if (s.equals(getString(R.string.accel_z)))
+			if (s.equals(mContext.getString(R.string.accel_z)))
 				enabledFields[Fields.ACCEL_Z] = true;
-			if (s.equals(getString(R.string.accel_total)))
+			if (s.equals(mContext.getString(R.string.accel_total)))
 				enabledFields[Fields.ACCEL_TOTAL] = true;
-			if (s.equals(getString(R.string.latitude)))
+			if (s.equals(mContext.getString(R.string.latitude)))
 				enabledFields[Fields.LATITUDE] = true;
-			if (s.equals(getString(R.string.longitude)))
+			if (s.equals(mContext.getString(R.string.longitude)))
 				enabledFields[Fields.LONGITUDE] = true;
-			if (s.equals(getString(R.string.magnetic_x)))
+			if (s.equals(mContext.getString(R.string.magnetic_x)))
 				enabledFields[Fields.MAG_X] = true;
-			if (s.equals(getString(R.string.magnetic_y)))
+			if (s.equals(mContext.getString(R.string.magnetic_y)))
 				enabledFields[Fields.MAG_Y] = true;
-			if (s.equals(getString(R.string.magnetic_z)))
+			if (s.equals(mContext.getString(R.string.magnetic_z)))
 				enabledFields[Fields.MAG_Z] = true;
-			if (s.equals(getString(R.string.magnetic_total)))
+			if (s.equals(mContext.getString(R.string.magnetic_total)))
 				enabledFields[Fields.MAG_TOTAL] = true;
-			if (s.equals(getString(R.string.heading_deg)))
+			if (s.equals(mContext.getString(R.string.heading_deg)))
 				enabledFields[Fields.HEADING_DEG] = true;
-			if (s.equals(getString(R.string.heading_rad)))
+			if (s.equals(mContext.getString(R.string.heading_rad)))
 				enabledFields[Fields.HEADING_RAD] = true;
-			if (s.equals(getString(R.string.temperature_c)))
+			if (s.equals(mContext.getString(R.string.temperature_c)))
 				enabledFields[Fields.TEMPERATURE_C] = true;
-			if (s.equals(getString(R.string.temperature_f)))
+			if (s.equals(mContext.getString(R.string.temperature_f)))
 				enabledFields[Fields.TEMPERATURE_F] = true;
-			if (s.equals(getString(R.string.temperature_k)))
+			if (s.equals(mContext.getString(R.string.temperature_k)))
 				enabledFields[Fields.TEMPERATURE_K] = true;
-			if (s.equals(getString(R.string.pressure)))
+			if (s.equals(mContext.getString(R.string.pressure)))
 				enabledFields[Fields.PRESSURE] = true;
-			if (s.equals(getString(R.string.altitude)))
+			if (s.equals(mContext.getString(R.string.altitude)))
 				enabledFields[Fields.ALTITUDE] = true;
-			if (s.equals(getString(R.string.luminous_flux)))
-				enabledFields[Fields.LIGHT] = true;
+			if (s.equals(mContext.getString(R.string.luminous_flux)))
+				enabledFields[Fields.LIGHT] = true;	
 		}
 	}
 
@@ -1293,7 +1299,7 @@ public class DataFieldManager extends Application {
 		recordingTimer = new Timer();
 		recordingTimer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				recordDataPoint();
+				dataSet.put(recordDataPoint());
 			}
 		}, srate, srate);
 	}
@@ -1312,8 +1318,9 @@ public class DataFieldManager extends Application {
 	
 	/**
 	 * This adds the current data from the sensors to our dataSet. 
+	 * @return returns a JSONArray of one single data point
 	 */
-	private void recordDataPoint() {
+	public JSONArray recordDataPoint() {
 		DecimalFormat toThou = new DecimalFormat("######0.000");
 
         if (enabledFields[Fields.ACCEL_X])
@@ -1370,9 +1377,118 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
         
-        
-        dataSet.put(putData());
+        return putData();
 	}
+	
+	/**
+	 * This method takes an imageUri and makes a datapoint from its timestamp and 
+	 * geo tag 
+	 * @param imageUri
+	 * @return JSONArray (DataPoint)
+	 */
+	public JSONArray getDataFromPic(Uri imageUri) {
+		double lat = 0;
+		double lon = 0;
+		String dateTime = null;
+		String picturePath; 
+		
+		if (imageUri == null){ 
+			Log.e("here", "null");
+		}
+		
+	    Cursor cursor = getContentResolver().query(imageUri, null, null, null, null);
+		if (cursor == null) { // Source is a cloud service (Dropbox, GoogleDrive)
+			picturePath = imageUri.getPath();
+	    } else { 
+	        cursor.moveToFirst(); 
+	        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA); 
+	        picturePath = cursor.getString(idx);
+	        cursor.close();
+	    }
+		
+		/*get data from picture file*/
+		ExifInterface exifInterface;
+		try {
+			exifInterface = new ExifInterface(picturePath);
+
+			/* get timestamp from picture */
+			String date = exifInterface.getAttribute(ExifInterface.TAG_GPS_DATESTAMP);
+			String time = exifInterface.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP);
+			
+			dateTime = date + " " + time;
+				
+			/*get location data from image*/
+			String latString = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+			String lonString = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+			String latRef = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
+			String lonRef = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
+			
+			if (latString != null && lonString != null) {
+			
+				lat = convertToDegree(latString);
+				lon = convertToDegree(lonString);
+				
+				if(latRef.equals("N")){
+					lat = convertToDegree(latString);
+				} else {
+					lat = 0 - convertToDegree(latString);
+				}
+				 
+				if(lonRef.equals("E")){
+					lon = convertToDegree(lonString);
+				} else {
+				   lon = 0 - convertToDegree(lonString);
+				}	
+				
+			} else {
+				lat = 0;
+				lon = 0;
+			}
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		/* Record the data */
+        if (enabledFields[Fields.LATITUDE])
+        	if(loc != null)
+                f.latitude = lat;
+        if (enabledFields[Fields.LONGITUDE])
+        	if(loc != null)
+                f.longitude = lon;
+        if (enabledFields[Fields.TIME])
+                f.timeMillis = Long.getLong(dateTime);         
+        
+		return putData();
+				
+	}
+	
+	@SuppressLint("UseValueOf")
+	private Float convertToDegree(String stringDMS){
+		 Float result = null;
+		 String[] DMS = stringDMS.split(",", 3);
+
+		 String[] stringD = DMS[0].split("/", 2);
+		    Double D0 = new Double(stringD[0]);
+		    Double D1 = new Double(stringD[1]);
+		    Double FloatD = D0/D1;
+
+		 String[] stringM = DMS[1].split("/", 2);
+		 Double M0 = new Double(stringM[0]);
+		 Double M1 = new Double(stringM[1]);
+		 Double FloatM = M0/M1;
+		  
+		 String[] stringS = DMS[2].split("/", 2);
+		 Double S0 = new Double(stringS[0]);
+		 Double S1 = new Double(stringS[1]);
+		 Double FloatS = S0/S1;
+		  
+		    result = new Float(FloatD + (FloatM/60) + (FloatS/3600));
+		  
+		 return result;
+	};
+
+	
 	
 	public void setUpDFMWithAllSensorFields(Context appContext) {
 		SharedPreferences mPrefs = appContext.getSharedPreferences(Setup.PROJ_PREFS_ID, 0);

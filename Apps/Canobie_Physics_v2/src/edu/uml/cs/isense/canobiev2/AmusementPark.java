@@ -114,7 +114,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 	private Vibrator vibrator;
 
 	/* Other Important Objects */
-	private LinkedList<String> acceptedFields;
 	private MediaPlayer mMediaPlayer;
 	private API api;
 	public static Context mContext;
@@ -533,8 +532,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 			if (!success) {
 				w.make("Could not re-build queue from file!", Waffle.IMAGE_X);
 			}
-		} else if (requestCode == CHOOSE_SENSORS_REQUESTED) {
-			dfm.setEnabledFields(acceptedFields);
 		} else if (requestCode == SETUP_REQUESTED) {
 				rideName.setText("Ride: " + rideNameString);
 				

@@ -324,13 +324,6 @@ public class UploadQueue implements Serializable {
 
 		@Override
 		protected void onPreExecute() {
-
-			dia = new ProgressDialog(mContext);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setMessage("Please wait while your data and media saved to Queue");
-			dia.setCancelable(false);
-			dia.show();
-
 		}
 		
 		@Override
@@ -341,34 +334,18 @@ public class UploadQueue implements Serializable {
 
 		@Override
 		protected void onPostExecute(String sdFileName) {
-
-			dia.setMessage("Done");
-			dia.dismiss();
-			Waffle w = new Waffle(mContext);
-			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
-					Waffle.IMAGE_CHECK);
-			
 			Intent i = new Intent().setClass(mContext, QueueLayout.class);
 			i.putExtra(QueueLayout.PARENT_NAME, getParentName());
 			mContext.startActivity(i);
-			
-//			showUploadQueue();
-//
-//			Date date = new Date();
-//			showSummary(date, sdFileName);
-
 		}
 	}
 	
 	// Calls the api primitives for actual uploading
 		private Runnable uploader = new Runnable() {
-
 			@Override
 			public void run() {
-	
 				addDataSetToQueue(ds);
 			}
-
 		};
 
 	

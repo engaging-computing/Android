@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,6 +24,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,42 +32,29 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import edu.uml.cs.isense.comm.API;
+import edu.uml.cs.isense.dfm.DataFieldManager;
+import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QDataSet;
+import edu.uml.cs.isense.queue.QDataSet.Type;
 
 
 public class Datawalk_Service extends Service {
-
-    private static final String TAG	= Datawalk_Service.class.getSimpleName();
-
-
     private SensorManager mSensorManager;
     private LocationManager mLocationManager;
     private MyLocationListener locationListener;
     private MySensorListener sensorListener;
-
-
-    private Location loc;
-    private Location prevLoc;
-    private Location firstLoc;
+    
+	private DataFieldManager dfm;
 
     private float accel[];
     private JSONArray dataSet;
 
-    private int elapsedMillis = 0;
-
-    private Timer Timer;
     private Timer recordTimer;
-    private int timerTick = 0;
-
-    private final int TIMER_LOOP = 1000;
 
     private int dataPointCount = 0;
 
     public static boolean running = false;
-    private boolean gpsWorking = true;
-
-    private Timer gpsTimer;
-
 
     /* Distance and Velocity */
     float distance = 0;
@@ -77,15 +66,10 @@ public class Datawalk_Service extends Service {
 
     Intent intent;
 
-    private String  Name = "";
-    private String loginPass = "";
-    private String projectURL = "";
     private String dataSetName = "";
-    private int dataSetID = -1;
 
     LocalBroadcastManager broadcaster;
     static final public String DATAWALK_RESULT = "edu.uml.cs.isense.datawalk_v2.Datawalk_Service.REQUEST_PROCESSED";
-
 
     /**
      * This is called when service is first created. The location manager is initiated but no data is
@@ -101,6 +85,9 @@ public class Datawalk_Service extends Service {
         // initialize GPS and Sensor managers
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        
+        //initialize dfm which handles project fields and data recording
+        initDfm();
 
         initLocationManager();
 
@@ -128,10 +115,21 @@ public class Datawalk_Service extends Service {
             notificationManger.notify(01, notification);
         }
 
-        //TODO callback to update ui with location data instead of having two location managers (one here and one in DataWalk.java)
-//        waitingForGPS();
+
 
 	}
+    
+    /**
+	 * Initialize DataFieldManager Object
+	 */
+		private void initDfm() {
+			API api = API.getInstance();
+			
+			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
+			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, DataWalk.mContext);
+			dfm.enableAllSensorFields();
+		}
 
     public void updateDataPoints(String message) {
         Intent intent = new Intent(DATAWALK_RESULT);
@@ -173,14 +171,17 @@ public class Datawalk_Service extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e("onStartCommand", "");
-
         running = true;
 
+		dfm.setProjID(Integer.parseInt(DataWalk.projectID));
+        
         dataPointCount = 0;
 
         //record data
         runRecordingTimer(intent);
-
+        
+        dfm.recordData(1000);
+        
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -194,39 +195,22 @@ public class Datawalk_Service extends Service {
 
         if (running) {
 
-            running = false;
+        	running = false;
 
             // Cancel the recording timer
-            if (recordTimer != null)
-                recordTimer.cancel();
+            dfm.stopRecording();
 
             // Create the name of the session using the entered name
             dataSetName = DataWalk.firstName + " " + DataWalk.lastInitial;
 
-
             // Save the newest DataSet to the Upload Queue if it has at
             // least 1 point
+			
+			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+			String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataPointCount;
+			Type type = Type.DATA;
 
-            Date date = new Date();
-
-
-            QDataSet ds = new QDataSet(dataSetName,
-                    "Time: " + getNiceDateString(date)  + " Data Points: " + dataPointCount,
-                    QDataSet.Type.DATA,
-                    dataSet.toString(),
-                    null,
-                    DataWalk.projectID,
-                    null);
-
-            ds.setRequestDataLabelInOrder(true);
-
-            Log.e("dataset: ", ds.getData());
-
-                    if (dataPointCount > 0) {
-                        DataWalk.uq.addDataSetToQueue(ds);
-                    }
-
-
+			DataWalk.uq.addToQueue(dataSetName, description, type, dataSet, null, DataWalk.projectID, null);
         }
 
         if (mLocationManager != null)
@@ -259,9 +243,6 @@ public class Datawalk_Service extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-
-
-
         return null;
     }
 
@@ -275,7 +256,6 @@ public class Datawalk_Service extends Service {
      */
     void runRecordingTimer(Intent intent) {
 
-
         // Prepare new containers where our recorded values will be stored
         dataSet = new JSONArray();
         accel = new float[4];
@@ -283,131 +263,16 @@ public class Datawalk_Service extends Service {
         // Reset timer variables
         startTime = System.currentTimeMillis();
 
-        elapsedMillis = 0;
-        timerTick = 0;
-
         // Rajia Set First Point to false hopefully this will fix the big
         // velocity issue
         bFirstPoint = true;
 
         // Initialize Total Distance
         totalDistance = 0;
-
-        // Creates a new timer that runs every second
-        recordTimer = new Timer();
-        recordTimer.scheduleAtFixedRate(new TimerTask() {
-
-            public void run() {
-                recordData();
-            }
-
-        }, 3000, TIMER_LOOP); //3000 is 3 second delay before starting to give gps time to boot up
-
+        
     }
 
-    void recordData() {
 
-        // Increase the timerTick count
-        timerTick++;
-
-        // Rajia: Begin Distance and Velocity Calculation
-        // : Only if GPS is working
-
-        // Convert Interval to Seconds
-        int nSeconds = DataWalk.mInterval / 1000;
-
-        if (gpsWorking) {
-            if (timerTick % nSeconds == 0) {
-
-                // For first point we do not have a previous location
-                // yet
-                // This will happen only once
-                if (bFirstPoint) {
-                    prevLoc.set(loc);
-                    bFirstPoint = false;
-                    // Also Try this for total distance
-                    firstLoc.set(loc);
-                }
-                distance = loc.distanceTo(prevLoc);
-
-                // Calculate Velocity
-                velocity = distance / nSeconds;
-
-                // Rajia: Now this location will be the previous one the
-                // next time we get here
-                prevLoc.set(loc);
-
-                // Rajia Accumlate total distance
-                totalDistance += distance;
-            }
-        }
-
-
-
-        // Update the main UI with the correct number of seconds
-
-
-        if (timerTick == 1) {
-            updateTime("Time Elapsed: " + timerTick
-                    + " second");
-        } else {
-            updateTime("Time Elapsed: " + timerTick
-                    + " seconds");
-        }
-
-        // Update distance and velocity text boxes
-        updateDistance("Distance: "
-                + roundTwoDecimals(totalDistance * 0.000621371)
-                + " Miles " + roundTwoDecimals(totalDistance)
-                + " Meters");
-
-        updateVelocity("Velocity: "
-                + roundTwoDecimals(velocity * 2.23694)
-                + " MPH " + roundTwoDecimals(velocity)
-                + " M/Sec    ");
-
-
-        // Every n seconds which is determined by interval
-        // (not including time 0)
-        if ((timerTick % (DataWalk.mInterval / 1000)) == 0 && timerTick != 0) {
-
-            // Prepare a new row of data
-            JSONArray dataJSON = new JSONArray();
-
-            // Determine how long you've been recording for
-            elapsedMillis += DataWalk.mInterval;
-            long time = startTime + elapsedMillis;
-
-            try {
-
-                // Store new values into JSON Array
-                dataJSON.put("u " + time);
-                dataJSON.put(accel[3]);
-                dataJSON.put(velocity);
-                dataJSON.put(totalDistance);
-                dataJSON.put(loc.getLatitude());
-                dataJSON.put(loc.getLongitude());
-
-                // Save this data point if GPS says it has a lock
-
-
-                dataSet.put(dataJSON);
-
-                // Updated the number of points recorded here and on
-                // the main UI
-                dataPointCount++;
-
-
-
-                updateDataPoints("Points Recorded: "
-                        + dataPointCount);
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
 
 
@@ -431,13 +296,7 @@ public class Datawalk_Service extends Service {
                 mLocationManager.getBestProvider(criteria, true), 0, 0,
                 locationListener);
 
-
-        // Save new GPS points in our loc variable
-        loc = new Location(mLocationManager.getBestProvider(criteria, true));
-
-        prevLoc = loc;
-        firstLoc = loc;
-    }
+}
 
     private void initSensorManager() {
         //MySensorListener is an object of the class I made down below
@@ -467,32 +326,14 @@ public class Datawalk_Service extends Service {
     {
 
         public void onLocationChanged(final Location location) {
-
-            Log.e("location data here" , Double.toString(loc.getLatitude()) );
-
-
-            if (location.getLatitude() != 0 && location.getLongitude() != 0) {
-                loc = location;
-                gpsWorking = true;
-            } else {
-                // Rajia will that fix the random velocity problem
-                prevLoc.set(loc);
-                gpsWorking = false;
-            }
-
-
-
+    		dfm.updateLoc(location);
         }
 
         public void onProviderDisabled(String provider) {
-            gpsWorking = false;
         }
-
 
         public void onProviderEnabled(String provider) {
-            gpsWorking = true;
         }
-
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
 
@@ -508,7 +349,11 @@ public class Datawalk_Service extends Service {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-//            Log.e("onSensorChanged ", "here");
+        	if (dfm != null) {
+    			dfm.updateValues(event);
+    		} else {
+    			Log.e("onSensorChanged ", "dfm is null");
+    		}
 
             if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
                 try {
@@ -532,6 +377,8 @@ public class Datawalk_Service extends Service {
     }
 
 
+    
+    
 }
 
 

@@ -34,6 +34,7 @@ public class CredentialManagerKey extends Activity {
 		name = "";
 
 		newKey = (EditText) findViewById(R.id.edittext_key);
+		//TODO add new edit text for contribname
 
 		bOK = (Button) findViewById(R.id.button_ok);
 		bCancel = (Button) findViewById(R.id.button_cancel);

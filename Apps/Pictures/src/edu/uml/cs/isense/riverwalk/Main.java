@@ -14,7 +14,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.ExifInterface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,28 +36,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
 import org.json.JSONArray;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import edu.uml.cs.isense.comm.API;
-import edu.uml.cs.isense.comm.Connection;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.dfm.Fields;
 import edu.uml.cs.isense.proj.Setup;
-import edu.uml.cs.isense.queue.QDataSet;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
+import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.riverwalk.dialogs.CameraPreview;
 import edu.uml.cs.isense.riverwalk.dialogs.Continuous;
 import edu.uml.cs.isense.riverwalk.dialogs.Description;
@@ -72,7 +66,7 @@ public class Main extends Activity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
-	private static final int project_REQUESTED = 104;
+	private static final int PROJECT_REQUESTED = 104;
 	private static final int QUEUE_UPLOAD_REQUESTED = 105;
 	private static final int DESCRIPTION_REQUESTED = 106;
 	private static final int SELECT_PICTURE_REQUESTED = 107;
@@ -95,8 +89,6 @@ public class Main extends Activity implements LocationListener {
 	public static UploadQueue uq;
 	public static final String activityName = "genpicsmain";
 
-	private static boolean uploadError = false;
-	private static boolean status400 = false;
 	public static boolean initialLoginStatus = true;
 	private static boolean showGpsDialog = true;
 
@@ -106,9 +98,7 @@ public class Main extends Activity implements LocationListener {
 	private Handler mHandler;
 	private TextView latLong;
 	private TextView queueCount;
-	private long curTime;
 	private static int waitingCounter = 0;
-	private static String descriptionStr = "";
 	
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
@@ -124,10 +114,6 @@ public class Main extends Activity implements LocationListener {
 
 	// private ProgressDialog dia;
 	private DataFieldManager dfm;
-	private Fields f;
-	
-	private double lat;
-	private double lon;
 
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	private static Camera mCamera;
@@ -158,8 +144,6 @@ public class Main extends Activity implements LocationListener {
 
 		w = new Waffle(mContext);
 
-		f = new Fields();
-
 		api = API.getInstance();
 		api.useDev(useDev);
 		
@@ -176,6 +160,8 @@ public class Main extends Activity implements LocationListener {
 					+ mPrefs.getString("project_id", ""));
 		}
 		
+		//Initialize DataFieldManager object
+		initDfm();
 
 		mHandler = new Handler();
 
@@ -230,15 +216,11 @@ public class Main extends Activity implements LocationListener {
 								MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 								values);
 						
-						//OrientationManager.disableRotation(Main.this);
-
 						Intent intent = new Intent(
 								MediaStore.ACTION_IMAGE_CAPTURE);
 						intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 						intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);	
 						startActivityForResult(intent, CAMERA_PIC_REQUESTED);
-						//OrientationManager.enableRotation(Main.this);
-
 
 					} else {
 						w.make("Cannot write to external storage.",
@@ -310,7 +292,7 @@ public class Main extends Activity implements LocationListener {
 
 				Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//              intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(
 						Intent.createChooser(intent, "Select Picture"),
 						SELECT_PICTURE_REQUESTED);
@@ -414,7 +396,6 @@ public class Main extends Activity implements LocationListener {
 					runOnUiThread(new Runnable() {
 						public void run() {
 							try {
-                                mCamera.enableShutterSound(true);
                   				mCamera.takePicture(null, null, mPicture); // takes
 																			// a
 																			// picture
@@ -436,12 +417,27 @@ public class Main extends Activity implements LocationListener {
 
                     if (validPicture) {
 
-                        //set curTime lat and long before running upload task
-					curTime = System.currentTimeMillis();
-					lat = loc.getLatitude();
-					lon = loc.getLongitude();
-					uploader.run();
-					uq.buildQueueFromFile();
+               
+  	
+            		SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
+        			String projId = mPrefs.getString("project_id", "-1");
+        			
+        			String dataSetName;
+        			if ( Description.photo_description == null) {
+        				dataSetName = name.getText().toString();
+        			} else {
+        				dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
+        			}
+        			
+        			String description = DateFormat.getDateTimeInstance().format(new Date());
+        			
+        			JSONArray dataPoint = dfm.recordDataPoint();
+        			JSONArray dataSet = new JSONArray();
+        			dataSet.put(dataPoint);
+            		
+        			//add image and data to upload queue
+    				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null);
+                	uq.buildQueueFromFile();
 
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -584,9 +580,6 @@ public class Main extends Activity implements LocationListener {
 		if (type == MEDIA_TYPE_IMAGE) {
 			mediaFile = new File(mediaStorageDir.getPath() + File.separator
 					+ "IMG_" + timeStamp + ".jpg");
-			// } else if(type == MEDIA_TYPE_VIDEO) {
-			// mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-			// "VID_"+ timeStamp + ".mp4");
 		} else {
 			return null;
 		}
@@ -644,7 +637,7 @@ public class Main extends Activity implements LocationListener {
 					Setup.class);
 			iproject.putExtra("constrictFields", true);
 			iproject.putExtra("app_name", "Pictures");
-			startActivityForResult(iproject, project_REQUESTED);
+			startActivityForResult(iproject, PROJECT_REQUESTED);
 			return true;
 
 		case R.id.MENU_ITEM_LOGIN:
@@ -763,7 +756,6 @@ public class Main extends Activity implements LocationListener {
 			w.make("No data to upload.", Waffle.IMAGE_X);
 			return;
 		}
-		//TODO
 		Intent i = new Intent().setClass(mContext, QueueLayout.class);
 		i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
 		startActivityForResult(i, QUEUE_UPLOAD_REQUESTED);
@@ -781,13 +773,7 @@ public class Main extends Activity implements LocationListener {
 			waitingForGPS();
 	}
 
-	private static int getApiLevel() {
-		return android.os.Build.VERSION.SDK_INT;
-	}
-
 	public static File convertImageUriToFile(Uri imageUri, Context c) {
-            Log.e("BOBBY URI !!! ", imageUri.toString());
-
 			String[] proj = { MediaStore.Images.Media.DATA,
 					MediaStore.Images.Media._ID };
 
@@ -813,82 +799,26 @@ public class Main extends Activity implements LocationListener {
 			}
 			return null;
 	}
-
-	private void postRunnableWaffleError(final String message) {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				w.make(message, Waffle.LENGTH_LONG, Waffle.IMAGE_X);
-			}
-		});
-	}
-
-	/* Add pictures and Data assosiated with picture to queue */
-	private Runnable uploader = new Runnable() {
-		@Override
-		public void run() {
-
-			SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
-			String projNum = mPrefs.getString("project_id", "Error");
-
-			if (projNum.equals("Error")) {
-				uploadError = true;
-				postRunnableWaffleError("No project selected to upload pictures to");
-				return;
-			}
-
-			// if (dfm == null)
-			initDfm();
-
-			JSONArray dataJSON = new JSONArray(); // data is set into JSONArray
-													// to be uploaded
-
-			if (!Connection.hasConnectivity(mContext))
-				projNum = "-1";
-
-
-			if (dfm.enabledFields[Fields.TIME])
-				f.timeMillis = curTime;
-			System.out.println("curTime =" + f.timeMillis);
-			if (dfm.enabledFields[Fields.LATITUDE])
-				f.latitude = lat;
-			System.out.println("Latitude =" + f.latitude);
-			if (dfm.enabledFields[Fields.LONGITUDE])
-				f.longitude = lon;
-			System.out.println("Longitude =" + f.longitude);
-			
-			dataJSON.put(dfm.putData());
-			
-			QDataSet ds;
-			ds = new QDataSet(name.getText().toString()
-					+ (descriptionStr.equals("") ? "" : ": " + descriptionStr),
-					makeThisDatePretty(curTime), QDataSet.Type.BOTH,
-					dataJSON.toString(), picture, projNum, null);
-				
-				/*upload to project not a data set*/
-//				ds = new QDataSet(name.getText().toString()
-//						+ (descriptionStr.equals("") ? "" : ": " + descriptionStr),
-//						makeThisDatePretty(curTime), QDataSet.Type.PIC,
-//						null, picture, projNum, null);
-
-			
-			
-
-			System.out.println("projectNum = " + projNum);
-
-			uq.addDataSetToQueue(ds);
-		}
-	};
-
-	private void initDfm() { // sets up data field manager
+	/**
+	 * Sets up data field manager
+	 */
+	private void initDfm() {
+		//get projId from saved prefs
 		SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
-		String projectInput = mPrefs.getString("project_id", "");
-		System.out.println("projectInput =" + projectInput);
+		String projectInput = mPrefs.getString("project_id", "-1");
+		
 		dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-				mContext, f);
-		dfm.getOrderWithExternalAsyncTask();
-		dfm.enableAllFields();
-		System.out.println("order =" + dfm.getOrderList());
+				mContext);
+		
+		/*Enable fields that app is capable of recording*/
+		LinkedList<String> acceptedFields = new LinkedList<String>();
+		acceptedFields.add(0, "Time");
+		acceptedFields.add(1, "Latitude");
+		acceptedFields.add(2, "Longitude");			
+		dfm.setEnabledFields(acceptedFields);	
+
+		/*Checks to see what fields entered above exist on this particular project*/
+		dfm.setProjID(Integer.parseInt(projectInput));
 	}
 
 	@Override
@@ -902,7 +832,6 @@ public class Main extends Activity implements LocationListener {
 		if (requestCode == CAMERA_PIC_REQUESTED) { // request to takes picture
 
 			if (resultCode == RESULT_OK) {
-				curTime = System.currentTimeMillis();
 				picture = convertImageUriToFile(imageUri, mContext);
 
 				Intent iDesc = new Intent(Main.this, Description.class);
@@ -910,19 +839,19 @@ public class Main extends Activity implements LocationListener {
 
 			}
 
-		} else if (requestCode == project_REQUESTED) { // obtains data fields
+		} else if (requestCode == PROJECT_REQUESTED) { // obtains data fields
 															// from project on
 															// isense
 			if (resultCode == Activity.RESULT_OK) {
 				SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
-				String eidString = mPrefs.getString("project_id", "");
+				String projIdString = mPrefs.getString("project_id", "");
 
 				projectLabel.setText(getResources().getString(
 						R.string.projectLabel)
-						+ eidString);
+						+ projIdString);
 								
-				dfm = new DataFieldManager(Integer.parseInt(eidString), api,
-						mContext, f);
+				dfm.setProjID(Integer.parseInt(projIdString));
+
 				dfm.getOrder();
 			}
 		} else if (requestCode == LOGIN_REQUESTED) { 
@@ -937,96 +866,57 @@ public class Main extends Activity implements LocationListener {
 			}
 
 		} else if (requestCode == DESCRIPTION_REQUESTED) {
-			descriptionStr = Description.photo_description;
-
 			uq.buildQueueFromFile();
 			queueCount.setText(getResources().getString(R.string.queueCount)
 					+ uq.queueSize());
 			
-			lat = loc.getLatitude();
-			lon = loc.getLongitude();
+			/*Records current time stamp and location data*/
+			JSONArray dataPoint = dfm.recordDataPoint();
+			JSONArray dataSet = new JSONArray();
+			dataSet.put(dataPoint);
+			Log.e("Pictures", dataSet.toString());
+			
+			SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
+			String projId = mPrefs.getString("project_id", "-1");
 
-			new UploadTask().execute();
-
+			String dataSetName = name.getText().toString() + " " + Description.photo_description;
+			String description = DateFormat.getDateTimeInstance().format(new Date());
+    		
+			//add image and data to upload queue
+			uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null);
+			
 		} else if (requestCode == SELECT_PICTURE_REQUESTED) {
 			if (resultCode == Activity.RESULT_OK) {
 
                 Uri selectedImageUri = data.getData();
-				String[] filePathColumn = { MediaStore.Images.Media.DATA };
-				Cursor cursor = getContentResolver().query(selectedImageUri,
-						filePathColumn, null, null, null);
-				cursor.moveToFirst();
-				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-				String picturePath = cursor.getString(columnIndex);
-				cursor.close();
 
-				picture = new File(picturePath);
+                /*gets data from picture */
+                JSONArray dataPoint = dfm.getDataFromPic(selectedImageUri);
+                JSONArray dataSet = new JSONArray();
+                dataSet.put(dataPoint);
+                
+                /* turns image uri to file to be uploaded */       
+        		File picture = convertImageUriToFile(selectedImageUri, mContext);
+        		
+        		SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
+    			String projId = mPrefs.getString("project_id", "-1");
+    			
+    			/* add picture and data to queue */
+    			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+    			String dataSetName = name.getText().toString();
+    			String description = currentDateTimeString;
+        		
+    			
+    			//add image and data to upload queue
+				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null);
 
-
-				
-				/*get data from picture file*/
-				ExifInterface exifInterface;
-				try {
-					exifInterface = new ExifInterface(picturePath);
-
-					String date = exifInterface.getAttribute(ExifInterface.TAG_GPS_DATESTAMP);
-					String time = exifInterface.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP);
-					
-					String dateTime = date + " " + time;
-					
-					try {
-						SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-						Date parsedDate = dateFormat.parse(dateTime);
-						curTime = parsedDate.getTime();
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}					
-
-					/*get location data from image*/
-					String latString = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-					String lonString = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-					String latRef = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
-					String lonRef = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
-					
-					if (latString != null && lonString != null) {
-					
-						lat = convertToDegree(latString);
-						lon = convertToDegree(lonString);
-						
-						if(latRef.equals("N")){
-							lat = convertToDegree(latString);
-						} else {
-							lat = 0 - convertToDegree(latString);
-						}
-						 
-						if(lonRef.equals("E")){
-							lon = convertToDegree(lonString);
-						} else {
-						   lon = 0 - convertToDegree(lonString);
-						}	
-						
-					} else {
-						lat = 0;
-						lon = 0;
-					}
-
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-
-                /*add image to upload queue*/
-				new UploadTask().execute();
-				
-				
 			}
 		} 
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		loc = location;
+		dfm.updateLoc(location);
 	}
 
 	@Override
@@ -1040,55 +930,6 @@ public class Main extends Activity implements LocationListener {
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-	}
-
-	private class UploadTask extends AsyncTask<Void, Integer, Void> { // adds
-																		// picture
-																		// to
-																		// queue
-
-		@Override
-		protected void onPreExecute() {
-			OrientationManager.disableRotation(Main.this);
-
-			// dia = new ProgressDialog(Main.this);
-			// dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			// dia.setMessage("Saving picture...");
-			// dia.setCancelable(false);
-			// dia.show();
-		}
-
-		@Override
-		protected Void doInBackground(Void... voids) {
-			uploader.run();
-			publishProgress(100);
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void voids) {
-
-			// dia.cancel();
-
-			OrientationManager.enableRotation(Main.this);
-
-			if (status400) {
-				w.make("Your data cannot be uploaded to this project.  It has been closed.",
-						Waffle.LENGTH_LONG, Waffle.IMAGE_X);
-			} else if (uploadError) {
-				// Do nothing - postRunnableWaffleError takes care of this
-				// Waffle
-			} else {
-				w.make("Picture saved!", Waffle.LENGTH_LONG, Waffle.IMAGE_CHECK);
-			}
-
-			queueCount.setText(getResources().getString(R.string.queueCount)
-					+ uq.queueSize());
-			uq.buildQueueFromFile();
-
-			uploadError = false;
-		}
 	}
 
 	// initialize location listener to get a pair of coordinates
@@ -1182,12 +1023,6 @@ public class Main extends Activity implements LocationListener {
 		super.onPause();
 	}
 
-	private String makeThisDatePretty(long time) {
-		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss.SSS, MM/dd/yy",
-				Locale.US);
-		return sdf.format(time);
-	}
-
 	@SuppressLint("UseValueOf")
 	private Float convertToDegree(String stringDMS){
 		 Float result = null;
@@ -1211,8 +1046,6 @@ public class Main extends Activity implements LocationListener {
 		    result = new Float(FloatD + (FloatM/60) + (FloatS/3600));
 		  
 		 return result;
-
-
 		};
 
 

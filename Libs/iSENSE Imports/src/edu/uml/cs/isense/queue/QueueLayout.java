@@ -24,7 +24,6 @@ import edu.uml.cs.isense.comm.uploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.dfm.FieldMatching;
-import edu.uml.cs.isense.dfm.Fields;
 import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -674,9 +673,8 @@ public class QueueLayout extends Activity implements OnClickListener {
 			SharedPreferences mPrefs = getSharedPreferences("PROJID_QUEUE", 0);
 			String projectInput = mPrefs.getString("project_id", "-1");
 
-			Fields f = new Fields();
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-					mContext, f);
+					mContext);
 			dfm.getOrderWithExternalAsyncTask();
 			dfm.writeProjectFields();
 

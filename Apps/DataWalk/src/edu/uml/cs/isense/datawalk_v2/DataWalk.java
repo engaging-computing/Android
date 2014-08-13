@@ -41,8 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.Timer;
@@ -94,7 +92,6 @@ public class DataWalk extends Activity implements LocationListener,
 	private SensorManager mSensorManager;
 	private Location loc;
 	private Location prevLoc;
-	private Location firstLoc;
 	private Timer recordTimer;
 	private Timer gpsTimer;
 	private Waffle w;
@@ -107,10 +104,8 @@ public class DataWalk extends Activity implements LocationListener,
 	public static boolean useDev = false;
 	public static String projectID = "13";
 
-	private String loginName = "";
-	private String loginPass = "";
+	
 	private String projectURL = "";
-	private String dataSetName = "";
 	private int dataSetID = -1;
 
 	/* Project Preferences */
@@ -132,7 +127,6 @@ public class DataWalk extends Activity implements LocationListener,
 
 	/* Recording Globals */
 	private float accel[];
-	private JSONArray dataSet;
 
 	/* Dialog Identity Constants */
 	private final int DIALOG_VIEW_DATA = 2;
@@ -148,7 +142,6 @@ public class DataWalk extends Activity implements LocationListener,
 	private final int TIMER_LOOP = 1000;
 	private static final int DEFAULT_INTERVAL = 10000;
 	public static int mInterval = DEFAULT_INTERVAL;
-	private int elapsedMillis = 0;
 	private int dataPointCount = 0;
 	private int timerTick = 0;
 	private int gpsWaitingCounter = 0;
@@ -191,6 +184,7 @@ public class DataWalk extends Activity implements LocationListener,
 
 		// Initialize main UI elements
 		initialize();
+		
 
         /* update UI with data passed back from service */
         receiver = new BroadcastReceiver() {
@@ -289,7 +283,7 @@ public class DataWalk extends Activity implements LocationListener,
                         (loc.getLatitude() != 0 && loc.getLongitude() != 0)  ) {
                     setLayoutRecording();
                     startService(service);
-                } else if (!gpsWorking || (loc.getLatitude() != 0 && loc.getLongitude() != 0) ) {
+                } else if (!gpsWorking || (loc.getLatitude() == 0 && loc.getLongitude() == 0) ) {
                     w.make("No GPS Signal", Waffle.LENGTH_LONG, Waffle.IMAGE_X);
                 }
 
@@ -695,8 +689,6 @@ public class DataWalk extends Activity implements LocationListener,
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
-        boolean gpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
 		// Start the GPS listener
         mLocationManager.addGpsStatusListener(this);
 
@@ -709,7 +701,6 @@ public class DataWalk extends Activity implements LocationListener,
 		loc = new Location(mLocationManager.getBestProvider(criteria, true));
 		// Rajia
 		prevLoc = loc;
-		firstLoc = loc;
 	}
 
 	/**
@@ -1154,5 +1145,7 @@ public class DataWalk extends Activity implements LocationListener,
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 		return Double.valueOf(twoDForm.format(d));
 	}
+	
+	
 
 }

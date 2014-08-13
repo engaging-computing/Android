@@ -172,7 +172,7 @@ public class QDataSet implements Serializable {
 					// if we got here, the data is a JSONArray of JSONArrays:
 					// convert it
 					DataFieldManager dfm = new DataFieldManager(
-							Integer.parseInt(this.projID), api, c, null);
+							Integer.parseInt(this.projID), api, c);
 					this.data = dfm.convertInternalDataToJSONObject(ja)
 							.toString();
                     requestDataLabelInOrder = false;
@@ -246,8 +246,9 @@ public class QDataSet implements Serializable {
 							Integer.parseInt(projID), picture, TargetType.PROJECT);
 				} else {
 					String key = CredentialManagerKey.getKey();
+					String conName = CredentialManagerKey.getName();
                     info = UploadQueue.getAPI().uploadMedia(
-							Integer.parseInt(projID), picture, TargetType.PROJECT, key, name);
+							Integer.parseInt(projID), picture, TargetType.PROJECT, key, conName);
 				}
 				break;
 
@@ -260,8 +261,9 @@ public class QDataSet implements Serializable {
 							info.dataSetId, picture, TargetType.DATA_SET);
 				} else {
 					String key = CredentialManagerKey.getKey();
+					String conName = CredentialManagerKey.getName();
 					picInfo = UploadQueue.getAPI().uploadMedia(
-                            info.dataSetId, picture, TargetType.DATA_SET, key, name);
+                            info.dataSetId, picture, TargetType.DATA_SET, key, conName);
 				}
 
                 info.mediaId = picInfo.mediaId;

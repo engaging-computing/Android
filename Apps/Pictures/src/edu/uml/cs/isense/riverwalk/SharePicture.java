@@ -52,8 +52,6 @@ public class SharePicture extends Activity {
 
 	private Waffle w;
 
-
-
 	API api = API.getInstance();
 
 	Context mContext;
@@ -79,8 +77,6 @@ public class SharePicture extends Activity {
         api.useDev(false);
 
 	    w = new Waffle(mContext);
-
-
 
 	    if (Intent.ACTION_SEND.equals(action) && type != null) {
 	        if (type.startsWith("image/")) {
@@ -193,6 +189,7 @@ public class SharePicture extends Activity {
                     } else {
                         validPicture = true;
                     }
+                    
                     if (validPicture) {
                         info = api.uploadMedia(project, imageFiles.get(i), TargetType.PROJECT);
                     } else {
@@ -246,11 +243,13 @@ public class SharePicture extends Activity {
                 Log.e("test", "Here");
                 for (int i = 0; i < imageUris.size(); i++) {
                     boolean validPicture;
+                    
                     if (imageFiles.get(i) == null) {
                         validPicture = false;
                     } else {
                         validPicture = true;
                     }
+                    
                     if (validPicture) {
                         info = api.uploadMedia(project, imageFiles.get(i), TargetType.PROJECT, key, "");
                     } else {
@@ -269,6 +268,7 @@ public class SharePicture extends Activity {
                             }
                         }
                     });
+                    
                 }
                 return null;
             }

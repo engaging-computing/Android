@@ -422,9 +422,14 @@ public class Main extends Activity implements LocationListener {
             		SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
         			String projId = mPrefs.getString("project_id", "-1");
         			
-        			String dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
-        			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        			String description = "Time: " + currentDateTimeString;
+        			String dataSetName;
+        			if ( Description.photo_description == null) {
+        				dataSetName = name.getText().toString();
+        			} else {
+        				dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
+        			}
+        			
+        			String description = DateFormat.getDateTimeInstance().format(new Date());
         			
         			JSONArray dataPoint = dfm.recordDataPoint();
         			JSONArray dataSet = new JSONArray();
@@ -875,7 +880,7 @@ public class Main extends Activity implements LocationListener {
 			String projId = mPrefs.getString("project_id", "-1");
 
 			String dataSetName = name.getText().toString() + " " + Description.photo_description;
-			String description = "Time: " + DateFormat.getDateTimeInstance().format(new Date());
+			String description = DateFormat.getDateTimeInstance().format(new Date());
     		
 			//add image and data to upload queue
 			uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null);
@@ -890,23 +895,16 @@ public class Main extends Activity implements LocationListener {
                 JSONArray dataSet = new JSONArray();
                 dataSet.put(dataPoint);
                 
-                /* turns image uri to file to be uploaded */
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-        		Cursor cursor = getContentResolver().query(imageUri,
-        				filePathColumn, null, null, null);
-        		cursor.moveToFirst();
-        		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-        		String picturePath = cursor.getString(columnIndex);
-        		cursor.close();
-        		File picture = new File(picturePath);
+                /* turns image uri to file to be uploaded */       
+        		File picture = convertImageUriToFile(selectedImageUri, mContext);
         		
         		SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
     			String projId = mPrefs.getString("project_id", "-1");
     			
     			/* add picture and data to queue */
-    			String dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
     			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-    			String description = "Time: " + currentDateTimeString;
+    			String dataSetName = name.getText().toString();
+    			String description = currentDateTimeString;
         		
     			
     			//add image and data to upload queue

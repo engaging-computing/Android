@@ -12,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.ExifInterface;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -23,7 +24,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Timer;
@@ -1389,14 +1392,13 @@ public class DataFieldManager extends Application {
 	public JSONArray getDataFromPic(Uri imageUri) {
 		double lat = 0;
 		double lon = 0;
-		String dateTime = null;
+		Long timePicTaken = null;
 		String picturePath; 
 		
-		if (imageUri == null){ 
-			Log.e("here", "null");
-		}
 		
-	    Cursor cursor = getContentResolver().query(imageUri, null, null, null, null);
+		
+		
+	    Cursor cursor = mContext.getContentResolver().query(imageUri, null, null, null, null);
 		if (cursor == null) { // Source is a cloud service (Dropbox, GoogleDrive)
 			picturePath = imageUri.getPath();
 	    } else { 
@@ -1411,11 +1413,18 @@ public class DataFieldManager extends Application {
 		try {
 			exifInterface = new ExifInterface(picturePath);
 
-			/* get timestamp from picture */
-			String date = exifInterface.getAttribute(ExifInterface.TAG_GPS_DATESTAMP);
-			String time = exifInterface.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP);
+			/* get timestamp from picture */		
+			String dateTime = exifInterface.getAttribute(ExifInterface.TAG_DATETIME);
+
+			Log.e("Time: ", dateTime);
 			
-			dateTime = date + " " + time;
+			try {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+				Date parsedDate = dateFormat.parse(dateTime);
+				timePicTaken = parsedDate.getTime();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 				
 			/*get location data from image*/
 			String latString = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
@@ -1457,7 +1466,7 @@ public class DataFieldManager extends Application {
         	if(loc != null)
                 f.longitude = lon;
         if (enabledFields[Fields.TIME])
-                f.timeMillis = Long.getLong(dateTime);         
+                f.timeMillis = timePicTaken;         
         
 		return putData();
 				

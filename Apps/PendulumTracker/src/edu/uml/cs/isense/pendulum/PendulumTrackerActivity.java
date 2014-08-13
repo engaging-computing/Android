@@ -1,14 +1,10 @@
 package edu.uml.cs.isense.pendulum;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -21,10 +17,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -47,12 +41,10 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.uml.cs.isense.comm.API;
-import edu.uml.cs.isense.comm.Connection;
-import edu.uml.cs.isense.comm.uploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.EnterName;
-import edu.uml.cs.isense.objects.RProjectField;
-import edu.uml.cs.isense.queue.QDataSet;
+import edu.uml.cs.isense.dfm.DataFieldManager;
+import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -68,6 +60,8 @@ public class PendulumTrackerActivity extends Activity implements
 	public static UploadQueue uq;
 
 	Paint paint;
+	
+	private DataFieldManager dfm;
 
 	public static Context mContext;
 
@@ -91,9 +85,9 @@ public class PendulumTrackerActivity extends Activity implements
 	
 	Boolean sessionNameEntered = false;
 
-	private static String experimentNumber = "29"; // production = 29, dev = 39
+//	private static String projId = "29"; // production = 29, dev = 39
 		
-	private String dateString;
+//	private String dateString;
 
 	// upload progress dialogue
 	ProgressDialog dia;
@@ -105,16 +99,16 @@ public class PendulumTrackerActivity extends Activity implements
 
 	// displayed image width and height
 	private int mImgWidth = 0;
-	private int mImgHeight = 0;
+//	private int mImgHeight = 0;
 
 	private boolean mIsColorSelected = false;
 	private Mat mRgba;
 	private Scalar mBlobColorRgba;
-	private Scalar mBlobColorHsv;
+//	private Scalar mBlobColorHsv;
 
 	private MarkerDetector mDetector;
 	private Mat mSpectrum;
-	private Size SPECTRUM_SIZE;
+//	private Size SPECTRUM_SIZE;
 	private Scalar CONTOUR_COLOR;
 
 	private CameraBridgeViewBase mOpenCvCameraView;
@@ -124,7 +118,7 @@ public class PendulumTrackerActivity extends Activity implements
 															// on another
 	private static boolean mSessionCreated = false;
 	private boolean mDisplayStatus = false;
-	private boolean mEnableTouchMode = false;
+//	private boolean mEnableTouchMode = false;
 
 	// start / stop icons
 	Menu menu;
@@ -198,6 +192,7 @@ public class PendulumTrackerActivity extends Activity implements
 		// mOpenCvCameraView.setMaxFrameSize(640, 480); // debug!
 		mOpenCvCameraView.setMaxFrameSize(320, 240);
 
+		initDfm();
 		
 
 		// TextView for instruction overlay
@@ -260,15 +255,15 @@ public class PendulumTrackerActivity extends Activity implements
 	public void onCameraViewStarted(int width, int height) {
 
 		mImgWidth = width;
-		mImgHeight = height;
+//		mImgHeight = height;
 
 		mRgba = new Mat(height, width, CvType.CV_8UC4);
 		mDetector = new MarkerDetector();
 
 		mSpectrum = new Mat();
 		mBlobColorRgba = new Scalar(255);
-		mBlobColorHsv = new Scalar(255);
-		SPECTRUM_SIZE = new Size(200, 64);
+//		mBlobColorHsv = new Scalar(255);
+//		SPECTRUM_SIZE = new Size(200, 64);
 		CONTOUR_COLOR = new Scalar(255, 0, 0, 255);
 
 	}
@@ -318,14 +313,6 @@ public class PendulumTrackerActivity extends Activity implements
 				
 				Point[] params = {point};
 				new RecordPointsTask().execute(params);
-				
-//				// yScale, -xScale
-//				if (point.x != 0 && point.y != 0) {
-//					// shift x-axis so center vertical axis is set to x=0 in
-//					// pendulum coordinates
-//					final int shiftX = (int) (mImgWidth / 2);
-//					this.addDataPoint(point.x - shiftX, point.y);
-//				}
 
 				// Make TextView disappear
 				mHandler.post(new Runnable() {
@@ -376,9 +363,6 @@ public class PendulumTrackerActivity extends Activity implements
 	}
 
 	private class RecordPointsTask extends AsyncTask<Point, Void, String> {
-
-		ProgressDialog dia;
-
 		@Override
 		protected void onPreExecute() {
 		}
@@ -529,7 +513,8 @@ public class PendulumTrackerActivity extends Activity implements
 				
 				if (mDataSet.length() > 0) {
 					Log.e("Start Stop button pressed", "About to try and add to queue");
-					new AddToQueueTask().execute();					
+					//TODO queue dfm stuff
+//					new AddToQueueTask().execute();					
 				} else {
 					w.make("You must first START data collection to upload data.",
 							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
@@ -610,7 +595,8 @@ public class PendulumTrackerActivity extends Activity implements
 		
 		} else {
 			if (resultCode == RESULT_OK) {
-				new AddToQueueTask().execute();
+				//TODO Queue DFM stuff
+//				new AddToQueueTask().execute();
 			}
 		}
 	}
@@ -655,40 +641,40 @@ public class PendulumTrackerActivity extends Activity implements
 
 
 	// Calls the api primitives for actual uploading
-				private Runnable uploader = new Runnable() {
-
-					@Override
-					public void run() {
-
-						SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
-						Date dt = new Date();
-						dateString = sdf.format(dt);
-						
-						final SharedPreferences mPrefs = getSharedPreferences(
-										EnterName.PREFERENCES_KEY_USER_INFO,
-										Context.MODE_PRIVATE);
-					
-						String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "") 
-												+ mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL, "")
-												+ " - " + dateString;
-			
-						// Create name from time stamp
-						String name = "Test Name";//dataName;
-						
-						Log.e("DATASET", mDataSet.toString());
-						
-						Date date = new Date();
-						
-						// Saves data to queue for later upload
-						QDataSet ds = new QDataSet(nameOfSession, "Pendulum Tracker",QDataSet.Type.DATA,
-								mDataSet.toString(), null, experimentNumber, null);
-
-			            ds.setRequestDataLabelInOrder(true);
-
-						uq.addDataSetToQueue(ds);
-					}
-
-				};
+//				private Runnable uploader = new Runnable() {
+//
+//					@Override
+//					public void run() {
+//
+//						SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
+//						Date dt = new Date();
+//						dateString = sdf.format(dt);
+//						
+//						final SharedPreferences mPrefs = getSharedPreferences(
+//										EnterName.PREFERENCES_KEY_USER_INFO,
+//										Context.MODE_PRIVATE);
+//					
+//						String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "") 
+//												+ mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL, "")
+//												+ " - " + dateString;
+//			
+//						// Create name from time stamp
+//						String name = "Test Name";//dataName;
+//						
+//						Log.e("DATASET", mDataSet.toString());
+//						
+//						Date date = new Date();
+//						
+//						// Saves data to queue for later upload
+//						QDataSet ds = new QDataSet(nameOfSession, "Pendulum Tracker",QDataSet.Type.DATA,
+//								mDataSet.toString(), null, experimentNumber, null);
+//
+//			            ds.setRequestDataLabelInOrder(true);
+//
+//						uq.addDataSetToQueue(ds);
+//					}
+//
+//				};
 
 				
 	
@@ -707,42 +693,52 @@ public class PendulumTrackerActivity extends Activity implements
 	}
 	
 	/**
-	 * Uploads data to iSENSE or something.
-	 * 
-	 * @author jpoulin
+	 * Initialize DataFieldManager Object
 	 */
-	private class AddToQueueTask extends AsyncTask<String, Void, String> {
-
-		ProgressDialog dia;
-
-		@Override
-		protected void onPreExecute() {
-
-			dia = new ProgressDialog(PendulumTrackerActivity.this);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setMessage("Please wait while your data and media saved to Queue");
-			dia.setCancelable(false);
-			dia.show();
-
+		private void initDfm() {
+			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
+			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
+			dfm.enableAllSensorFields();
 		}
-		
-		@Override
-		protected String doInBackground(String... strings) {
-			uploader.run();
-			return null; //strings[0];
-		}
-
-		@Override
-		protected void onPostExecute(String sdFileName) {
-
-			dia.setMessage("Done");
-			dia.dismiss();
-			
-			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
-					Waffle.IMAGE_CHECK);
-			manageUploadQueue();
-			
-		}
-	}
+	
+//	/**
+//	 * Uploads data to iSENSE or something.
+//	 * 
+//	 * @author jpoulin
+//	 */
+//	private class AddToQueueTask extends AsyncTask<String, Void, String> {
+//
+//		ProgressDialog dia;
+//
+//		@Override
+//		protected void onPreExecute() {
+//
+//			dia = new ProgressDialog(PendulumTrackerActivity.this);
+//			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//			dia.setMessage("Please wait while your data and media saved to Queue");
+//			dia.setCancelable(false);
+//			dia.show();
+//
+//		}
+//		
+//		@Override
+//		protected String doInBackground(String... strings) {
+//			uploader.run();
+//			return null; //strings[0];
+//		}
+//
+//		@Override
+//		protected void onPostExecute(String sdFileName) {
+//
+//			dia.setMessage("Done");
+//			dia.dismiss();
+//			
+//			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
+//					Waffle.IMAGE_CHECK);
+//			manageUploadQueue();
+//			
+//		}
+//	}
 }
 

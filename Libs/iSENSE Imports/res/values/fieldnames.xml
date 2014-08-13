@@ -22,6 +22,9 @@
     <string name="luminous_flux">Light</string>         		<!-- 16 -->
     <string name="temperature_f">Temp. (Fahrenheit)</string>    <!-- 17 -->
     <string name="temperature_k">Temp. (Kelvin)</string>		<!-- 18 -->
+    <string name="x">X</string>									<!-- 19 -->
+    <string name="y">Y</string>									<!-- 20 -->
+    
     
     <string name="compatible">Compatible</string>
     <string name="incompatible">Incompatible</string>

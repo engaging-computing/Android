@@ -12,7 +12,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.ExifInterface;
-import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -1389,6 +1388,7 @@ public class DataFieldManager extends Application {
 	 * @param imageUri
 	 * @return JSONArray (DataPoint)
 	 */
+	@SuppressLint("SimpleDateFormat")
 	public JSONArray getDataFromPic(Uri imageUri) {
 		double lat = 0;
 		double lon = 0;

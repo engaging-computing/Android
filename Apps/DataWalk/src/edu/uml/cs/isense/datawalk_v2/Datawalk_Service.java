@@ -22,20 +22,16 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.proj.Setup;
-import edu.uml.cs.isense.queue.QDataSet;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
 
@@ -49,8 +45,6 @@ public class Datawalk_Service extends Service {
 
     private float accel[];
     private JSONArray dataSet;
-
-    private Timer recordTimer;
 
     private int dataPointCount = 0;
 

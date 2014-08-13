@@ -22,7 +22,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.queue.QDataSet.Type;
-import edu.uml.cs.isense.waffle.Waffle;
 
 /**
  * Class that represents the queue of data sets.  This object

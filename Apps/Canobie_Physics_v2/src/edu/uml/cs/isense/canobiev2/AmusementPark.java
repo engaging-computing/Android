@@ -20,7 +20,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Locale;
 
 import org.json.JSONArray;
@@ -136,7 +135,6 @@ public class AmusementPark extends Activity implements SensorEventListener,
 
 	/* Start Activity Codes*/
 	private final int QUEUE_UPLOAD_REQUESTED = 1;
-	private final int CHOOSE_SENSORS_REQUESTED = 3;
 	private final int SYNC_TIME_REQUESTED = 4;
 	private final int SETUP_REQUESTED = 5;
 	private final int LOGIN_REQUESTED = 6;

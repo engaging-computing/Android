@@ -34,7 +34,7 @@ public class Fields {
 	public String mag_x, mag_y, mag_z, mag_total;
 	public String altitude;
 	public String pressure;
-	public double x, y;
+	public float velocity, distance;
 	
 	/**
 	 * Default constructor for the Fields object.
@@ -64,8 +64,8 @@ public class Fields {
 	public static final int LIGHT = 16;
 	public static final int TEMPERATURE_F = 17;
 	public static final int TEMPERATURE_K = 18;
-	public static final int X = 19;
-	public static final int Y = 20;
+	public static final int Velocity = 19;
+	public static final int Distance = 20;
 
 	
 	

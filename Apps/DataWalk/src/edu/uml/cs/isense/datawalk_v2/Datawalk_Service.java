@@ -46,8 +46,6 @@ public class Datawalk_Service extends Service {
     private float accel[];
     private JSONArray dataSet;
 
-    private int dataPointCount = 0;
-
     public static boolean running = false;
 
     /* Distance and Velocity */
@@ -169,8 +167,6 @@ public class Datawalk_Service extends Service {
 
 		dfm.setProjID(Integer.parseInt(DataWalk.projectID));
         
-        dataPointCount = 0;
-
         //record data
         runRecordingTimer(intent);
         
@@ -192,7 +188,7 @@ public class Datawalk_Service extends Service {
         	running = false;
 
             // Cancel the recording timer
-            dfm.stopRecording();
+            dataSet = dfm.stopRecording();
 
             // Create the name of the session using the entered name
             dataSetName = DataWalk.firstName + " " + DataWalk.lastInitial;
@@ -201,7 +197,7 @@ public class Datawalk_Service extends Service {
             // least 1 point
 			
 			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-			String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataPointCount;
+			String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataSet.length();
 			Type type = Type.DATA;
 
 			DataWalk.uq.addToQueue(dataSetName, description, type, dataSet, null, DataWalk.projectID, null);
@@ -369,10 +365,6 @@ public class Datawalk_Service extends Service {
 
         }
     }
-
-
-    
-    
 }
 
 

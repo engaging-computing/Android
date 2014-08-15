@@ -55,6 +55,12 @@ public class DataFieldManager extends Application {
 	private String pressure = "";
 	private String light = "";
 	private Location loc;
+	private Location prevLoc;
+	private float distance = 0;
+	private float totalDistance = 0;
+	private float velocity = 0;
+	
+	long dataSetRate = 0;
 	
 	private int projID;
 	private API api;
@@ -90,7 +96,7 @@ public class DataFieldManager extends Application {
 	 */
 	public boolean[] enabledFields = { false, false, false, false, false,
 			false, false, false, false, false, false, false, false, false,
-			false, false, false, false, false };
+			false, false, false, false, false, false, false };
 
 	/**
 	 * Constructor for the DataFieldManager class.
@@ -179,6 +185,8 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.luminous_flux));
 			order.add(mContext.getString(R.string.temperature_f));
 			order.add(mContext.getString(R.string.temperature_k));
+			order.add(mContext.getString(R.string.velocity));
+			order.add(mContext.getString(R.string.distance));
 		} else {
 			// Execute a new task
 			new GetOrderTask().execute();
@@ -217,6 +225,8 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.luminous_flux));
 			order.add(mContext.getString(R.string.temperature_f));
 			order.add(mContext.getString(R.string.temperature_k));
+			order.add(mContext.getString(R.string.velocity));
+			order.add(mContext.getString(R.string.distance));
 		} else {
 			// Function is being called within an AsyncTask already, so
 			// no need to create a new task for the API call
@@ -349,6 +359,16 @@ public class DataFieldManager extends Application {
 
 			if (enabledFields[Fields.TEMPERATURE_K] && f.temperature_k != null)
 				dataJSON.put(f.temperature_k);
+			else
+				dataJSON.put("");
+			
+			if (enabledFields[Fields.Velocity])
+				dataJSON.put(f.velocity);
+			else
+				dataJSON.put("");
+			
+			if (enabledFields[Fields.Distance])
+				dataJSON.put(f.distance);
 			else
 				dataJSON.put("");
 
@@ -518,6 +538,20 @@ public class DataFieldManager extends Application {
 					b.append(f.pressure);
 				else
 					b.append(", ").append(f.pressure);
+
+			} else if (s.equals(mContext.getString(R.string.velocity))) {
+				firstLineWritten = true;
+				if (start)
+					b.append(f.velocity);
+				else
+					b.append(", ").append(f.velocity);
+
+			} else if (s.equals(mContext.getString(R.string.distance))) {
+				firstLineWritten = true;
+				if (start)
+					b.append(f.distance);
+				else
+					b.append(", ").append(f.distance);
 
 			} else {
 				firstLineWritten = true;
@@ -719,6 +753,14 @@ public class DataFieldManager extends Application {
 								R.string.pressure))) {
 							outRow.put(id + "", row.getString(Fields.PRESSURE));
 							continue;
+						} else if (s.equals(a.getResources().getString(
+								R.string.velocity))) {
+							outRow.put(id + "", row.getString(Fields.Velocity));
+							continue;
+						} else if (s.equals(a.getResources().getString(
+								R.string.distance))) {
+							outRow.put(id + "", row.getString(Fields.Distance));
+							continue;
 						} else {
 							Log.e("DFM", s + " " + a.getResources().getString(
 									R.string.time));
@@ -910,6 +952,18 @@ public class DataFieldManager extends Application {
 					break;
 				}
 
+				// velocity
+				else if (field.name.toLowerCase(Locale.US).contains("velocity")) {
+					order.add(mContext.getString(R.string.velocity));
+					break;
+				}
+				
+				// distance
+				else if (field.name.toLowerCase(Locale.US).contains("distance")) {
+					order.add(mContext.getString(R.string.distance));
+					break;
+				}
+				
 				else {
 					order.add(mContext.getString(R.string.null_string)
 							+ field.name);
@@ -1130,6 +1184,8 @@ public class DataFieldManager extends Application {
 		enabledFields[Fields.PRESSURE] = true;
 		enabledFields[Fields.ALTITUDE] = true;
 		enabledFields[Fields.LIGHT] = true;
+		enabledFields[Fields.Velocity]= true;
+		enabledFields[Fields.Distance] = true;
 	}
 
 	/**
@@ -1179,6 +1235,10 @@ public class DataFieldManager extends Application {
 				enabledFields[Fields.ALTITUDE] = true;
 			if (s.equals(mContext.getString(R.string.luminous_flux)))
 				enabledFields[Fields.LIGHT] = true;	
+			if (s.equals(mContext.getString(R.string.velocity)))
+				enabledFields[Fields.Velocity] = true;	
+			if (s.equals(mContext.getString(R.string.luminous_flux)))
+				enabledFields[Fields.Distance] = true;	
 		}
 	}
 
@@ -1297,7 +1357,7 @@ public class DataFieldManager extends Application {
 	public void recordData(long srate) {
 		//Clears Data from last recording
 		dataSet = new JSONArray();
-		
+		dataSetRate = srate;
 		recordingTimer = new Timer();
 		recordingTimer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
@@ -1378,12 +1438,35 @@ public class DataFieldManager extends Application {
                 f.altitude = "" + loc.getAltitude();
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
+        if (enabledFields[Fields.Distance] || enabledFields[Fields.Velocity]) {
+        	//calculations required for distance and velocity
+        	if (prevLoc != null) {
+        		distance = loc.distanceTo((prevLoc));
+        		totalDistance += distance;
+        	} else {
+        		f.distance = 0;
+        	}
+        	prevLoc = loc;
+        	
+	        if (enabledFields[Fields.Distance]) {
+	        	f.distance = totalDistance;
+	        }
+	        
+	        if (enabledFields[Fields.Velocity]) {
+	        	velocity = distance/dataSetRate;
+	        	f.velocity = velocity;
+	        }
+	        //TODO create some kind of event listener for velocity and distance so that apps can display the values
+        
+        }
         
         return putData();
 	}
 	
+	
+	
 	/**
-	 * This method takes an imageUri and makes a datapoint from its timestamp and 
+	 * This method takes an imageUri and makes a data point from its time stamp and 
 	 * geo tag 
 	 * @param imageUri
 	 * @return JSONArray (DataPoint)
@@ -1394,9 +1477,6 @@ public class DataFieldManager extends Application {
 		double lon = 0;
 		Long timePicTaken = null;
 		String picturePath; 
-		
-		
-		
 		
 	    Cursor cursor = mContext.getContentResolver().query(imageUri, null, null, null, null);
 		if (cursor == null) { // Source is a cloud service (Dropbox, GoogleDrive)
@@ -1469,18 +1549,17 @@ public class DataFieldManager extends Application {
                 f.timeMillis = timePicTaken;         
         
 		return putData();
-				
 	}
 	
 	@SuppressLint("UseValueOf")
 	private Float convertToDegree(String stringDMS){
-		 Float result = null;
-		 String[] DMS = stringDMS.split(",", 3);
+		Float result = null;
+		String[] DMS = stringDMS.split(",", 3);
 
-		 String[] stringD = DMS[0].split("/", 2);
-		    Double D0 = new Double(stringD[0]);
-		    Double D1 = new Double(stringD[1]);
-		    Double FloatD = D0/D1;
+		String[] stringD = DMS[0].split("/", 2);
+	    Double D0 = new Double(stringD[0]);
+	    Double D1 = new Double(stringD[1]);
+	    Double FloatD = D0/D1;
 
 		 String[] stringM = DMS[1].split("/", 2);
 		 Double M0 = new Double(stringM[0]);
@@ -1492,7 +1571,7 @@ public class DataFieldManager extends Application {
 		 Double S1 = new Double(stringS[1]);
 		 Double FloatS = S0/S1;
 		  
-		    result = new Float(FloatD + (FloatM/60) + (FloatS/3600));
+		 result = new Float(FloatD + (FloatM/60) + (FloatS/3600));
 		  
 		 return result;
 	};
@@ -1526,7 +1605,9 @@ public class DataFieldManager extends Application {
 				+ appContext.getResources().getString(R.string.altitude) + ","
 				+ appContext.getResources().getString(R.string.luminous_flux) + ","
 				+ appContext.getResources().getString(R.string.temperature_f) + ","
-				+ appContext.getResources().getString(R.string.temperature_k);
+				+ appContext.getResources().getString(R.string.temperature_k) + ","
+				+ appContext.getResources().getString(R.string.velocity) + ","
+				+ appContext.getResources().getString(R.string.distance);
 
 		mEdit.putString("accepted_fields", acceptedFields).commit();
 	}
@@ -1592,3 +1673,5 @@ public class DataFieldManager extends Application {
 			return android.os.Build.VERSION.SDK_INT;
 		}
 }
+
+

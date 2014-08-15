@@ -207,6 +207,10 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH", 0);
 		length = countdown = prefs.getInt("length", 10);
+		
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+		dfm.registerSensors(mSensorManager, CarRampPhysicsV2.this);
 
 		if (savedInstanceState == null) {
 			if (firstName.equals("") || lastInitial.equals("")) {
@@ -511,6 +515,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				}
 				
 				dfm.setProjID(Integer.parseInt(projectNumber));
+				dfm.registerSensors(mSensorManager, CarRampPhysicsV2.this);
+
 			}
 
 		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
@@ -589,72 +595,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	}
 
 	
-//
-//	/**
-//	 * Upload function specifically for when projID = -1 initially.
-//	 * 
-//	 * In this scenario, you'll need to provide an
-//	 * {@link edu.uml.cs.isense.comm.API API} instance along with an activity
-//	 * context.
-//	 * 
-//	 * @param api
-//	 *            - An instance of API
-//	 * @param c
-//	 *            - The context of the calling activity
-//	 * 
-//	 * @return The ID of the data set created on iSENSE, or -1 if the upload
-//	 *         failed
-//	 */
-//	public static int upload(API api, Context c) {
-//		if (CarRampPhysicsV2.projectNumber.equals("-1"))
-//			return -1;
-//
-//		return upload(DataFieldManager.reOrderData(dataSet,
-//				CarRampPhysicsV2.projectNumber, mContext, null, null));
-//	}
-
-//	/**
-//	 * Attempts to upload data with the given information passed in through the
-//	 * QDataSet constructor
-//	 * 
-//	 * @return The ID of the data set created on iSENSE, or -1 if the upload
-//	 *         failed
-//	 */
-//	public static int upload(String obj) {
-//
-//		int dataSetID = -1;
-//
-//		try {
-//			JSONArray dataJSON = new JSONArray(obj);
-//			if (!(dataJSON.isNull(0))) {
-//
-//				dataToUpload = new JSONObject();
-//				try {
-//					dataToUpload.put("data", dataJSON);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				dataToUpload = UploadQueue.getAPI().rowsToCols(dataToUpload);
-//
-//				System.out.println("JOBJ: " + dataToUpload.toString());
-//
-//                uploadInfo info = UploadQueue.getAPI().uploadDataSet(
-//						Integer.parseInt(projectNumber), dataToUpload, nameOfDataSet);
-//                dataSetID = info.dataSetId;
-//				System.out.println("Data set ID from Upload is: " + dataSetID);
-//
-//			}
-//		} catch (JSONException e) {
-//
-//		}
-//
-//		return dataSetID;
-//	}
-
-
-
-
-
 	private void manageUploadQueue() {
 
 		if (!uq.emptyQueue()) {
@@ -713,5 +653,5 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		dfm.enableAllSensorFields();
 	}
 	
-
+	
 }

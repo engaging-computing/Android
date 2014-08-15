@@ -126,6 +126,7 @@ public class MediaManager extends Activity {
 						filePathColumn, null, null, null);
 				cursor.moveToFirst();
 				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+				@SuppressWarnings("unused")
 				String picturePath = cursor.getString(columnIndex);
 				cursor.close();
 				pushPicture();
@@ -276,6 +277,7 @@ public class MediaManager extends Activity {
 
 			// if (dfm == null)
 
+			@SuppressWarnings("unused")
 			JSONArray dataJSON = new JSONArray(); // data is set into JSONArray
 													// to be uploaded
 

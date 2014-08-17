@@ -47,20 +47,6 @@
             android:layout_weight="1"
             android:text="@string/browse"
             android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/or" />
-
-        <Button
-            android:id="@+id/project_qr"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:text="@string/scan_qr"
-            android:textSize="18sp" />
     </LinearLayout>
 
     <View

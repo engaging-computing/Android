@@ -3,7 +3,6 @@ package edu.uml.cs.isense.proj;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,7 +49,7 @@ public class Setup extends Activity implements OnClickListener {
 
 	private Button okay;
 	private Button cancel;
-	private Button qrCode;
+//	private Button qrCode;
 	private Button browse;
 	private Button createProject;
 
@@ -106,8 +105,8 @@ public class Setup extends Activity implements OnClickListener {
 		cancel = (Button) findViewById(R.id.project_cancel);
 		cancel.setOnClickListener(this);
 
-		qrCode = (Button) findViewById(R.id.project_qr);
-		qrCode.setOnClickListener(this);
+//		qrCode = (Button) findViewById(R.id.project_qr);
+//		qrCode.setOnClickListener(this);
 
 		browse = (Button) findViewById(R.id.project_browse);
 		browse.setOnClickListener(this);
@@ -179,19 +178,20 @@ public class Setup extends Activity implements OnClickListener {
 		} else if (id == R.id.project_cancel) {
 			setResult(RESULT_CANCELED);
 			finish();
-		} else if (id == R.id.project_qr) {
-			try {
-				Intent intent = new Intent(
-						"com.google.zxing.client.android.SCAN");
-
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-				intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-				startActivityForResult(intent, QR_CODE_REQUESTED);
-			} catch (ActivityNotFoundException e) {
-				Intent iNoQR = new Intent(Setup.this, NoQR.class);
-				startActivityForResult(iNoQR, NO_QR_REQUESTED);
-			}
+		//Find project id by QR code (currently website does not have QR codes anymore)
+//		} else if (id == R.id.project_qr) {
+//			try {
+//				Intent intent = new Intent(
+//						"com.google.zxing.client.android.SCAN");
+//
+//				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+//
+//				intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+//				startActivityForResult(intent, QR_CODE_REQUESTED);
+//			} catch (ActivityNotFoundException e) {
+//				Intent iNoQR = new Intent(Setup.this, NoQR.class);
+//				startActivityForResult(iNoQR, NO_QR_REQUESTED);
+//			}
 		} else if (id == R.id.project_browse) {
 			Intent iProject = new Intent(getApplicationContext(),
 					BrowseProjects.class);

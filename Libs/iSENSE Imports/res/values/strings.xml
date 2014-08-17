@@ -163,6 +163,10 @@
 	<string name="browse_proj">Browse Projects</string>
 	<string name="proj">Project:</string>
 	<string name="contributor">Contributor Name:</string>
+	<string name="x">Ax:</string>
+	<string name="y">Ay:</string>
+	<string name="z">Az:</string>
+		
 	
     
 </resources>

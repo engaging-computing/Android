@@ -288,7 +288,6 @@ public class DataWalk extends Activity implements LocationListener,
                 }
 
 				return Datawalk_Service.running;
-
 			}
 
 		});
@@ -338,8 +337,6 @@ public class DataWalk extends Activity implements LocationListener,
 		pointsUploadedTV.setText("Points Recorded: " + dataPointCount);
 		elapsedTimeTV.setText("Time Elapsed: " + timerTick + " seconds");
 		
-
-
 		rcrdIntervalB.setOnClickListener(new OnClickListener() {
 
 			@Override

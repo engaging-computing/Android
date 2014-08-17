@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -83,7 +84,10 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public static String RECORD_SETTINGS = "RECORD_SETTINGS";
 
 	private Button startStop;
-	private TextView values;
+	private Button uploadButton;
+	private Button projNumB;
+	private Button nameB;
+	private TextView x, y, z;
 	public static Boolean running = false;
 
 	private SensorManager mSensorManager;
@@ -110,11 +114,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public static final int SAVE_MODE_REQUESTED = 10005;
 	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
 
-//	private boolean timeHasElapsed = false;
-
 	private MediaPlayer mMediaPlayer;
-
-//	private int elapsedMillis = 0;
 
 	DecimalFormat toThou = new DecimalFormat("######0.000");
 
@@ -202,28 +202,50 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		mHandler = new Handler();
 
 		startStop = (Button) findViewById(R.id.startStop);
+		uploadButton = (Button) findViewById(R.id.b_upload);
+		projNumB = (Button) findViewById(R.id.b_project);
+		nameB = (Button) findViewById(R.id.b_name);
+		
+		SharedPreferences namePrefs = getSharedPreferences(
+				EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
+		firstName = namePrefs.getString(
+				EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME,
+				"");
+		lastInitial = namePrefs
+				.getString(
+						EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
+						"");
 
-		values = (TextView) findViewById(R.id.values);
+		if (firstName.length() == 0) {
+			Intent iEnterName = new Intent(this, EnterName.class);
+			iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
+					true);
+			startActivityForResult(iEnterName, RESULT_GOT_NAME);
+		} else {
+			nameB.setText(firstName + " " + lastInitial);
+		}
+
+		x = (TextView) findViewById(R.id.x);
+		y = (TextView) findViewById(R.id.y);
+		z = (TextView) findViewById(R.id.z);
+		
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		String projId = mPrefs.getString(Setup.PROJECT_ID, "");
+				
+		if (projId == "-1") {
+			projNumB.setText(getResources().getString(R.string.project_num));
+		} else {
+			projNumB.setText("Project: " + projId);
+		}
 
 		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH", 0);
 		length = countdown = prefs.getInt("length", 10);
 		
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+		initDfm();
 		dfm.registerSensors(mSensorManager, CarRampPhysicsV2.this);
 
-		if (savedInstanceState == null) {
-			if (firstName.equals("") || lastInitial.equals("")) {
-			
-				Intent iEnterName = new Intent(this, EnterName.class);
-				iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-						true);
-				startActivityForResult(iEnterName, RESULT_GOT_NAME);
-				
-			}
-		}
-
-		initDfm();
 
 		new DecimalFormat("#,##0.0");
 
@@ -233,7 +255,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			public boolean onLongClick(View arg0) {
 
 				mMediaPlayer.setLooping(false);
-					mMediaPlayer.start();
+				mMediaPlayer.start();
 	
 					if (running) {
 							running = false;
@@ -319,7 +341,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 										});
 										countdown--;
 									}
-									//TODO look into timestamp
+									//TODO look into timestamp make sure currect
 									//f.timeMillis = currentTime + elapsedMillis;
 		
 								}
@@ -334,7 +356,48 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	});
 
 		
+		uploadButton.setOnClickListener(new OnClickListener (){
+
+			@Override
+			public void onClick(View v) {
+				// Launched the upload queue dialog
+				manageUploadQueue();
+			}
+			
+		});
+		
+		projNumB.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// Allows the user to pick a project to upload to
+				Intent setup = new Intent(mContext, Setup.class);
+				startActivityForResult(setup, PROJECT_REQUESTED);
+			}
+
+		});
+		
+		nameB.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// Launch the dialog that allows users to enter his/her
+				// firstname
+				// and last initial
+				Intent iEnterName = new Intent(mContext, EnterName.class);
+				SharedPreferences classPrefs = getSharedPreferences(
+						ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
+				iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
+						classPrefs.getBoolean(
+								ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE,
+								true));
+				startActivityForResult(iEnterName, RESULT_GOT_NAME);
+			}
+
+		});
+		
 	}
+	
 
 	@Override
 	public void onPause() {
@@ -474,21 +537,21 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			Log.e("onSensorChanged ", "dfm is null");
 		}
 		
-		if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
-			event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
 			
 		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
 		String xPrepend = event.values[0] > 0 ? "+" : "";
 		String yPrepend = event.values[1] > 0 ? "+" : "";
 		String zPrepend = event.values[2] > 0 ? "+" : "";
 		
-		values.setText("Ax: " + xPrepend
-				+ oneDigit.format(event.values[0]) + " " + "Ay: " + yPrepend
-				+ oneDigit.format(event.values[1]) + " " + "Az: " + zPrepend
-				+ oneDigit.format(event.values[2]) + " ");
+		x.setText("X: " + xPrepend
+				+ oneDigit.format(event.values[0]));
+		y.setText("Y: " + yPrepend
+				+ oneDigit.format(event.values[1]));
+		z.setText("Z: " + zPrepend
+				+ oneDigit.format(event.values[2]));
 		}
 		
-
 	}
 
 	@Override
@@ -512,6 +575,12 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				
 				if (projectNumber == null) {
 					projectNumber = DEFAULT_PROJ;
+				}
+				
+				if (projectNumber == "-1") {
+					projNumB.setText(getResources().getString(R.string.project_num));
+				} else {
+					projNumB.setText("Project: " + projectNumber);
 				}
 				
 				dfm.setProjID(Integer.parseInt(projectNumber));
@@ -552,6 +621,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 					firstName = user.name;
 					lastInitial = "";
+					
+					nameB.setText(firstName + " " + lastInitial);
+
 
 				} else {
 					firstName = namePrefs.getString(
@@ -561,6 +633,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 							.getString(
 									EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
 									"");
+					
+					nameB.setText(firstName + " " + lastInitial);
+
 				}
 
 			}

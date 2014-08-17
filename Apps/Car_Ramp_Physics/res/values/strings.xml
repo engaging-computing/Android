@@ -18,9 +18,9 @@ Accel-Mag\t\t\t\t\t\t\tNumber\n\n
     <string name="login_title">Login</string>
     <string name="logged_in_as">Logged in as: </string>
     <string name="recordSettings">Recording Fields</string>
-    <string name="X">X</string>
-    <string name="Y">Y</string>
-    <string name="Z">Z</string>
+    <string name="X">X:</string>
+    <string name="Y">Y:</string>
+    <string name="Z">Z:</string>
     <string name="mag">Magnitude</string>
     <string name="done">Done</string>
     <string name="upload_or_trash">Upload Data or Throw It Away</string>
@@ -31,6 +31,8 @@ Accel-Mag\t\t\t\t\t\t\tNumber\n\n
     <string name="digits_restriction">	    ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -_.,01234567879()@</string>
     <string name="changename">Change Name</string>
     <string name="reset">Reset Settings</string>
+    <string name="project_num">to project #</string>
+    
 
     <string-array name="lengths_array">
         <item>1 sec</item>
@@ -59,5 +61,9 @@ Accel-Mag\t\t\t\t\t\t\tNumber\n\n
     <string name="not_logged_in">Not Logged In</string>
     <string name="gravity">Include Gravity:   </string>
     <string name="new_proj_name_title">Create New Project</string>
+    <string name="force">Force Values:</string>
+    <string name="nameWithColon">Name: </string>
+    <string name="john_smith">John S.</string>
+    
 
 </resources>

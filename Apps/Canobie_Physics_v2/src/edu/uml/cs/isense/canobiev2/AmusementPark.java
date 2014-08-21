@@ -253,7 +253,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 						prepWriteToSDCard(new Date());
 
 						//enable sensors needed
-						dfm.registerSensors(mSensorManager, AmusementPark.this);
+						dfm.registerSensors();
 
 						elapsedSecs = 0;
 
@@ -541,7 +541,7 @@ public class AmusementPark extends Activity implements SensorEventListener,
 				
 				//change fields for new project
 				dfm.setProjID(projectNum);
-				dfm.registerSensors(mSensorManager, AmusementPark.this);
+				dfm.registerSensors();
 				
 		} else if (requestCode == LOGIN_REQUESTED) {
 			

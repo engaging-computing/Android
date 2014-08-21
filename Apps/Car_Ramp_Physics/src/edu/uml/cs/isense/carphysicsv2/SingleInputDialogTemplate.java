@@ -31,8 +31,10 @@ public class SingleInputDialogTemplate extends Activity {
 			return 3;
 		else if (length.equalsIgnoreCase("30"))
 			return 4;
-		else
+		else  if (length.equalsIgnoreCase("60"))
 			return 5;
+		else 
+			return 6;
 	}
 
 	public void onRadioButtonClicked(View view) {
@@ -48,7 +50,7 @@ public class SingleInputDialogTemplate extends Activity {
 
 	public void onCreate(Bundle b) {
 		super.onCreate(b);
-		setContentView(R.layout.single_input_template);
+		setContentView(R.layout.duration_dialog);
 
 		setTitle(getIntent().getExtras().getString("title"));
 		TextView messageBox = (TextView) findViewById(R.id.messageBox2);
@@ -78,8 +80,11 @@ public class SingleInputDialogTemplate extends Activity {
 		case 4:
 			defaultR = (RadioButton) findViewById(R.id.radio4);
 			break;
-		default:
+		case 5:
 			defaultR = (RadioButton) findViewById(R.id.radio5);
+			break;
+		default:
+			defaultR = (RadioButton) findViewById(R.id.radio6);
 			break;
 		}
 

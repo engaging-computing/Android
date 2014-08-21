@@ -5,16 +5,6 @@
         android:showAsAction="ifRoom"
         android:title="@string/login_title">
     </item>
-	 <item
-        android:id="@+id/project_select"
-        android:showAsAction="ifRoom"
-        android:title="@string/choose_project_title">
-    </item>
-    <item
-        android:id="@+id/upload"
-        android:showAsAction="ifRoom"
-        android:title="@string/upload">
-    </item>
     <item
         android:id="@+id/record_length"
         android:showAsAction="ifRoom"

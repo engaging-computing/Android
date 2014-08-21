@@ -10,10 +10,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -46,6 +50,9 @@ import edu.uml.cs.isense.proj.Setup;
  */
 @SuppressLint("UseValueOf")
 public class DataFieldManager extends Application {
+    private MySensorListener sensorListener;
+    private MyLocationListener locationListener;
+	
 	private float rawAccel[] = new float[4];
 	private float rawMag[] = new float[3];
 	private float accel[] = new float[4];
@@ -59,6 +66,9 @@ public class DataFieldManager extends Application {
 	private float distance = 0;
 	private float totalDistance = 0;
 	private float velocity = 0;
+	
+    private SensorManager mSensorManager;
+    private LocationManager mLocationManager;
 	
 	long dataSetRate = 0;
 	
@@ -1280,7 +1290,9 @@ public class DataFieldManager extends Application {
 	 * @param location
 	 */
 	public void updateLoc(Location location) {
-		loc = location;
+		if (loc != null) {
+			loc = location;
+		}
 	}
 	
 	
@@ -1618,12 +1630,23 @@ public class DataFieldManager extends Application {
 		 * @param appContext
 		 */
 		@SuppressLint("InlinedApi")
-		public void registerSensors(SensorManager mSensorManager, SensorEventListener appContext) {
+		public void registerSensors() {
+			//just to be sure
+			unRegisterSensors(); 
+			
+			//Initialize sensor managers
+			sensorListener = new MySensorListener();
+	        locationListener = new MyLocationListener();
+			
+			mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+		    mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+		        
+	        
 			if (enabledFields[Fields.ACCEL_X]
 					|| enabledFields[Fields.ACCEL_Y]
 					|| enabledFields[Fields.ACCEL_Z]
 					|| enabledFields[Fields.ACCEL_TOTAL]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager
 								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 						SensorManager.SENSOR_DELAY_FASTEST);
@@ -1635,7 +1658,7 @@ public class DataFieldManager extends Application {
 					|| enabledFields[Fields.MAG_TOTAL]
 					|| enabledFields[Fields.HEADING_DEG]
 					|| enabledFields[Fields.HEADING_RAD]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager
 								.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
 						SensorManager.SENSOR_DELAY_FASTEST);
@@ -1647,8 +1670,8 @@ public class DataFieldManager extends Application {
 					|| enabledFields[Fields.ALTITUDE]) {
 				if (getApiLevel() >= 14) {
 					mSensorManager.registerListener(
-									appContext,
-									mSensorManager
+							sensorListener,
+							        mSensorManager 
 											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
 									SensorManager.SENSOR_DELAY_FASTEST);
 				}
@@ -1656,22 +1679,84 @@ public class DataFieldManager extends Application {
 
 			if (enabledFields[Fields.PRESSURE]
 					|| enabledFields[Fields.ALTITUDE]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
 
 			if (enabledFields[Fields.LIGHT]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
+			
+			if (enabledFields[Fields.LATITUDE] || enabledFields[Fields.LONGITUDE] || enabledFields[Fields.ALTITUDE]) {
+				 Criteria criteria = new Criteria();
+			     criteria.setAccuracy(Criteria.ACCURACY_FINE);
+				
+				 mLocationManager.requestLocationUpdates(
+			                mLocationManager.getBestProvider(criteria, true), 0, 0,
+			                locationListener);			
+				 }
+		}
+		
+		/**
+		 * Disables all active sensors and turns off gps
+		 */
+		public void unRegisterSensors() {
+			if (mLocationManager != null)
+	            mLocationManager.removeUpdates(locationListener);
+
+	        if (mSensorManager != null)
+	            mSensorManager.unregisterListener(sensorListener);
 		}
 		
 		// Assists with differentiating between displays for dialogues
 		private int getApiLevel() {
 			return android.os.Build.VERSION.SDK_INT;
 		}
+		
+		/**
+		 * You can not implement a LocationListener to a service so that is why
+		 * There is a separate class here that implements a LocationListener
+		 */
+		public class MyLocationListener implements LocationListener
+		{
+
+		    public void onLocationChanged(final Location location) {
+				updateLoc(location);
+		    }
+
+		    public void onProviderDisabled(String provider) {
+		    }
+
+		    public void onProviderEnabled(String provider) {
+		    }
+
+		    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+		    }
+
+		}
+
+		/**
+		 * You can not implement a SensorEventListener to a service so that is why
+		 * There is a separate class here that implements a SensorEventListener
+		 */
+		public class MySensorListener implements SensorEventListener {
+
+		    @Override
+		    public void onSensorChanged(SensorEvent event) {
+		    	updateValues(event);
+		    }
+
+		    @Override
+		    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+		    }
+		}
 }
+
+
 
 

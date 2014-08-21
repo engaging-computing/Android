@@ -52,6 +52,7 @@ public class Setup extends Activity implements OnClickListener {
 //	private Button qrCode;
 	private Button browse;
 	private Button createProject;
+	private Button projLater;
 
 	private LinearLayout oklayout;
 
@@ -113,6 +114,9 @@ public class Setup extends Activity implements OnClickListener {
 
 		createProject = (Button) findViewById(R.id.createProjectBtn);
 		createProject.setOnClickListener(this);
+		
+		projLater = (Button) findViewById(R.id.project_later);
+		projLater.setOnClickListener(this);
 
 		oklayout = (LinearLayout) findViewById(R.id.OKCancelLayout);
 		oklayout.setVisibility(View.VISIBLE);
@@ -197,6 +201,14 @@ public class Setup extends Activity implements OnClickListener {
 					BrowseProjects.class);
 			
 			startActivityForResult(iProject, PROJECT_CODE);
+			
+		} else if (id == R.id.project_later) {
+			SharedPreferences.Editor mEditor = mPrefs.edit();
+			mEditor.putString(PROJECT_ID, "-1")
+					.commit();
+			setResult(RESULT_OK);
+			finish();
+			
 		} else if (id == R.id.createProjectBtn) {
 			if (!Connection.hasConnectivity(mContext))
 				w.make("Internet connection required to create project",
@@ -206,8 +218,7 @@ public class Setup extends Activity implements OnClickListener {
 						Waffle.LENGTH_LONG, Waffle.IMAGE_WARN);
 				startActivityForResult(new Intent(this, CredentialManager.class),
 						LOGIN_STATUS_REQUESTED);
-			}
-			else {
+			} else {
 				if (!constrictFields) {
 					Intent iProjCreate = new Intent(getApplicationContext(),
 							ProjectCreate.class);

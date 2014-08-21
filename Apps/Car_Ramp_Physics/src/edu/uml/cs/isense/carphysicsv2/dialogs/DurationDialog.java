@@ -14,7 +14,7 @@ import edu.uml.cs.isense.carphysicsv2.CarRampPhysicsV2;
 import edu.uml.cs.isense.carphysicsv2.R;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class SingleInputDialogTemplate extends Activity {
+public class DurationDialog extends Activity {
 
 	Button pos, neg;
 	EditText input;
@@ -46,7 +46,7 @@ public class SingleInputDialogTemplate extends Activity {
 	
 	public void onCreate(Bundle b) {
 		super.onCreate(b);
-		setContentView(R.layout.single_input_template);
+		setContentView(R.layout.duration_dialog);
 
 		setTitle(getIntent().getExtras().getString("title"));
 		TextView messageBox = (TextView) findViewById(R.id.messageBox2);

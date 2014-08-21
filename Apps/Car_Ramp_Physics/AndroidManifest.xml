@@ -7,9 +7,13 @@
 
     <uses-sdk
         android:minSdkVersion="9"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="20" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -18,6 +22,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/display_name" >
         
+        <service android:enabled="true" android:name=".Recording_Service" />
         <uses-library android:name="android.test.runner" />
         
         
@@ -114,7 +119,7 @@
             android:label="Output a message"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name=".SingleInputDialogTemplate"
+            android:name="edu.uml.cs.isense.carphysicsv2.dialogs.DurationDialog"
             android:label="Single input"
             android:theme="@style/AppThemeDialog" />
         <activity
@@ -148,6 +153,11 @@
             android:label="Credential Manager"
             android:configChanges="screenSize|orientation"
             android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.proj.ProjectCreate"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Create New Project"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.credentials.CredentialManagerKey"

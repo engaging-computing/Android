@@ -14,6 +14,8 @@
     <string name="scan_qr">Scan QR</string>
     <string name="chooseProject">Enter Project ID:</string>
     <string name="noProjectYet">Don\'t have a project yet?</string>
+    <string name="noConnection">No Internet Connection?</string>
+    <string name="projLater">Select a Project Later</string>
     <string name="createProject">Create New Project</string>
     <string name="createProjectButton">Create Project</string>
     <string name="search">Search</string>

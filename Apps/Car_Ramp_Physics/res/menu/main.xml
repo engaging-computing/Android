@@ -11,14 +11,9 @@
         android:title="@string/record_length">
     </item>
      <item
-        android:id="@+id/record_interval"
+        android:id="@+id/record_rate"
         android:showAsAction="ifRoom"
-        android:title="@string/record_interval">
-    </item>
-    <item
-        android:id="@+id/changename"
-        android:showAsAction="ifRoom"
-        android:title="@string/changename">
+        android:title="@string/record_rate">
     </item>
     <item
         android:id="@+id/reset"

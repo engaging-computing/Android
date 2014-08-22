@@ -1,7 +1,6 @@
 package edu.uml.cs.isense.carphysicsv2.dialogs;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -10,47 +9,43 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import edu.uml.cs.isense.carphysicsv2.CarRampPhysicsV2;
 import edu.uml.cs.isense.carphysicsv2.R;
-import edu.uml.cs.isense.carphysicsv2.R.id;
-import edu.uml.cs.isense.carphysicsv2.R.layout;
-import edu.uml.cs.isense.waffle.Waffle;
 
 public class RateDialog extends Activity {
 
 	Button ok, cancel;
 	EditText input;
 	Spinner spinner;
-	int interval;
+	int rate;
 	
 	public void onRadioButtonClicked(View view) {
 	    switch (view.getId()) {
 	    case R.id.radio0:
-	    	interval = 50;
+	    	rate = 50;
 	    	break;
 	    
 	    case R.id.radio1:
-	    	interval = 100;
+	    	rate = 100;
 	    	break;
 	    
 	    case R.id.radio2:
-	    	interval = 500;
+	    	rate = 500;
 	    	break;
 	    
 	    case R.id.radio3:
-	    	interval = 1000;
+	    	rate = 1000;
 	    	break;
 	    
 	    case R.id.radio4:
-	    	interval = 5000;
+	    	rate = 5000;
 	    	break;
 	    
 	    case R.id.radio5:
-	    	interval = 30000;
+	    	rate = 30000;
 	    	break;
 	    
 	    default: 
-	    	interval = 60000;
+	    	rate = 60000;
 	    	break;
 	    }
 	  
@@ -69,10 +64,10 @@ public class RateDialog extends Activity {
 		cancel = (Button) findViewById(R.id.negative2);
 		RadioButton defaultR;
 
-		SharedPreferences prefs = getSharedPreferences("RECORD_INTERVAL", 0);
-		interval = prefs.getInt("interval", 50);
+		SharedPreferences prefs = getSharedPreferences("RECORD_RATE", 0);
+		rate = prefs.getInt("rate", 50);
 
-		switch (interval) {
+		switch (rate) {
 
 		case 50:
 			defaultR = (RadioButton) findViewById(R.id.radio0);
@@ -103,10 +98,10 @@ public class RateDialog extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				SharedPreferences prefs = getSharedPreferences("RECORD_INTERVAL",
+				SharedPreferences prefs = getSharedPreferences("RECORD_RATE",
 						0);
 				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("interval", interval);
+				editor.putInt("rate", rate);
 				editor.commit();
 
 				setResult(RESULT_OK);

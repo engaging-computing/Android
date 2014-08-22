@@ -64,6 +64,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 
 	public static String projectNumber = "-1";
 	public static final String DEFAULT_PROJ = "-1";
+	public static final int DEFAULT_RATE = 50;
+	public static final int DEFAULT_LENGTH = 10;
 	public static boolean useDev = false;
 	public static boolean promptForName = true;
 
@@ -297,7 +299,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 
 		
 		uploadButton.setOnClickListener(new OnClickListener (){
-
 			@Override
 			public void onClick(View v) {
 				// Launched the upload queue dialog
@@ -404,19 +405,10 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			i.putExtra("title", "Change Recording Length");
 			startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
 			return true;
-		case R.id.record_interval:
+		case R.id.record_rate:
 			Intent rate = new Intent(mContext, RateDialog.class);
-			rate.putExtra("title", "Change Recording Interval");
+			rate.putExtra("title", "Change Recording Rate");
 			startActivityForResult(rate, RECORDING_INTERVAL_REQUESTED);
-			return true;
-		case R.id.changename:
-			Intent iEnterName = new Intent(mContext, EnterName.class);
-			SharedPreferences classPrefs = getSharedPreferences(
-					ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
-			iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-					classPrefs.getBoolean(
-							ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE, true));
-			startActivityForResult(iEnterName, RESULT_GOT_NAME);
 			return true;
 		case R.id.reset:
 			startActivityForResult(new Intent(this, ResetToDefaults.class),
@@ -568,17 +560,30 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			}
 		} else if (reqCode == RESET_REQUESTED) {
 			if (resultCode == RESULT_OK) {
+				/*Logout*/
+				CredentialManager.logout(this, api);
 
-				CredentialManager.login(this, api);
-
+				/*reset project*/
 				SharedPreferences eprefs = getSharedPreferences("PROJID", 0);
 				SharedPreferences.Editor editor = eprefs.edit();
 				projectNumber = DEFAULT_PROJ;
 				editor.putString("project_id", projectNumber);
 				editor.commit();
-
-				//TODO reset rate and duration
+				projNumB.setText("Generic Project");
 				
+				/*reset rate*/
+				SharedPreferences ratePrefs = getSharedPreferences("RECORD_RATE", 0);
+				SharedPreferences.Editor editor2 = ratePrefs.edit();
+				editor2.putInt("rate", DEFAULT_RATE);
+				editor2.commit();
+				
+				/*reset recording length*/
+				SharedPreferences lengthPrefs = getSharedPreferences("RECORD_LENGTH", 0);
+				SharedPreferences.Editor editor3 = lengthPrefs.edit();
+				editor3.putInt("length", DEFAULT_LENGTH);
+				editor3.commit();
+
+				/*reset name*/
 				Intent iEnterName = new Intent(mContext, EnterName.class);
 				SharedPreferences classPrefs = getSharedPreferences(
 						ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
@@ -600,7 +605,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
 			startActivityForResult(i, QUEUE_UPLOAD_REQUESTED);
 		} else {
-			w.make("There are no data to upload!", Waffle.LENGTH_LONG,
+			w.make("There is no data to upload!", Waffle.LENGTH_LONG,
 					Waffle.IMAGE_X);
 		}
 	}

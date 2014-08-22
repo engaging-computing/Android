@@ -1,7 +1,6 @@
 package edu.uml.cs.isense.carphysicsv2.dialogs;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,9 +10,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import edu.uml.cs.isense.carphysicsv2.CarRampPhysicsV2;
 import edu.uml.cs.isense.carphysicsv2.R;
-import edu.uml.cs.isense.waffle.Waffle;
 
 public class DurationDialog extends Activity {
 

@@ -142,7 +142,7 @@ public class Recording_Service extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
     	int length; //length of dataset
-    	int interval; //interval between datapoints
+    	int rate; //interval between datapoints
     	
         running = true;
         
@@ -150,13 +150,13 @@ public class Recording_Service extends Service {
 				0);
 		length = prefs.getInt("length", 10);
 		
-		SharedPreferences prefs2 = getSharedPreferences("RECORD_INTERVAL", 0);
-		interval = prefs2.getInt("interval", 50);
+		SharedPreferences prefs2 = getSharedPreferences("RECORD_RATE", 0);
+		rate = prefs2.getInt("rate", 50);
 
 		dfm.setProjID(Integer.parseInt(CarRampPhysicsV2.projectNumber));
         
         //record data        
-        dfm.recordData(interval);
+        dfm.recordData(rate);
         
         if(length != -1) {
         	mTimer =  new CountDownTimer(length * 1000, 1000) {

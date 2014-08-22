@@ -49,11 +49,11 @@ import java.util.Timer;
 import edu.uml.cs.isense.carphysicsv2.dialogs.About;
 import edu.uml.cs.isense.carphysicsv2.dialogs.DurationDialog;
 import edu.uml.cs.isense.carphysicsv2.dialogs.Help;
+import edu.uml.cs.isense.carphysicsv2.dialogs.RateDialog;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.EnterName;
-import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QueueLayout;
@@ -86,11 +86,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 	
 	private Timer timeTimer;
 
-	private DataFieldManager dfm;
 	public API api;
-
-	public static int rate = 50;
-	public static int duration;
 
 	static String firstName = "";
 	static String lastInitial = "";
@@ -99,6 +95,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 	public static final int UPLOAD_OK_REQUESTED = 90000;
 	public static final int LOGIN_STATUS_REQUESTED = 6005;
 	public static final int RECORDING_LENGTH_REQUESTED = 4009;
+	public static final int RECORDING_INTERVAL_REQUESTED = 4010;
 	public static final int PROJECT_REQUESTED = 9000;
 	public static final int QUEUE_UPLOAD_REQUESTED = 5000;
 	public static final int RESET_REQUESTED = 6003;
@@ -113,7 +110,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 	int i = 0;
 	int len = 0;
 	int len2 = 0;
-	int length;
 
 	ProgressDialog dia;
 	double partialProg = 1.0;
@@ -246,14 +242,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		} else {
 			projNumB.setText("Project: " + projId);
 		}
-
-		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH", 0);
-		length = duration = prefs.getInt("length", 10);
 		
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-		initDfm();
-		dfm.registerSensors();
 		
 		 /* update UI with data passed back from service */
         receiver = new BroadcastReceiver() {
@@ -410,8 +400,14 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			manageUploadQueue();
 			return true;
 		case R.id.record_length:
-			createSingleInputDialog("Change Recording Length", "",
-					RECORDING_LENGTH_REQUESTED);
+			Intent i = new Intent(mContext, DurationDialog.class);
+			i.putExtra("title", "Change Recording Length");
+			startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
+			return true;
+		case R.id.record_interval:
+			Intent rate = new Intent(mContext, RateDialog.class);
+			rate.putExtra("title", "Change Recording Interval");
+			startActivityForResult(rate, RECORDING_INTERVAL_REQUESTED);
 			return true;
 		case R.id.changename:
 			Intent iEnterName = new Intent(mContext, EnterName.class);
@@ -478,13 +474,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 	}
 
 	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (dfm != null) {
-			dfm.updateValues(event);
-		} else {
-			Log.e("onSensorChanged ", "dfm is null");
-		}
-		
+	public void onSensorChanged(SensorEvent event) {	
 		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
 			
 		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
@@ -526,9 +516,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 					projNumB.setText("Project: " + projectNumber);
 				}
 				
-				dfm.setProjID(Integer.parseInt(projectNumber));
-				dfm.registerSensors();
-
 			}
 
 		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
@@ -542,18 +529,11 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 
 		} else if (reqCode == RECORDING_LENGTH_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				try {
-				length = Integer.parseInt(data.getStringExtra("input"));
-				duration = length;
-				} catch (Exception e) {
-					duration = -1;
-				}
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("length", length);
-				editor.putInt("Interval", rate);
-				editor.commit();
+				
+			}
+		} else if (reqCode == RECORDING_INTERVAL_REQUESTED) {
+			if (resultCode == RESULT_OK) {
+			
 			}
 		} else if (reqCode == RESULT_GOT_NAME) {
 			if (resultCode == RESULT_OK) {
@@ -588,9 +568,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			}
 		} else if (reqCode == RESET_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				duration = length = prefs.getInt("length", 10);
 
 				CredentialManager.login(this, api);
 
@@ -599,10 +576,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 				projectNumber = DEFAULT_PROJ;
 				editor.putString("project_id", projectNumber);
 				editor.commit();
-				rate = 50;
-				//TODO what is rate ^^?
 
-				dfm.setUpDFMWithAllSensorFields(mContext);
+				//TODO reset rate and duration
 				
 				Intent iEnterName = new Intent(mContext, EnterName.class);
 				SharedPreferences classPrefs = getSharedPreferences(
@@ -636,29 +611,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		i.putExtra("message", message);
 
 		startActivityForResult(i, reqCode);
-	}
-
-	public void createSingleInputDialog(String title, String message,
-			int reqCode) {
-
-		Intent i = new Intent(mContext, DurationDialog.class);
-		i.putExtra("title", title);
-		i.putExtra("message", message);
-		startActivityForResult(i, reqCode);
-
-	}
-
-
-	
-	
-/**
- * Initialize DataFieldManager Object
- */
-	private void initDfm() {
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
-		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
-		dfm.enableAllSensorFields();
 	}
 
 @Override

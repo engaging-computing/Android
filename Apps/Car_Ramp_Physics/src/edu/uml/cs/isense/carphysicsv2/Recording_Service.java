@@ -141,15 +141,25 @@ public class Recording_Service extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+    	int length; //length of dataset
+    	int interval; //interval between datapoints
+    	
         running = true;
+        
+		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
+				0);
+		length = prefs.getInt("length", 10);
+		
+		SharedPreferences prefs2 = getSharedPreferences("RECORD_INTERVAL", 0);
+		interval = prefs2.getInt("interval", 50);
 
 		dfm.setProjID(Integer.parseInt(CarRampPhysicsV2.projectNumber));
         
         //record data        
-        dfm.recordData(CarRampPhysicsV2.rate);
+        dfm.recordData(interval);
         
-        if(CarRampPhysicsV2.duration != -1) {
-        	mTimer =  new CountDownTimer(CarRampPhysicsV2.duration * 1000, 1000) {
+        if(length != -1) {
+        	mTimer =  new CountDownTimer(length * 1000, 1000) {
 
         	     public void onTick(long millisUntilFinished) {
         	    	 updateButtonTimer("" + millisUntilFinished / 1000);
@@ -192,6 +202,7 @@ public class Recording_Service extends Service {
 			Type type = Type.DATA;
 
 			//add new dataset to queue
+			CarRampPhysicsV2.uq.buildQueueFromFile();
 			CarRampPhysicsV2.uq.addToQueue(dataSetName, description, type, dataSet, null, CarRampPhysicsV2.projectNumber, null);
         }
 

@@ -143,10 +143,11 @@
             android:label="Delete Selected Data Sets"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name="edu.uml.cs.isense.proj.ProjectNameDialog"
+            android:name="edu.uml.cs.isense.proj.ProjectFieldDialog"
             android:label="@string/new_proj_name_title"
+            android:windowSoftInputMode="stateHidden"
             tools:ignore="MissingRegistered"
-            android:theme="@style/AppThemeDialog" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name="edu.uml.cs.isense.credentials.ClassroomMode"
             android:label="@string/classroom_mode"

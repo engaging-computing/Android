@@ -227,7 +227,7 @@ public class Setup extends Activity implements OnClickListener {
 					startActivityForResult(iProjCreate, NEW_PROJ_REQUESTED);
 				} else {
 					Intent iNewProjName = new Intent(getApplicationContext(),
-							ProjectNameDialog.class);
+							ProjectFieldDialog.class);
 					startActivityForResult(iNewProjName,
 							NAME_FOR_NEW_PROJECT_REQUESTED);
 				}

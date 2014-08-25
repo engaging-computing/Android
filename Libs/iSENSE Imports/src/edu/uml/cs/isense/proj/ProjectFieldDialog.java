@@ -16,14 +16,14 @@ import android.widget.EditText;
  * @author iSENSE Android Development Team
  * 
  */
-public class ProjectNameDialog extends Activity {
+public class ProjectFieldDialog extends Activity {
 	
 	private EditText nameInput;
 	private Button ok,cancel;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.new_project_name);
+		setContentView(R.layout.project_fields_checklist);
 		
 		nameInput = (EditText) findViewById(R.id.new_proj_name);
 		ok = (Button) findViewById(R.id.okB);

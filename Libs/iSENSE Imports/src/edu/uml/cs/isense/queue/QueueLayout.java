@@ -266,7 +266,6 @@ public class QueueLayout extends Activity implements OnClickListener {
 					QueueDeleteSelected.class);
 			startActivityForResult(iDelSel, QUEUE_DELETE_SELECTED_REQUESTED);
 		}
-
 	}
 	
 	private boolean runUploadSanityChecks() {
@@ -275,8 +274,6 @@ public class QueueLayout extends Activity implements OnClickListener {
 				w.make("No internet connection found", Waffle.IMAGE_X);
 				return false;
 			}
-			
-
 			return true;
 		} else {
 			Intent iNoInitialProject = new Intent(QueueLayout.this,

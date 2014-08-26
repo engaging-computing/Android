@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+   <EditText
+        android:id="@+id/new_proj_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/new_proj_name"
+        android:inputType="text" >
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/topButtons"
+        android:layout_below="@id/new_proj_name" >
+
+        
+        
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Select All" />
+    </LinearLayout>
+    
+   <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/buttons"
+        android:layout_below="@id/topButtons"
+        android:scrollbars="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+    	android:orientation="vertical" >
+        
+    <CheckBox
+        android:id="@+id/cbTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Timestamp"/>
+
+    <CheckBox
+        android:id="@+id/cbAcceleration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Acceleration" />
+
+    <CheckBox
+        android:id="@+id/cbMagnetic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Magnetic" />
+
+    <CheckBox
+        android:id="@+id/cbHeadingDeg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Heading Degrees" />
+
+    <CheckBox
+        android:id="@+id/cbHeadingRad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Temperature C" />
+
+    <CheckBox
+        android:id="@+id/cbTempF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Temperature F" />
+
+    <CheckBox
+        android:id="@+id/cbTempK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Temperature K" />
+
+    <CheckBox
+        android:id="@+id/cbPressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Pressure" />
+
+    <CheckBox
+        android:id="@+id/cbAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Altitude" />
+
+    <CheckBox
+        android:id="@+id/cbLuminuous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Luminous Flux (Light)" />
+
+    <CheckBox
+        android:id="@+id/cbVelocity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Velocity (Calculated from gps)" />
+
+    <CheckBox
+        android:id="@+id/cbDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Distance (Calculated from gps)" />
+
+    <CheckBox
+        android:id="@+id/cbLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Location" />
+    
+    </LinearLayout>
+    
+    </ScrollView>
+    
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2"
+        android:id="@+id/buttons" >
+
+        <Button
+            android:id="@+id/clB"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:text="@android:string/cancel" />
+
+        <Button
+            android:id="@+id/okB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/createProjectButton" />
+    </LinearLayout>
+
+</RelativeLayout>

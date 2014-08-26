@@ -66,6 +66,7 @@ public class DataFieldManager extends Application {
 	private float distance = 0;
 	private float totalDistance = 0;
 	private float velocity = 0;
+	private float humidity = 0;
 	
     private SensorManager mSensorManager;
     private LocationManager mLocationManager;
@@ -106,7 +107,7 @@ public class DataFieldManager extends Application {
 	 */
 	public boolean[] enabledFields = { false, false, false, false, false,
 			false, false, false, false, false, false, false, false, false,
-			false, false, false, false, false, false, false };
+			false, false, false, false, false, false, false, false };
 
 	/**
 	 * Constructor for the DataFieldManager class.
@@ -197,6 +198,8 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.temperature_k));
 			order.add(mContext.getString(R.string.velocity));
 			order.add(mContext.getString(R.string.distance));
+			order.add(mContext.getString(R.string.humidity));
+
 		} else {
 			// Execute a new task
 			new GetOrderTask().execute();
@@ -237,6 +240,8 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.temperature_k));
 			order.add(mContext.getString(R.string.velocity));
 			order.add(mContext.getString(R.string.distance));
+			order.add(mContext.getString(R.string.humidity));
+
 		} else {
 			// Function is being called within an AsyncTask already, so
 			// no need to create a new task for the API call
@@ -301,12 +306,12 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.LATITUDE])
+			if (enabledFields[Fields.LATITUDE] && f.latitude != 0)
 				dataJSON.put(f.latitude);
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.LONGITUDE])
+			if (enabledFields[Fields.LONGITUDE] && f.longitude != 0)
 				dataJSON.put(f.longitude);
 			else
 				dataJSON.put("");
@@ -351,8 +356,7 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.ALTITUDE] && f.altitude != null)
-
+			if (enabledFields[Fields.ALTITUDE] && f.altitude != 0)
 				dataJSON.put(f.altitude);
 			else
 				dataJSON.put("");
@@ -372,15 +376,22 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 			
-			if (enabledFields[Fields.Velocity])
+			if (enabledFields[Fields.VELOCITY])
 				dataJSON.put(f.velocity);
 			else
 				dataJSON.put("");
 			
-			if (enabledFields[Fields.Distance])
+			if (enabledFields[Fields.DISTANCE])
 				dataJSON.put(f.distance);
 			else
 				dataJSON.put("");
+			
+			if (enabledFields[Fields.HUMIDITY]) {
+				dataJSON.put(Fields.HUMIDITY);
+			} else {
+				dataJSON.put("");
+
+			}
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -562,6 +573,13 @@ public class DataFieldManager extends Application {
 					b.append(f.distance);
 				else
 					b.append(", ").append(f.distance);
+				
+			} else if (s.equals(mContext.getString(R.string.humidity))) {
+					firstLineWritten = true;
+					if (start)
+						b.append(f.humidity);
+					else
+						b.append(", ").append(f.humidity);
 
 			} else {
 				firstLineWritten = true;
@@ -765,11 +783,14 @@ public class DataFieldManager extends Application {
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.velocity))) {
-							outRow.put(id + "", row.getString(Fields.Velocity));
+							outRow.put(id + "", row.getString(Fields.VELOCITY));
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.distance))) {
-							outRow.put(id + "", row.getString(Fields.Distance));
+							outRow.put(id + "", row.getString(Fields.DISTANCE));
+							continue;
+						} else if (s.equals(a.getResources().getString(R.string.humidity))) {
+							outRow.put(id + "", row.getString(Fields.HUMIDITY));
 							continue;
 						} else {
 							Log.e("DFM", s + " " + a.getResources().getString(
@@ -902,7 +923,7 @@ public class DataFieldManager extends Application {
 				}
 
 				// Potential Altitude
-				else if (field.name.toLowerCase(Locale.US).contains("altitude")) {
+				else if (field.name.toLowerCase(Locale.US).contains("alt")) {
 					order.add(mContext.getString(R.string.altitude));
 					break;
 				}
@@ -957,23 +978,30 @@ public class DataFieldManager extends Application {
 				}
 
 				// Pressure
-				else if (field.name.toLowerCase(Locale.US).contains("pressure")) {
+				else if (field.name.toLowerCase(Locale.US).contains("pres")) {
 					order.add(mContext.getString(R.string.pressure));
 					break;
 				}
 
 				// velocity
-				else if (field.name.toLowerCase(Locale.US).contains("velocity")) {
+				else if (field.name.toLowerCase(Locale.US).contains("vel")) {
 					order.add(mContext.getString(R.string.velocity));
 					break;
 				}
 				
 				// distance
-				else if (field.name.toLowerCase(Locale.US).contains("distance")) {
+				else if (field.name.toLowerCase(Locale.US).contains("dist")) {
 					order.add(mContext.getString(R.string.distance));
 					break;
 				}
 				
+				// humidity
+				else if (field.name.toLowerCase(Locale.US).contains("humidity")) {
+					order.add(mContext.getString(R.string.humidity));
+					break;
+				}
+				
+			
 				else {
 					order.add(mContext.getString(R.string.null_string)
 							+ field.name);
@@ -1194,8 +1222,9 @@ public class DataFieldManager extends Application {
 		enabledFields[Fields.PRESSURE] = true;
 		enabledFields[Fields.ALTITUDE] = true;
 		enabledFields[Fields.LIGHT] = true;
-		enabledFields[Fields.Velocity]= true;
-		enabledFields[Fields.Distance] = true;
+		enabledFields[Fields.VELOCITY]= true;
+		enabledFields[Fields.DISTANCE] = true;
+		enabledFields[Fields.HUMIDITY] = true;
 	}
 
 	/**
@@ -1246,9 +1275,12 @@ public class DataFieldManager extends Application {
 			if (s.equals(mContext.getString(R.string.luminous_flux)))
 				enabledFields[Fields.LIGHT] = true;	
 			if (s.equals(mContext.getString(R.string.velocity)))
-				enabledFields[Fields.Velocity] = true;	
-			if (s.equals(mContext.getString(R.string.luminous_flux)))
-				enabledFields[Fields.Distance] = true;	
+				enabledFields[Fields.VELOCITY] = true;	
+			if (s.equals(mContext.getString(R.string.distance)))
+				enabledFields[Fields.DISTANCE] = true;
+			if (s.equals(mContext.getString(R.string.humidity)))
+				enabledFields[Fields.HUMIDITY] = true;
+
 		}
 	}
 
@@ -1355,6 +1387,10 @@ public class DataFieldManager extends Application {
 		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
 			if (enabledFields[Fields.LIGHT])
 				light = toThou.format(event.values[0]);
+		} else if (event.sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY) {
+			if (enabledFields[Fields.HUMIDITY]) {
+				humidity = event.values[0];
+			}
 		}
 	}
 	
@@ -1406,7 +1442,7 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.ACCEL_TOTAL])
                 f.accel_total = toThou.format(accel[3]);
         if (enabledFields[Fields.LATITUDE])
-        	if(loc != null)
+        	if(loc != null && f.latitude != 0)
                 f.latitude = loc.getLatitude();
         if (enabledFields[Fields.LONGITUDE])
         	if(loc != null)
@@ -1447,12 +1483,12 @@ public class DataFieldManager extends Application {
                 f.pressure = pressure;
         if (enabledFields[Fields.ALTITUDE])
         	if(loc != null)
-                f.altitude = "" + loc.getAltitude();
+                f.altitude = loc.getAltitude();
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
-        if (enabledFields[Fields.Distance] || enabledFields[Fields.Velocity]) {
+        if (enabledFields[Fields.DISTANCE] || enabledFields[Fields.VELOCITY]) {
         	//calculations required for distance and velocity
-        	if (prevLoc != null) {
+        	if (prevLoc != null && loc != null) {
         		distance = loc.distanceTo((prevLoc));
         		totalDistance += distance;
         	} else {
@@ -1460,16 +1496,19 @@ public class DataFieldManager extends Application {
         	}
         	prevLoc = loc;
         	
-	        if (enabledFields[Fields.Distance]) {
+	        if (enabledFields[Fields.DISTANCE]) {
 	        	f.distance = totalDistance;
 	        }
 	        
-	        if (enabledFields[Fields.Velocity]) {
+	        if (enabledFields[Fields.VELOCITY]) {
 	        	velocity = distance/dataSetRate;
 	        	f.velocity = velocity;
 	        }
 	        //TODO create some kind of event listener for velocity and distance so that apps can display the values
         
+        }
+        if (enabledFields[Fields.HUMIDITY] || enabledFields[Fields.HUMIDITY]) {
+        	f.humidity = humidity; 
         }
         
         return putData();
@@ -1619,7 +1658,8 @@ public class DataFieldManager extends Application {
 				+ appContext.getResources().getString(R.string.temperature_f) + ","
 				+ appContext.getResources().getString(R.string.temperature_k) + ","
 				+ appContext.getResources().getString(R.string.velocity) + ","
-				+ appContext.getResources().getString(R.string.distance);
+				+ appContext.getResources().getString(R.string.distance) + ","
+				+ appContext.getResources().getString(R.string.humidity);
 
 		mEdit.putString("accepted_fields", acceptedFields).commit();
 	}
@@ -1666,8 +1706,7 @@ public class DataFieldManager extends Application {
 
 			if (enabledFields[Fields.TEMPERATURE_C]
 					|| enabledFields[Fields.TEMPERATURE_F]
-					|| enabledFields[Fields.TEMPERATURE_K]
-					|| enabledFields[Fields.ALTITUDE]) {
+					|| enabledFields[Fields.TEMPERATURE_K]) {
 				if (getApiLevel() >= 14) {
 					mSensorManager.registerListener(
 							sensorListener,
@@ -1675,6 +1714,14 @@ public class DataFieldManager extends Application {
 											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
 									SensorManager.SENSOR_DELAY_FASTEST);
 				}
+			}
+			
+			if (enabledFields[Fields.HUMIDITY]) {
+				mSensorManager.registerListener(
+						sensorListener,
+						        mSensorManager 
+										.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
+								SensorManager.SENSOR_DELAY_FASTEST);
 			}
 
 			if (enabledFields[Fields.PRESSURE]
@@ -1698,6 +1745,11 @@ public class DataFieldManager extends Application {
 			                mLocationManager.getBestProvider(criteria, true), 0, 0,
 			                locationListener);			
 				 }
+			if (enabledFields[Fields.HUMIDITY]) {
+				mSensorManager.registerListener(sensorListener,
+						mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
 		}
 		
 		/**

@@ -278,15 +278,10 @@ public class Setup extends Activity implements OnClickListener {
 		} else if (requestCode == NAME_FOR_NEW_PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
 				ArrayList<RProjectField> fields = null;
-				if (data.hasExtra("fields")) {
-					try {
-						fields = (ArrayList<RProjectField>) data.getSerializableExtra("fields");
-					} catch (Exception e) {
-						Log.e("Exception in Setup.java", e.toString());
-					}
-					
-				} else {
-					fields = getArrayOfFields();
+				try {
+					fields = (ArrayList<RProjectField>) data.getSerializableExtra("fields");
+				} catch (Exception e) {
+					Log.e("Exception in Setup.java", e.toString());
 				}
 				if (data.hasExtra("new_proj_name")) {
 					new CreateProjectTask().execute(
@@ -327,9 +322,9 @@ public class Setup extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(Integer projNum) {
 			super.onPostExecute(projNum);
-
-			SharedPreferences.Editor mEditor = mPrefs.edit();
-			mEditor.putString(PROJECT_ID, projNum + "").commit();
+			SharedPreferences mEditor = getSharedPreferences("PROJID", 0);
+			SharedPreferences.Editor editor = mEditor.edit();
+			editor.putString(PROJECT_ID, projNum + "").commit();
 			setResult(RESULT_OK);
 			finish();
 		}
@@ -349,141 +344,6 @@ public class Setup extends Activity implements OnClickListener {
 		}
 	}
 
-	private ArrayList<RProjectField> getArrayOfFields() {
-		ArrayList<RProjectField> fields = new ArrayList<RProjectField>();
-
-		if (APPNAME.equals("CRP")) {
-			RProjectField time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			RProjectField aX, aY, aZ, aT;
-			aX = new RProjectField();
-			aY = new RProjectField();
-			aZ = new RProjectField();
-			aT = new RProjectField();
-
-			String b = "Accel-";
-			aX.name = b + "X";
-			aY.name = b + "Y";
-			aZ.name = b + "Z";
-			aT.name = b + "Total";
-
-			aX.type = aY.type = aZ.type = aT.type = RProjectField.TYPE_NUMBER;
-			aX.unit = aY.unit = aZ.unit = aT.unit = "m/s^2";
-
-			fields.add(aX);
-			fields.add(aY);
-			fields.add(aZ);
-			fields.add(aT);
-
-		} else if (APPNAME.equals("DataWalk")) {
-			RProjectField time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			RProjectField aT, Vel, TD, Lat, Lon;
-
-			aT = new RProjectField();
-			aT.name = "Accel-Magnitude";
-			aT.type = RProjectField.TYPE_NUMBER;
-			aT.unit = "m/s^2";
-
-			Vel = new RProjectField();
-			Vel.name = "Velocity";
-			Vel.type = RProjectField.TYPE_NUMBER;
-			Vel.unit = "m/s";
-
-			TD = new RProjectField();
-			TD.name = "Total Distance";
-			TD.type = RProjectField.TYPE_NUMBER;
-			TD.unit = "m";
-
-			Lat = new RProjectField();
-			Lat.name = "Latitude";
-			Lat.type = RProjectField.TYPE_LAT;
-			Lat.unit = "deg";
-
-			Lon = new RProjectField();
-			Lon.name = "Longitude";
-			Lon.type = RProjectField.TYPE_LON;
-			Lon.unit = "deg";
-
-			fields.add(aT);
-			fields.add(Vel);
-			fields.add(TD);
-			fields.add(Lat);
-			fields.add(Lon);
-
-		} else if (APPNAME.equals("Canobie")) {
-
-			RProjectField time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			RProjectField aX, aY, aZ, aT;
-			aX = new RProjectField();
-			aY = new RProjectField();
-			aZ = new RProjectField();
-			aT = new RProjectField();
-
-			String b = "Accel-";
-			aX.name = b + "X";
-			aY.name = b + "Y";
-			aZ.name = b + "Z";
-			aT.name = b + "Total";
-
-			aX.type = aY.type = aZ.type = aT.type = RProjectField.TYPE_NUMBER;
-			aX.unit = aY.unit = aZ.unit = aT.unit = "m/s^2";
-
-			RProjectField Lat, Lon;
-
-			Lat = new RProjectField();
-			Lat.name = "Latitude";
-			Lat.type = RProjectField.TYPE_LAT;
-			Lat.unit = "deg";
-
-			Lon = new RProjectField();
-			Lon.name = "Longitude";
-			Lon.type = RProjectField.TYPE_LON;
-			Lon.unit = "deg";
-
-			fields.add(aX);
-			fields.add(aY);
-			fields.add(aZ);
-			fields.add(aT);
-			fields.add(Lat);
-			fields.add(Lon);
-
-		} else if (APPNAME.equals("Pictures")) {
-
-			RProjectField time, Lat, Lon;
-
-			time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			Lat = new RProjectField();
-			Lat.name = "Latitude";
-			Lat.type = RProjectField.TYPE_LAT;
-			Lat.unit = "deg";
-
-			Lon = new RProjectField();
-			Lon.name = "Longitude";
-			Lon.type = RProjectField.TYPE_LON;
-			Lon.unit = "deg";
-
-			fields.add(time);
-			fields.add(Lat);
-			fields.add(Lon);
-		}
-
-		return fields;
-	}
 
 	@Override
 	public void onBackPressed() {

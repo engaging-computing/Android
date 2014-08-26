@@ -519,8 +519,10 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 				projectNumber = prefs.getString("project_id", "-1");
 				
 				if (projectNumber.equals("-1")) {
+					w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
 					projNumB.setText("Generic Project");
 				} else {
+					w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
 					projNumB.setText("Project: " + projectNumber);
 				}
 				

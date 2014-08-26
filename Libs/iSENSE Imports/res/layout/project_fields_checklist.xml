@@ -22,6 +22,7 @@
         
         
         <Button
+            android:id="@+id/select_deselect_all"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -60,57 +61,15 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:text="Magnetic" />
-
-    <CheckBox
-        android:id="@+id/cbHeadingDeg"
+    
+     <CheckBox
+        android:id="@+id/cbLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Heading Degrees" />
-
-    <CheckBox
-        android:id="@+id/cbHeadingRad"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Temperature C" />
-
-    <CheckBox
-        android:id="@+id/cbTempF"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Temperature F" />
-
-    <CheckBox
-        android:id="@+id/cbTempK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Temperature K" />
-
-    <CheckBox
-        android:id="@+id/cbPressure"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Pressure" />
-
-    <CheckBox
-        android:id="@+id/cbAltitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Altitude" />
-
-    <CheckBox
-        android:id="@+id/cbLuminuous"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Luminous Flux (Light)" />
-
-    <CheckBox
+        android:text="Location" />
+     
+     <CheckBox
         android:id="@+id/cbVelocity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -124,12 +83,51 @@
         android:padding="5dp"
         android:text="Distance (Calculated from gps)" />
 
-    <CheckBox
-        android:id="@+id/cbLocation"
+     <CheckBox
+        android:id="@+id/cbAltitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Location" />
+        android:text="Altitude" />
+     
+    <CheckBox
+        android:id="@+id/cbPressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Pressure" />
+    
+        <CheckBox
+        android:id="@+id/cbHumidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Pressure" />
+     
+    <CheckBox
+        android:id="@+id/cbHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Heading" />
+
+    <CheckBox
+        android:id="@+id/cbTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Temperature" />
+
+    <CheckBox
+        android:id="@+id/cbLuminuous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Luminous Flux (Light)" />
+
+    
+
+   
     
     </LinearLayout>
     

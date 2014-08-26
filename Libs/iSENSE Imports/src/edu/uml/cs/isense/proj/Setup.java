@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -237,6 +238,7 @@ public class Setup extends Activity implements OnClickListener {
 	}
 
 	// Performs tasks after returning to main UI from previous activities
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -275,7 +277,17 @@ public class Setup extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == NAME_FOR_NEW_PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				ArrayList<RProjectField> fields = getArrayOfFields();
+				ArrayList<RProjectField> fields = null;
+				if (data.hasExtra("fields")) {
+					try {
+						fields = (ArrayList<RProjectField>) data.getSerializableExtra("fields");
+					} catch (Exception e) {
+						Log.e("Exception in Setup.java", e.toString());
+					}
+					
+				} else {
+					fields = getArrayOfFields();
+				}
 				if (data.hasExtra("new_proj_name")) {
 					new CreateProjectTask().execute(
 							data.getStringExtra("new_proj_name"), fields);

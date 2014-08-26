@@ -36,6 +36,7 @@ public class Fields {
 	public String pressure;
 	public float velocity, distance;
 	public double humidity;
+	
 
 	
 	/**

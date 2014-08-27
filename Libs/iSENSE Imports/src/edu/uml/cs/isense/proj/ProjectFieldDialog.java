@@ -84,57 +84,57 @@ public class ProjectFieldDialog extends Activity {
 						RProjectField accelx = new RProjectField();
 						accelx.name = "Accel-x";
 						accelx.type = RProjectField.TYPE_NUMBER;
-						accelx.unit = "";
+						accelx.unit = "m/s^2";
 						fields.add(accelx);
 						
 						RProjectField accely = new RProjectField();
 						accely.name = "Accel-y";
 						accely.type = RProjectField.TYPE_NUMBER;
-						accely.unit = "";
+						accely.unit = "m/s^2";
 						fields.add(accely);
 
 						
 						RProjectField accelz = new RProjectField();
 						accelz.name = "Accel-z";
 						accelz.type = RProjectField.TYPE_NUMBER;
-						accelz.unit = "";
+						accelz.unit = "m/s^2";
 						fields.add(accelz);
 
 						
 						RProjectField accelmag = new RProjectField();
 						accelmag.name = "Accel-magnitude";
 						accelmag.type = RProjectField.TYPE_NUMBER;
-						accelmag.unit = "";
+						accelmag.unit = "m/s^2";
 						fields.add(accelmag);
 
 						
 					}
 					if (magnetic.isChecked()) {
 						RProjectField magx = new RProjectField();
-						magx.name = "magnetic-x";
+						magx.name = "Magnetic-x";
 						magx.type = RProjectField.TYPE_NUMBER;
-						magx.unit = "";
+						magx.unit = "μT";
 						fields.add(magx);
 
 						
 						RProjectField magy = new RProjectField();
-						magy.name = "magnetic-y";
+						magy.name = "Magnetic-y";
 						magy.type = RProjectField.TYPE_NUMBER;
-						magy.unit = "";
+						magy.unit = "μT";
 						fields.add(magy);
 
 						
 						RProjectField magz = new RProjectField();
-						magz.name = "magnetic-z";
+						magz.name = "Magnetic-z";
 						magz.type = RProjectField.TYPE_NUMBER;
-						magz.unit = "";
+						magz.unit = "μT";
 						fields.add(magz);
 
 						
 						RProjectField magmag = new RProjectField();
-						magmag.name = "magnetic-magnitude";
+						magmag.name = "Magnetic-magnitude";
 						magmag.type = RProjectField.TYPE_NUMBER;
-						magmag.unit = "";
+						magmag.unit = "μT";
 						fields.add(magmag);
 						
 					}
@@ -149,7 +149,7 @@ public class ProjectFieldDialog extends Activity {
 						RProjectField lon = new RProjectField();
 						lon.name = "Longitude";
 						lon.type = RProjectField.TYPE_LON;
-						lon.unit = "Degreeds";
+						lon.unit = "Degrees";
 						fields.add(lon);
 
 					}

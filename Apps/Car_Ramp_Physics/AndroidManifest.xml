@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="edu.uml.cs.isense.carphysicsv2"
-    android:versionCode="26"
+    android:versionCode="27"
     android:versionName="3.1.5">
 
     <uses-sdk
@@ -24,7 +24,6 @@
         
         <service android:enabled="true" android:name=".Recording_Service" />
         <uses-library android:name="android.test.runner" />
-        
         
         <activity
             android:name=".CarRampPhysicsV2"

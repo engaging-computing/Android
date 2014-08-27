@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.manualentry"
+    android:versionCode="1"
+    android:versionName="1.0" >
+    
+  	<uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="21" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.credentials.CredentialManager"
+            android:label="Credential Manager"
+            android:configChanges="screenSize|orientation"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppThemeDialog" />
+    	<activity
+	        android:name="edu.uml.cs.isense.credentials.CredentialManagerKey"
+	        android:label="Add Contributor Key"
+	        android:theme="@style/AppThemeDialog" />
+    	<activity
+            android:name="edu.uml.cs.isense.credentials.EnterName"
+            android:label="@string/enter_name_prompt"
+            android:launchMode="singleTop"
+            android:theme="@style/AppThemeDialog"/>
+    	<activity
+            android:name="edu.uml.cs.isense.proj.Setup"
+            android:label="Choose Project"
+            android:theme="@style/AppThemeDialog"/>
+        <activity
+            android:name="edu.uml.cs.isense.proj.BrowseProjects"
+            android:label="@string/select_proj"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="edu.uml.cs.isense.queue.NoInitialProject"
+            android:label="No Associated Projects"
+            android:theme="@style/AppThemeDialog"/>
+    </application>
+
+</manifest>

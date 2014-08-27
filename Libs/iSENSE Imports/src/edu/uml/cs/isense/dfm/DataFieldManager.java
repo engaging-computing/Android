@@ -246,6 +246,7 @@ public class DataFieldManager extends Application {
 			// Function is being called within an AsyncTask already, so
 			// no need to create a new task for the API call
 			projFields = api.getProjectFields(projID);
+			Log.e("DFM", "proj fields: " + projFields);
 			getProjectFieldOrder();
 
 		}
@@ -336,15 +337,19 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.HEADING_DEG] && f.angle_deg != null)
+			if (enabledFields[Fields.HEADING_DEG] && f.angle_deg != null) {
+				Log.e("","deg" + f.angle_deg);
 				dataJSON.put(f.angle_deg);
-			else
+			} else {
 				dataJSON.put("");
+			}
 
-			if (enabledFields[Fields.HEADING_RAD] && f.angle_rad != null)
+			if (enabledFields[Fields.HEADING_RAD] && f.angle_rad != null) {
+				Log.e("","rad" + f.angle_rad);
 				dataJSON.put(f.angle_rad);
-			else
+			} else {
 				dataJSON.put("");
+			}
 
 			if (enabledFields[Fields.TEMPERATURE_C] && f.temperature_c != null)
 				dataJSON.put(f.temperature_c);
@@ -700,8 +705,6 @@ public class DataFieldManager extends Application {
 						if (s.equals(a.getResources().getString(
 								R.string.accel_x))) {
 							outRow.put(id + "", row.getString(Fields.ACCEL_X));
-							Log.e("DFM",s + " " + a.getResources().getString(
-									R.string.accel_x)); 
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.accel_y))) {
@@ -793,8 +796,6 @@ public class DataFieldManager extends Application {
 							outRow.put(id + "", row.getString(Fields.HUMIDITY));
 							continue;
 						} else {
-							Log.e("DFM", s + " " + a.getResources().getString(
-									R.string.time));
 							outRow.put(id + "", "");
 						}
 					} catch (JSONException e) {
@@ -1448,13 +1449,13 @@ public class DataFieldManager extends Application {
         	if(loc != null)
                 f.longitude = loc.getLongitude();
         if (enabledFields[Fields.HEADING_DEG])
-				 f.angle_deg = toThou.format(orientation[0]);
+				 f.angle_deg = toThou.format(orientation[0] * (180 / Math.PI ));
         if (enabledFields[Fields.HEADING_RAD])
-       	 if (!f.angle_deg.equals(""))
-				f.angle_rad = toThou
-						.format((Double.parseDouble(f.angle_deg) * (Math.PI / 180)));
-			else
+       	 if (!f.angle_deg.equals("")) {
+				f.angle_rad = toThou.format(orientation[0]);
+       	 } else {
 				f.angle_rad = "";
+       	 }
         if (enabledFields[Fields.MAG_X])
                 f.mag_x = "" + mag[0];
         if (enabledFields[Fields.MAG_Y])
@@ -1471,14 +1472,14 @@ public class DataFieldManager extends Application {
                 f.temperature_c = temperature;
         if (enabledFields[Fields.TEMPERATURE_F])
                 if (temperature.equals(""))
-                        f.temperature_f = temperature;
+                    f.temperature_f = temperature;
                 else
-                        f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
+                    f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
         if (enabledFields[Fields.TEMPERATURE_K])
                 if (temperature.equals(""))
-                        f.temperature_k = temperature;
+                	f.temperature_k = temperature;
                 else
-                        f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
+                   	f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
         if (enabledFields[Fields.PRESSURE])
                 f.pressure = pressure;
         if (enabledFields[Fields.ALTITUDE])
@@ -1546,8 +1547,6 @@ public class DataFieldManager extends Application {
 
 			/* get timestamp from picture */		
 			String dateTime = exifInterface.getAttribute(ExifInterface.TAG_DATETIME);
-
-			Log.e("Time: ", dateTime);
 			
 			try {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");

@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,6 +36,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -166,6 +168,12 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		
 		api = API.getInstance();
 		setUseDev(useDev);
+		
+		//bool in resources is false in values-xlarge but true in values 
+		//this only allows devices with xlarge displays to put this activity in landscape
+		if(getResources().getBoolean(R.bool.force_portrait)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
 		
 		//initialize intent for service
         service = new Intent(mContext, Recording_Service.class);
@@ -434,9 +442,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			startActivityForResult(new Intent(this, ResetToDefaults.class),
 					RESET_REQUESTED);
 			return true;
-		case R.id.about_app:
-			startActivity(new Intent(this, About.class));
-			return true;
+//		case R.id.about_app:
+//			startActivity(new Intent(this, About.class));
+//			return true;
 		case R.id.helpMenuItem:
 			startActivity(new Intent(this, Help.class));
 			return true;

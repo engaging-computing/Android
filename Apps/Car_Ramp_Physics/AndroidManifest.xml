@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="edu.uml.cs.isense.carphysicsv2"
-    android:versionCode="25"
+    android:versionCode="26"
     android:versionName="3.1.5">
 
     <uses-sdk
@@ -28,7 +28,6 @@
         
         <activity
             android:name=".CarRampPhysicsV2"
-            android:configChanges="orientation|keyboardHidden"
             android:label="@string/display_name"
             android:theme="@style/AppTheme" >
             <intent-filter>
@@ -145,6 +144,7 @@
         <activity
             android:name="edu.uml.cs.isense.proj.ProjectFieldDialog"
             android:label="@string/new_proj_name_title"
+            android:configChanges="keyboard|keyboardHidden"
             android:windowSoftInputMode="stateHidden"
             tools:ignore="MissingRegistered"
             android:theme="@style/AppTheme" />

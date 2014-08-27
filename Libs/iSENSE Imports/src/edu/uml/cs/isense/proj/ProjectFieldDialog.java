@@ -72,7 +72,7 @@ public class ProjectFieldDialog extends Activity {
 				if (name.equals("")){
 					nameInput.setError("Project Name Cannot Be Empty");
 				} else {
-					ArrayList fields = new ArrayList<RProjectField>();
+					ArrayList<RProjectField> fields = new ArrayList<RProjectField>();
 					
 					if (timestamp.isChecked()) {
 						RProjectField time = new RProjectField();
@@ -265,6 +265,7 @@ public class ProjectFieldDialog extends Activity {
 			@Override
 			public void onClick(View v) {
 				if (allchecked) {
+					selectAll.setText("Select All");
 					allchecked = false;
 					timestamp.setChecked(false);
 					acceleration.setChecked(false);
@@ -279,6 +280,7 @@ public class ProjectFieldDialog extends Activity {
 					temp.setChecked(false);
 					light.setChecked(false);
 				} else {
+					selectAll.setText("Deselect All");
 					allchecked = true;
 					timestamp.setChecked(true);
 					acceleration.setChecked(true);

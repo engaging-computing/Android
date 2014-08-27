@@ -10,11 +10,11 @@
         android:showAsAction="ifRoom"
         android:title="@string/reset">
     </item>
-    <item
+   <!--  <item
         android:id="@+id/about_app"
         android:showAsAction="ifRoom"
         android:title="@string/about_title">
-    </item>
+    </item> -->
     <item
         android:id="@+id/helpMenuItem"
         android:showAsAction="ifRoom"

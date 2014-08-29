@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Border -->
+    <item>
+        <shape>
+            <padding android:top="3dp" android:right="3dp" android:bottom="3dp" android:left="3dp" />
+            <solid android:color="@color/navy_light" />
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+
+    <!-- Background -->
+    <item>
+    <shape>
+            <solid android:color="#F3F3F3" />
+        <corners android:radius="3dp" />
+    </shape>
+   </item>
+</layer-list>

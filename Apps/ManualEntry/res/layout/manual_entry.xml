@@ -1,17 +1,31 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.manualentry.ManualEntry" >
-       
+    
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_above="@+id/adddatapoint"
+       android:layout_alignParentTop="true"
+       tools:context="com.example.manualentry.ManualEntry" >
+
    <LinearLayout
-    	android:id="@+id/fields_sv"
+    	android:id="@+id/datapoints_sv"
     	android:orientation="vertical"
 		android:layout_width="match_parent"
-   		android:layout_height="wrap_content"
-    	android:layout_margin="5dp" />
+   		android:layout_height="wrap_content"/>
       
-       
-       
     </ScrollView>
 
+   <Button
+       android:id="@+id/adddatapoint"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_alignParentBottom="true"
+       android:layout_centerHorizontal="true"
+	    android:background="@drawable/button_bar_rsense"
+       android:text="Add Data Point" />
+
+</RelativeLayout>

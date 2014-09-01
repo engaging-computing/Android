@@ -6,6 +6,9 @@
     <item android:id="@+id/MENU_ITEM_LOGIN"
           android:title="Credential Manager"
           android:showAsAction="ifRoom"/>
+    <item android:id="@+id/MENU_ITEM_UPLOAD"
+          android:title="Upload"
+          android:showAsAction="ifRoom"/>
     <item android:id="@+id/MENU_ITEM_PROJECT"
           android:title="Project"
           android:showAsAction="ifRoom"/>

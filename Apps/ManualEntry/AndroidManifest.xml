@@ -59,6 +59,31 @@
             android:name="edu.uml.cs.isense.queue.NoInitialProject"
             android:label="No Associated Projects"
             android:theme="@style/AppThemeDialog"/>
+        <activity
+            android:name="edu.uml.cs.isense.proj.ProjectCreate"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Create New Project"
+            android:theme="@style/AppThemeDialog" />
+          <activity
+            android:name="edu.uml.cs.isense.queue.QueueLayout"
+            android:label="Upload Data"
+            android:theme="@style/AppThemeQueue"/>
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueAlter"
+            android:label="Alter Data Set"
+            android:theme="@style/AppThemeDialog"/>
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueEditData"
+            android:label="Edit Data"
+            android:theme="@style/AppThemeDialog"/>
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueEditRename"
+            android:label="Rename Data Set"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueDeleteSelected"
+            android:label="Delete Selected Data Sets"
+            android:theme="@style/AppThemeDialog" />
     </application>
 
 </manifest>

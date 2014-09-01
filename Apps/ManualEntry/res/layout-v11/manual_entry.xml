@@ -32,15 +32,19 @@
 	       android:id="@+id/adddatapoint"
 	       android:layout_width="match_parent"
 	       android:layout_height="wrap_content"
-	       android:background="@drawable/button_bar_rsense"
+	       style="?android:attr/buttonBarButtonStyle"
 	       android:layout_weight="1"
 	       android:text="Add Data Point" />
+	   
+	   <View android:layout_height="fill_parent"
+		   android:layout_width="2px"
+		   android:background="#90909090"/>
 	   
 	    <Button
 	       android:id="@+id/save"
 	       android:layout_width="match_parent"
 	       android:layout_height="wrap_content"
-	       android:background="@drawable/button_bar_rsense"
+	       style="?android:attr/buttonBarButtonStyle"
 	       android:layout_weight="1"
 	       android:text="Save" />
     

@@ -56,6 +56,7 @@ public class Setup extends Activity implements OnClickListener {
 	private Button projLater;
 
 	private LinearLayout oklayout;
+	private LinearLayout selectLaterLayout;
 
 	private Context mContext;
 	private Waffle w;
@@ -89,6 +90,7 @@ public class Setup extends Activity implements OnClickListener {
 	private boolean showOKCancel = true;
 	private boolean constrictFields = false;
 	private boolean themeNavBar = false;
+	private boolean showSelectLater = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -121,15 +123,21 @@ public class Setup extends Activity implements OnClickListener {
 
 		oklayout = (LinearLayout) findViewById(R.id.OKCancelLayout);
 		oklayout.setVisibility(View.VISIBLE);
+		
+		selectLaterLayout = (LinearLayout) findViewById(R.id.select_later_layout);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			showOKCancel = extras.getBoolean("showOKCancel", true);
 			constrictFields = extras.getBoolean("constrictFields", false);
 			themeNavBar = extras.getBoolean(ProjectCreate.THEME_NAV_BAR, false);
+			showSelectLater = extras.getBoolean("showSelectLater", true);
 
 			if (!showOKCancel)
 				oklayout.setVisibility(View.GONE);
+			
+			if(!showSelectLater)
+				selectLaterLayout.setVisibility(View.GONE);
 
 			String fromWhere = extras.getString("from_where");
 			if (fromWhere != null) {

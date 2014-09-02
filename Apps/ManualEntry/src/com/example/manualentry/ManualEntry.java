@@ -53,6 +53,7 @@ public class ManualEntry extends Activity implements LocationListener {
 	private ArrayList<RProjectField> fields;
 	private Button addField;
 	private Button save;
+	private EditText datasetName;
 	private int datapoints = 0;
 	private Waffle w;
 	public static UploadQueue uq;
@@ -93,6 +94,7 @@ public class ManualEntry extends Activity implements LocationListener {
 		CredentialManager.login(mContext, api);
 		addField = (Button) findViewById(R.id.adddatapoint);
 		save = (Button) findViewById(R.id.upload);
+		datasetName = (EditText) findViewById(R.id.dataset_name);
 		
 		// Initialize action bar customization for API >= 11
 		if (android.os.Build.VERSION.SDK_INT >= 11) {
@@ -113,8 +115,9 @@ public class ManualEntry extends Activity implements LocationListener {
 
 			@Override
 			public void onClick(View v) {
-				Log.e("Here", "push button");
-				addFields();				
+				if(fields.size() != 0) {
+					addFields();	
+				}
 			}
 			
 		});
@@ -124,9 +127,11 @@ public class ManualEntry extends Activity implements LocationListener {
 
 			@Override
 			public void onClick(View v) {
+				if(fields.size() != 0) {
+				
 				JSONArray uploadData = getDataFromScreen();
 				
-				String dataSetName = "test";
+				String dataSetName = datasetName.toString();
 				String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 				String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + uploadData.length();
 				Type type = Type.DATA;
@@ -142,6 +147,9 @@ public class ManualEntry extends Activity implements LocationListener {
 	        
 				
 				clearFields();
+				new getNewFieldsTask().execute();
+				
+				}
 			}
 			
 		});
@@ -164,6 +172,7 @@ public class ManualEntry extends Activity implements LocationListener {
 		}
 		if (id == R.id.MENU_ITEM_PROJECT) {
 			Intent setup = new Intent(mContext, Setup.class);
+			setup.putExtra("showSelectLater", false);
 			this.startActivityForResult(setup, PROJECT_REQUESTED);
 			return true;
 		}
@@ -251,9 +260,12 @@ public class ManualEntry extends Activity implements LocationListener {
 	/**
 	 * Adds current fields to the layout
 	 */
+	@SuppressLint({ "SimpleDateFormat", "InflateParams" })
 	private void addFields() {
 		datapoints++;	
-
+		
+		
+		
 		LayoutInflater inflater = (LayoutInflater)getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout datapoint = new LinearLayout(mContext);
 		FrameLayout dataPointFrame = new FrameLayout(mContext);
@@ -268,7 +280,19 @@ public class ManualEntry extends Activity implements LocationListener {
 		
 		datapoint.addView(datapointnumber, 0);	
 		
-		
+		SharedPreferences setupPrefs = getSharedPreferences(
+				Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
+		int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
+					"-1"));
+		if (fields.size() == 0 && projectID != -1) {
+			w.make("This Project Doesn't Have Any Fields", Waffle.IMAGE_X);
+			ViewGroup noFieldError = new RelativeLayout(mContext);
+			inflater.inflate(R.layout.no_fields, noFieldError);
+			datapoint.addView(noFieldError, 1);	
+			
+			datapointsLayout.addView(dataPointFrame, datapoints - 1);
+		} else {
+			
 		for(int i=0; i<fields.size(); i++) {
 			RProjectField field = fields.get(i);
 			
@@ -293,7 +317,6 @@ public class ManualEntry extends Activity implements LocationListener {
 				ViewGroup singlefield = new RelativeLayout(mContext);
 				inflater.inflate(R.layout.field, singlefield);
 				
-				EditText et = (EditText) singlefield.findViewById(R.id.field_et);
 				TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 				
 				tv.setText(field.name + ":");
@@ -347,6 +370,7 @@ public class ManualEntry extends Activity implements LocationListener {
 		
 		
 		datapointsLayout.addView(dataPointFrame, datapoints - 1);
+		}
 	}
 	
 	/**
@@ -391,6 +415,11 @@ public class ManualEntry extends Activity implements LocationListener {
 	
 	JSONArray getDataFromScreen() {
 		JSONArray data = new JSONArray();
+
+		
+		if (fields.size() == 0) {
+			return data;
+		} else {
 		
 		for (int i = 0; i < datapointsLayout.getChildCount(); i++) {
 			JSONArray dataPoint = new JSONArray();
@@ -426,6 +455,7 @@ public class ManualEntry extends Activity implements LocationListener {
 		}
 		
 		return data;
+		}
 	}
 	
 	private void manageUploadQueue() {

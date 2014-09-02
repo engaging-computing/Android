@@ -318,6 +318,12 @@ public class ManualEntry extends Activity implements LocationListener {
 				inflater.inflate(R.layout.field, singlefield);
 				
 				TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
+				EditText et = (EditText) singlefield.findViewById(R.id.field_et);
+				
+				if (field.restrictions == null) {
+					et.setVisibility(View.GONE);
+				}
+				//TODO set restrictions for edit text if the field has restrictions
 				
 				tv.setText(field.name + ":");
 				datapoint.addView(singlefield, i+1);	
@@ -396,8 +402,7 @@ public class ManualEntry extends Activity implements LocationListener {
 				e.printStackTrace();
 				fields = new ArrayList<RProjectField>(); 
 			}
-			
-			Log.e("MANUAL", "" + api.getProjectFields(projectID));
+
 			return null;
 		}
 
@@ -433,7 +438,7 @@ public class ManualEntry extends Activity implements LocationListener {
 				RelativeLayout fieldlayout = (RelativeLayout) datapointlayout.getChildAt(j + 1);
 				EditText etData = (EditText) fieldlayout.findViewById(R.id.field_et);
 				
-				//try to get data from edittext for a field and add to json
+				//try to get data from edit text for a field and add to json
 				try {
 					if (etData == null) {
 						dataPoint.put("");
@@ -441,7 +446,6 @@ public class ManualEntry extends Activity implements LocationListener {
 						dataPoint.put(j, etData.getText());
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -477,10 +481,8 @@ public class ManualEntry extends Activity implements LocationListener {
 		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 		if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-
 			mLocationManager.requestLocationUpdates(
 					mLocationManager.getBestProvider(c, true), 0, 0, ManualEntry.this);
-
 		}
 
 	}

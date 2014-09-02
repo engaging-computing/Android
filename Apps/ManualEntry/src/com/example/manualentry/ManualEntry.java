@@ -22,6 +22,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -41,7 +45,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class ManualEntry extends Activity {
+public class ManualEntry extends Activity implements LocationListener {
 	public static Context mContext;
 	private API api; 
 	private Boolean useDev = false;
@@ -52,7 +56,7 @@ public class ManualEntry extends Activity {
 	private int datapoints = 0;
 	private Waffle w;
 	public static UploadQueue uq;
-
+	private LocationManager mLocationManager;
 
 	
 	/* Action Bar */
@@ -66,12 +70,23 @@ public class ManualEntry extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.manual_entry);
+		
+		SharedPreferences setupPrefs = getSharedPreferences(
+				Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
+		int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
+					"-1"));
+		if (projectID == -1) {
+			Intent intent = new Intent(this, NoProject.class);
+			startActivity(intent);
+		}
 		mContext = this;
 		api = API.getInstance();
 		api.useDev(useDev);
 		
 		uq = new UploadQueue("ManualEntry", mContext, api);
 		uq.buildQueueFromFile();
+		
+		initializeLocationManager();
 		
 		w = new Waffle(mContext);
 
@@ -303,6 +318,12 @@ public class ManualEntry extends Activity {
 				TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 				
 				et.setEnabled(false);
+				if (mLocationManager.getLastKnownLocation(LOCATION_SERVICE) != null) {
+					et.setText("" + mLocationManager.getLastKnownLocation(LOCATION_SERVICE).getLongitude());
+				} else {
+					et.setHint("No GPS Signal");
+				}
+				
 				tv.setText(field.name + ":");
 				datapoint.addView(singlefield, i+1);	
 				
@@ -314,6 +335,11 @@ public class ManualEntry extends Activity {
 				TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 				
 				et.setEnabled(false);
+				if (mLocationManager.getLastKnownLocation(LOCATION_SERVICE) != null) {
+					et.setText("" + mLocationManager.getLastKnownLocation(LOCATION_SERVICE).getLatitude());
+				} else {
+					et.setHint("No GPS Signal");
+				}
 				tv.setText(field.name + ":");
 				datapoint.addView(singlefield, i+1);	
 			}
@@ -399,8 +425,6 @@ public class ManualEntry extends Activity {
 			}
 		}
 		
-		
-		Log.e("data", "Data: " + data.toString());
 		return data;
 	}
 	
@@ -416,4 +440,51 @@ public class ManualEntry extends Activity {
 		}
 	}
 	
+	void initializeLocationManager() {
+		Criteria c = new Criteria();
+		c.setAccuracy(Criteria.ACCURACY_FINE);
+
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+			mLocationManager.requestLocationUpdates(
+					mLocationManager.getBestProvider(c, true), 0, 0, ManualEntry.this);
+
+		}
+
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		initializeLocationManager();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		//turn off gps to save battery
+		if (mLocationManager != null)
+			mLocationManager.removeUpdates(ManualEntry.this);
+	}
 }

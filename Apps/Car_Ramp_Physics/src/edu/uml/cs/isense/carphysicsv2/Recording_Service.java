@@ -181,7 +181,6 @@ public class Recording_Service extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        
         if (running) {
         	running = false;
 

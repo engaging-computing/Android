@@ -84,6 +84,12 @@
             android:name="edu.uml.cs.isense.queue.QueueDeleteSelected"
             android:label="Delete Selected Data Sets"
             android:theme="@style/AppThemeDialog" />
+         <activity
+            android:name=".NoProject"
+            android:label="@string/app_name" 
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
     </application>
 
 </manifest>

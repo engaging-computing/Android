@@ -22,7 +22,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/display_name" >
         
-        <service android:enabled="true" android:name=".Recording_Service" />
+        <service android:enabled="true" android:name=".RecordingService" />
         <uses-library android:name="android.test.runner" />
         
         <activity

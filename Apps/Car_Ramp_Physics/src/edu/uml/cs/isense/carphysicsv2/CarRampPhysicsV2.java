@@ -83,7 +83,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 	private Button lengthB;
 	private TextView x, y, z;
 	public static Boolean running = false;
-
+	
 	private SensorManager mSensorManager;
 
 	
@@ -164,6 +164,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		saved = savedInstanceState;
 		mContext = this;
 		
+
+		
 		api = API.getInstance();
 		setUseDev(useDev);
 		
@@ -174,7 +176,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 	    }
 		
 		//initialize intent for service
-        service = new Intent(mContext, Recording_Service.class);
+        service = new Intent(mContext, RecordingService.class);
 
 		if (api.getCurrentUser() != null) {
 			Runnable r = new Runnable() {
@@ -193,6 +195,12 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 			// make the actionbar clickable
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
+		
+		if (RecordingService.running)
+			useMenu = false;
+		else
+			useMenu = true;
+
 		
 		uq = new UploadQueue("carrampphysics", mContext, api);
 		uq.buildQueueFromFile();
@@ -214,7 +222,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		rateB = (Button) findViewById(R.id.b_rate);
 		lengthB = (Button) findViewById(R.id.b_length);
 		
-		if (Recording_Service.running) {
+		if (RecordingService.running) {
 			startStop.setBackgroundResource(R.drawable.button_rsense_green);
 			startStop.setText("Recording");
 		} else {
@@ -295,13 +303,19 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 				mMediaPlayer.setLooping(false);
 				mMediaPlayer.start();
 
-                if (Recording_Service.running) {
+                if (RecordingService.running) {
 					startStop.setBackgroundResource(R.drawable.button_rsense);
 					startStop.setText("Hold to Start");
+					useMenu = true;
+					if (android.os.Build.VERSION.SDK_INT >= 11)
+						invalidateOptionsMenu();
                     stopService(service);
                 } else {
 					startStop.setBackgroundResource(R.drawable.button_rsense_green);
 					startStop.setText("Recording");
+					useMenu = false;
+					if (android.os.Build.VERSION.SDK_INT >= 11)
+						invalidateOptionsMenu();
                     startService(service);
                 } 
 
@@ -313,10 +327,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		uploadButton.setOnClickListener(new OnClickListener (){
 			@Override
 			public void onClick(View v) {
-				// Launched the upload queue dialog
+				//Launched the upload queue dialog
 				manageUploadQueue();
 			}
-			
 		});
 		
 		projNumB.setOnClickListener(new OnClickListener() {
@@ -403,7 +416,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 		super.onStart();
 		inPausedState = false;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver), new IntentFilter(Recording_Service.RESULT));
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver), new IntentFilter(RecordingService.RESULT));
 
 		mSensorManager.registerListener(CarRampPhysicsV2.this,
 				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),

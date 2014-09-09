@@ -330,11 +330,7 @@ public class ManualEntry extends Activity implements LocationListener {
 				inflater.inflate(R.layout.field, singlefield);
 				
 				TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
-				EditText et = (EditText) singlefield.findViewById(R.id.field_et);
-				
-				
-				//TODO set restrictions for edit text if the field has restrictions
-				
+								
 				tv.setText(field.name + ":");
 				datapoint.addView(singlefield, i+1);	
 				
@@ -349,7 +345,7 @@ public class ManualEntry extends Activity implements LocationListener {
 					String delims = ",";
 					String[] restrict = field.restrictions.split(delims);
 					
-					//TODO set restrictions for edit text if the field has restrictions
+					//TODO set restrictions if the field has restrictions
 					
 					Log.e("ManualEntry", field.restrictions.toString());
 					Log.e("ManualEntry", restrict[0]);

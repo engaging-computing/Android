@@ -9,6 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="20dp"
-        android:text="Select Project" />
+        android:text="Select a Project" 
+        android:background="@drawable/button_rsense"
+        android:textColor="#0066FF"
+	    android:textSize="30sp" />
 
 </LinearLayout>

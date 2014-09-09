@@ -19,8 +19,8 @@
 	        android:id="@+id/dataset_name"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:hint="Bob's Dataset"
 	        android:layout_weight="1"
+	        android:lines="1"
 	        android:ems="10" >
 
         <requestFocus />

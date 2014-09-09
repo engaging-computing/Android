@@ -37,12 +37,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class ManualEntry extends Activity implements LocationListener {
@@ -95,6 +97,14 @@ public class ManualEntry extends Activity implements LocationListener {
 		addField = (Button) findViewById(R.id.adddatapoint);
 		save = (Button) findViewById(R.id.upload);
 		datasetName = (EditText) findViewById(R.id.dataset_name);
+		datasetName.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				datasetName.setError(null);				
+			}
+			
+		});
 		
 		// Initialize action bar customization for API >= 11
 		if (android.os.Build.VERSION.SDK_INT >= 11) {
@@ -128,27 +138,28 @@ public class ManualEntry extends Activity implements LocationListener {
 			@Override
 			public void onClick(View v) {
 				if(fields.size() != 0) {
-				
-				JSONArray uploadData = getDataFromScreen();
-				
-				String dataSetName = datasetName.toString();
-				String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-				String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + uploadData.length();
-				Type type = Type.DATA;
-				
-				SharedPreferences setupPrefs = getSharedPreferences(
-						Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-				int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
-							"-1"));
-
-				//add new dataset to queue
-				uq.buildQueueFromFile();
-				uq.addToQueue(dataSetName, description, type, uploadData, null, Integer.toString(projectID), null);
-	        
-				
-				clearFields();
-				new getNewFieldsTask().execute();
-				
+					if(!datasetName.getText().toString().equals("")) {
+						JSONArray uploadData = getDataFromScreen();
+						
+						String dataSetName = datasetName.getText().toString();
+						String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+						String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + uploadData.length();
+						Type type = Type.DATA;
+						
+						SharedPreferences setupPrefs = getSharedPreferences(
+								Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
+						int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
+									"-1"));
+		
+						//add new dataset to queue
+						uq.buildQueueFromFile();
+						uq.addToQueue(dataSetName, description, type, uploadData, null, Integer.toString(projectID), null);
+						
+						clearFields();
+						new getNewFieldsTask().execute();
+					} else {
+						datasetName.setError("No Name Entered");
+					}
 				}
 			}
 			
@@ -264,8 +275,6 @@ public class ManualEntry extends Activity implements LocationListener {
 	private void addFields() {
 		datapoints++;	
 		
-		
-		
 		LayoutInflater inflater = (LayoutInflater)getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout datapoint = new LinearLayout(mContext);
 		FrameLayout dataPointFrame = new FrameLayout(mContext);
@@ -314,19 +323,44 @@ public class ManualEntry extends Activity implements LocationListener {
 				datapoint.addView(singlefield, i+1);	
 
 			} else if (field.type == RProjectField.TYPE_TEXT) {
+				
+				if (field.restrictions == null) {
+				
 				ViewGroup singlefield = new RelativeLayout(mContext);
 				inflater.inflate(R.layout.field, singlefield);
 				
 				TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 				EditText et = (EditText) singlefield.findViewById(R.id.field_et);
 				
-				if (field.restrictions == null) {
-					et.setVisibility(View.GONE);
-				}
+				
 				//TODO set restrictions for edit text if the field has restrictions
 				
 				tv.setText(field.name + ":");
 				datapoint.addView(singlefield, i+1);	
+				
+				} else {
+					
+					ViewGroup singlefield = new RelativeLayout(mContext);
+					inflater.inflate(R.layout.field_restriction, singlefield);
+					
+					TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
+					Spinner mSpinner = (Spinner) singlefield.findViewById(R.id.field_spinner);
+					
+					String delims = ",";
+					String[] restrict = field.restrictions.split(delims);
+					
+					//TODO set restrictions for edit text if the field has restrictions
+					
+					Log.e("ManualEntry", field.restrictions.toString());
+					Log.e("ManualEntry", restrict[0]);
+
+					ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, restrict); //selected item will look like a spinner set from XML
+					mSpinner.setAdapter(spinnerArrayAdapter);
+
+					
+					tv.setText(field.name + ":");
+					datapoint.addView(singlefield, i+1);	
+				}
 				
 			} else if (field.type == RProjectField.TYPE_NUMBER) {
 				ViewGroup singlefield = new RelativeLayout(mContext);

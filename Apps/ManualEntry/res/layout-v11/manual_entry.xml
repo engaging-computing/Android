@@ -8,7 +8,8 @@
     	android:id="@+id/dataset_name_layout"
     	android:orientation="horizontal"
 		android:layout_width="match_parent"
-   		android:layout_height="wrap_content">
+   		android:layout_height="wrap_content"
+   		android:padding="10dp">
 	    <TextView
            android:id="@+id/textView1"
            android:layout_width="wrap_content"
@@ -46,6 +47,7 @@
    
   <LinearLayout
    	android:id="@+id/buttons"
+   	style="?android:attr/buttonBarStyle"
    	android:orientation="horizontal"
 	android:layout_width="match_parent"
   	android:layout_height="wrap_content"
@@ -54,21 +56,17 @@
    
 	   <Button
 	       android:id="@+id/adddatapoint"
+	       style="?android:attr/buttonBarButtonStyle"
 	       android:layout_width="match_parent"
 	       android:layout_height="wrap_content"
-	       style="?android:attr/buttonBarButtonStyle"
 	       android:layout_weight="1"
 	       android:text="Add Data Point" />
 	   
-	   <View android:layout_height="fill_parent"
-		   android:layout_width="2px"
-		   android:background="#90909090"/>
-	   
 	    <Button
 	       android:id="@+id/save"
+	       style="?android:attr/buttonBarButtonStyle"
 	       android:layout_width="match_parent"
 	       android:layout_height="wrap_content"
-	       style="?android:attr/buttonBarButtonStyle"
 	       android:layout_weight="1"
 	       android:text="Save" />
     

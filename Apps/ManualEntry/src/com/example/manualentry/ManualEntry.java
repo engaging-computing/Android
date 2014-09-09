@@ -17,6 +17,7 @@ import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.waffle.Waffle;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -27,9 +28,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.InputType;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +40,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -280,15 +286,57 @@ public class ManualEntry extends Activity implements LocationListener {
 		FrameLayout dataPointFrame = new FrameLayout(mContext);
 		
 		dataPointFrame = (FrameLayout) getLayoutInflater().inflate(R.layout.data_point, null);
-		
 		datapoint = (LinearLayout) dataPointFrame.findViewById(R.id.ll_data_point);
 		
+		//Set Datapoint number
 		TextView datapointnumber = new TextView(mContext);
+		datapointnumber = (TextView) datapoint.findViewById(R.id.pointNumber);
 		datapointnumber.setText("Data Point: " + datapoints);
-		datapointnumber.setWidth(LayoutParams.MATCH_PARENT);
 		
-		datapoint.addView(datapointnumber, 0);	
-		
+		Button removeDataPoint = (Button) datapoint.findViewById(R.id.deletePoint);
+		removeDataPoint.setOnClickListener(new OnClickListener(){
+
+			@TargetApi(Build.VERSION_CODES.KITKAT)
+			@Override
+			public void onClick(View v) {
+				
+				if (datapoints == 1) {
+					w.make("Must have one data point", Waffle.LENGTH_LONG, Waffle.IMAGE_X);
+				} else {
+					FrameLayout dataPointFrame = (FrameLayout) v.getParent().getParent().getParent();
+
+
+					Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+					animation.setDuration(200);
+					
+					animation.setAnimationListener(new AnimationListener() {
+					    @Override
+					    public void onAnimationEnd(final Animation animation)
+					    {
+					    	datapointsLayout.removeView(animation.View);
+							renumberDataPoints();
+					    }
+
+						@Override
+						public void onAnimationRepeat(Animation animation) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void onAnimationStart(Animation animation) {
+							// TODO Auto-generated method stub
+					    	Log.e("This", "THIS");
+
+						}
+					});
+					dataPointFrame.startAnimation(animation);
+				
+				}
+			}
+			
+		});
+				
 		SharedPreferences setupPrefs = getSharedPreferences(
 				Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
 		int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
@@ -409,6 +457,21 @@ public class ManualEntry extends Activity implements LocationListener {
 		}
 	}
 	
+	/**
+	 * Datapoint was removed from screen so now we need to go through and renumber them
+	 */
+	void renumberDataPoints() {
+		datapoints--;
+		
+		for(int i = 0; i < datapoints; i++) {
+			TextView pointNumber = (TextView) datapointsLayout.getChildAt(i).findViewById(R.id.pointNumber);
+			pointNumber.setText("Data Point: " + (i+1));
+		}
+		
+		// TODO Renumber Datapoints
+		
+	}
+
 	/**
 	 * Gets Fields from project and sets ui
 	 * 

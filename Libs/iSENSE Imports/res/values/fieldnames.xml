@@ -24,6 +24,8 @@
     <string name="temperature_k">Temp. (Kelvin)</string>		<!-- 18 -->
     <string name="velocity">Velocity</string>					<!-- 19 -->
     <string name="distance">Distance</string>					<!-- 20 -->
+    <string name="humidity">Humidity</string>					<!-- 21 -->
+    
     
     
     <string name="compatible">Compatible</string>

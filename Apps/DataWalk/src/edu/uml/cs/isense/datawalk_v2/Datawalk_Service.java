@@ -55,6 +55,7 @@ public class Datawalk_Service extends Service {
     boolean bFirstPoint = true;
     float totalDistance = 0;
     long startTime;
+    
 
     Intent intent;
 
@@ -71,8 +72,6 @@ public class Datawalk_Service extends Service {
     @Override
 	public void onCreate() {
 		super.onCreate();
-        Log.e("oncreate", "");
-
 
         // initialize GPS and Sensor managers
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -89,7 +88,6 @@ public class Datawalk_Service extends Service {
 
         if (android.os.Build.VERSION.SDK_INT >= 11) {
             Intent intent = new Intent(DataWalk.mContext, DataWalk.class);
-            //PendingIntent pendingIntent = PendingIntent.getActivity(this, 01, intent, Intent.FLAG_ACTIVITY_CLEAR_TASK);
             PendingIntent pendingIntent = PendingIntent.getActivity(DataWalk.mContext, 01, intent, 0);
 
             Notification.Builder builder = new Notification.Builder(getApplicationContext());

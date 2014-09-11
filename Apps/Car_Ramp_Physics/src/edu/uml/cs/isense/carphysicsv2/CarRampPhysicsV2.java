@@ -21,57 +21,50 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.util.Log;
+import android.os.Vibrator;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-
 import org.json.JSONArray;
-
-
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
-
-import edu.uml.cs.isense.carphysicsv2.dialogs.About;
+import edu.uml.cs.isense.carphysicsv2.dialogs.DurationDialog;
 import edu.uml.cs.isense.carphysicsv2.dialogs.Help;
+import edu.uml.cs.isense.carphysicsv2.dialogs.RateDialog;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.EnterName;
-import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
-import edu.uml.cs.isense.queue.QDataSet.Type;
-import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
-		LocationListener {
+public class CarRampPhysicsV2 extends Activity implements SensorEventListener {
 
 	public static String projectNumber = "-1";
 	public static final String DEFAULT_PROJ = "-1";
+	public static final int DEFAULT_RATE = 50;
+	public static final int DEFAULT_LENGTH = 10;
 	public static boolean useDev = false;
 	public static boolean promptForName = true;
 
@@ -83,19 +76,20 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public static String RECORD_SETTINGS = "RECORD_SETTINGS";
 
 	private Button startStop;
-	private TextView values;
+	private Button uploadButton;
+	private Button projNumB;
+	private Button nameB;
+	private Button rateB;
+	private Button lengthB;
+	private TextView x, y, z;
 	public static Boolean running = false;
-
+	
 	private SensorManager mSensorManager;
 
 	
 	private Timer timeTimer;
-	private int INTERVAL = 50;
 
-	private DataFieldManager dfm;
 	public API api;
-
-	private int countdown;
 
 	static String firstName = "";
 	static String lastInitial = "";
@@ -104,24 +98,21 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public static final int UPLOAD_OK_REQUESTED = 90000;
 	public static final int LOGIN_STATUS_REQUESTED = 6005;
 	public static final int RECORDING_LENGTH_REQUESTED = 4009;
+	public static final int RECORDING_RATE_REQUESTED = 4010;
 	public static final int PROJECT_REQUESTED = 9000;
 	public static final int QUEUE_UPLOAD_REQUESTED = 5000;
 	public static final int RESET_REQUESTED = 6003;
 	public static final int SAVE_MODE_REQUESTED = 10005;
 	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
 
-//	private boolean timeHasElapsed = false;
-
 	private MediaPlayer mMediaPlayer;
-
-//	private int elapsedMillis = 0;
+	private Vibrator vibrator;
 
 	DecimalFormat toThou = new DecimalFormat("######0.000");
 
 	int i = 0;
 	int len = 0;
 	int len2 = 0;
-	int length;
 
 	ProgressDialog dia;
 	double partialProg = 1.0;
@@ -136,7 +127,6 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	static boolean exitAppViaBack = false;
 	static boolean dontPromptMeTwice = false;
 	
-	private Handler mHandler;
 	public static JSONArray dataSet;
 
 	long currentTime;
@@ -153,6 +143,10 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 	public static Menu menu;
 	
+    Intent service;
+    
+    //Receives info from library to update ui
+    BroadcastReceiver receiver;
 
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
@@ -171,8 +165,18 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		mContext = this;
 		
 
+		
 		api = API.getInstance();
 		setUseDev(useDev);
+		
+		//bool in resources is false in values-xlarge but true in values 
+		//this only allows devices with xlarge displays to put this activity in landscape
+		if(getResources().getBoolean(R.bool.force_portrait)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
+		//initialize intent for service
+        service = new Intent(mContext, RecordingService.class);
 
 		if (api.getCurrentUser() != null) {
 			Runnable r = new Runnable() {
@@ -192,38 +196,97 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
 		
+		if (RecordingService.running)
+			useMenu = false;
+		else
+			useMenu = true;
+
+		
 		uq = new UploadQueue("carrampphysics", mContext, api);
 		uq.buildQueueFromFile();
 
 		w = new Waffle(mContext);
 
 		CredentialManager.login(mContext, api);
-
-		mHandler = new Handler();
+		
+		// Beep sound
+		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
+		
+		// Vibrator for Long Click
+		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
 		startStop = (Button) findViewById(R.id.startStop);
-
-		values = (TextView) findViewById(R.id.values);
-
-		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH", 0);
-		length = countdown = prefs.getInt("length", 10);
+		uploadButton = (Button) findViewById(R.id.b_upload);
+		projNumB = (Button) findViewById(R.id.b_project);
+		nameB = (Button) findViewById(R.id.b_name);
+		rateB = (Button) findViewById(R.id.b_rate);
+		lengthB = (Button) findViewById(R.id.b_length);
 		
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		if (RecordingService.running) {
+			startStop.setBackgroundResource(R.drawable.button_rsense_green);
+			startStop.setText("Recording");
+		} else {
+			startStop.setBackgroundResource(R.drawable.button_rsense);
+			startStop.setText("Hold to Start");
+		}
+		
+		SharedPreferences namePrefs = getSharedPreferences(
+				EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
+		firstName = namePrefs.getString(
+				EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME,
+				"");
+		lastInitial = namePrefs
+				.getString(
+						EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
+						"");
 
-		dfm.registerSensors(mSensorManager, CarRampPhysicsV2.this);
-
-		if (savedInstanceState == null) {
-			if (firstName.equals("") || lastInitial.equals("")) {
-			
-				Intent iEnterName = new Intent(this, EnterName.class);
-				iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-						true);
-				startActivityForResult(iEnterName, RESULT_GOT_NAME);
-				
-			}
+		if (firstName.length() == 0) {
+			Intent iEnterName = new Intent(this, EnterName.class);
+			iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
+					true);
+			startActivityForResult(iEnterName, RESULT_GOT_NAME);
+		} else {
+			nameB.setText(firstName + " " + lastInitial);
 		}
 
-		initDfm();
+		x = (TextView) findViewById(R.id.x);
+		y = (TextView) findViewById(R.id.y);
+		z = (TextView) findViewById(R.id.z);
+		
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		String projId = mPrefs.getString(Setup.PROJECT_ID, "-1");
+				
+		if (projId.equals("-1")) {
+			projNumB.setText("Generic Project");
+		} else {
+			projNumB.setText("Project: " + projId);
+		}
+		
+		setRateText();
+		setLengthText();
+	
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+	
+		
+		 /* update UI with data passed back from service */
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.hasExtra("BUTTON")) {
+                    String s = intent.getStringExtra("BUTTON");
+                    startStop.setText(s);
+                } else if(intent.hasExtra("BUTTONSTART")) {
+					startStop.setBackgroundResource(R.drawable.button_rsense_green);
+                    startStop.setText("Recording");
+
+                } else if(intent.hasExtra("BUTTONSTOP")) {
+					startStop.setBackgroundResource(R.drawable.button_rsense);
+                    startStop.setText("Hold to Start");
+                }
+            }  
+        };
+
+
 
 		new DecimalFormat("#,##0.0");
 
@@ -233,108 +296,98 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			public boolean onLongClick(View arg0) {
 
 				mMediaPlayer.setLooping(false);
-					mMediaPlayer.start();
-	
-					if (running) {
-							running = false;
-							try{
-							getWindow().clearFlags(
-									WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-							} catch (Exception e){
-								Log.e("onButtonPress", "Failed to remove layoutParams.FLAG_KEEP_SCREEN_ON");
-							}
-							
-							dfm.stopRecording();
-							int dataPointCount = dataSet.length();
-							
-							SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-							String projId = mPrefs.getString(Setup.PROJECT_ID, "");
-							
-							String dataName = firstName + " " + lastInitial;;
-							String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-							String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataPointCount;
-							Type type = Type.DATA;
+				mMediaPlayer.start();
+				
+				// Vibrate and beep
+				vibrator.vibrate(300);
+				mMediaPlayer.setLooping(false);
+				mMediaPlayer.start();
 
-							uq.addToQueue(dataName, description, type, dataSet, null, projId, null);
-	
-							setupDone = false;
-							useMenu = true;
-							countdown = length;
-	
-							startStop.setText("Hold to Start");
-	
-							timeTimer.cancel();
-							choiceViaMenu = false;
-	
-							startStop.setBackgroundResource(R.drawable.button_rsense);
-	
-					} else {
-	
-						OrientationManager.disableRotation(CarRampPhysicsV2.this);
-						getWindow().addFlags(
-								WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-	
-						startStop.setBackgroundResource(R.drawable.button_rsense_green);
-	
-						dataSet = new JSONArray();
-						len = 0;
-						len2 = 0;
-						i = 0;
-						
-						initDfm();
-						dfm.recordData(INTERVAL);
+                if (RecordingService.running) {
+					startStop.setBackgroundResource(R.drawable.button_rsense);
+					startStop.setText("Hold to Start");
+					useMenu = true;
+					if (android.os.Build.VERSION.SDK_INT >= 11)
+						invalidateOptionsMenu();
+                    stopService(service);
+                } else {
+					startStop.setBackgroundResource(R.drawable.button_rsense_green);
+					startStop.setText("Recording");
+					useMenu = false;
+					if (android.os.Build.VERSION.SDK_INT >= 11)
+						invalidateOptionsMenu();
+                    startService(service);
+                } 
 
-						useMenu = false;
-	
-						running = true;
-						startStop.setText("" + countdown);
-						
-						timeTimer = new Timer();
-						timeTimer.scheduleAtFixedRate(new TimerTask() {
-	
-							public void run() {
-	
-								if (i >= (length * (1000 / INTERVAL))) {
-	
-									timeTimer.cancel();
-									
-									CarRampPhysicsV2.this.runOnUiThread(new Runnable() {
-									    public void run() {
-											startStop.performLongClick();
-									    }
-									});
-	
-								} else {
-	
-									i++;
-									len++;
-									len2++;
-	
-									if (i % (1000 / INTERVAL) == 0) {
-										mHandler.post(new Runnable() {
-											@Override
-											public void run() {
-												startStop.setText("" + countdown);
-											}
-										});
-										countdown--;
-									}
-									//TODO look into timestamp
-									//f.timeMillis = currentTime + elapsedMillis;
-		
-								}
-	
-							}
-						}, 0, INTERVAL);
-						
-				}
-			
-					return running;
+				return running;
 		}
 	});
 
 		
+		uploadButton.setOnClickListener(new OnClickListener (){
+			@Override
+			public void onClick(View v) {
+				//Launched the upload queue dialog
+				manageUploadQueue();
+			}
+		});
+		
+		projNumB.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// Allows the user to pick a project to upload to
+				Intent setup = new Intent(mContext, Setup.class);
+				setup.putExtra("constrictFields", true);
+				startActivityForResult(setup, PROJECT_REQUESTED);
+			}
+
+		});
+		
+		nameB.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// Launch the dialog that allows users to enter his/her
+				// firstname
+				// and last initial
+				Intent iEnterName = new Intent(mContext, EnterName.class);
+				SharedPreferences classPrefs = getSharedPreferences(
+						ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
+				iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
+						classPrefs.getBoolean(
+								ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE,
+								true));
+				startActivityForResult(iEnterName, RESULT_GOT_NAME);
+			}
+
+		});
+		
+		rateB.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent rate = new Intent(mContext, RateDialog.class);
+				rate.putExtra("title", "Change Recording Rate");
+				startActivityForResult(rate, RECORDING_RATE_REQUESTED);
+			}
+
+		});
+		
+		lengthB.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(mContext, DurationDialog.class);
+				i.putExtra("title", "Change Recording Length");
+				startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
+			}
+
+		});
+		
+		
 	}
+	
 
 	@Override
 	public void onPause() {
@@ -353,6 +406,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		if (timeTimer != null)
 			timeTimer.cancel();
 		inPausedState = true;
+		
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 	}
 
 
@@ -360,6 +415,8 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	public void onStart() {
 		super.onStart();
 		inPausedState = false;
+
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver), new IntentFilter(RecordingService.RESULT));
 
 		mSensorManager.registerListener(CarRampPhysicsV2.this,
 				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -389,35 +446,16 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			startActivityForResult(new Intent(this, CredentialManager.class),
 					LOGIN_STATUS_REQUESTED);
 			return true;
-		case R.id.project_select:
-			Intent setup = new Intent(this, Setup.class);
-			setup.putExtra("constrictFields", true);
-			setup.putExtra("app_name", "CRP");
-			startActivityForResult(setup, PROJECT_REQUESTED);
-			return true;
 		case R.id.upload:
 			manageUploadQueue();
-			return true;
-		case R.id.record_length:
-			createSingleInputDialog("Change Recording Length", "",
-					RECORDING_LENGTH_REQUESTED);
-			return true;
-		case R.id.changename:
-			Intent iEnterName = new Intent(mContext, EnterName.class);
-			SharedPreferences classPrefs = getSharedPreferences(
-					ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
-			iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-					classPrefs.getBoolean(
-							ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE, true));
-			startActivityForResult(iEnterName, RESULT_GOT_NAME);
 			return true;
 		case R.id.reset:
 			startActivityForResult(new Intent(this, ResetToDefaults.class),
 					RESET_REQUESTED);
 			return true;
-		case R.id.about_app:
-			startActivity(new Intent(this, About.class));
-			return true;
+//		case R.id.about_app:
+//			startActivity(new Intent(this, About.class));
+//			return true;
 		case R.id.helpMenuItem:
 			startActivity(new Intent(this, Help.class));
 			return true;
@@ -467,33 +505,22 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 	}
 
 	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (dfm != null) {
-			dfm.updateValues(event);
-		} else {
-			Log.e("onSensorChanged ", "dfm is null");
-		}
-		
-		if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
-			event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+	public void onSensorChanged(SensorEvent event) {	
+		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
 			
 		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
 		String xPrepend = event.values[0] > 0 ? "+" : "";
 		String yPrepend = event.values[1] > 0 ? "+" : "";
 		String zPrepend = event.values[2] > 0 ? "+" : "";
 		
-		values.setText("Ax: " + xPrepend
-				+ oneDigit.format(event.values[0]) + " " + "Ay: " + yPrepend
-				+ oneDigit.format(event.values[1]) + " " + "Az: " + zPrepend
-				+ oneDigit.format(event.values[2]) + " ");
+		x.setText("X: " + xPrepend
+				+ oneDigit.format(event.values[0]));
+		y.setText("Y: " + yPrepend
+				+ oneDigit.format(event.values[1]));
+		z.setText("Z: " + zPrepend
+				+ oneDigit.format(event.values[2]));
 		}
 		
-
-	}
-
-	@Override
-	public void onLocationChanged(Location location) {
-		dfm.updateLoc(location);
 	}
 
 	public static int getApiLevel() {
@@ -508,15 +535,16 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		if (reqCode == PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
 				SharedPreferences prefs = getSharedPreferences("PROJID", 0);
-				projectNumber = prefs.getString("project_id", null);
+				projectNumber = prefs.getString("project_id", "-1");
 				
-				if (projectNumber == null) {
-					projectNumber = DEFAULT_PROJ;
+				if (projectNumber.equals("-1")) {
+					w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
+					projNumB.setText("Generic Project");
+				} else {
+					w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
+					projNumB.setText("Project: " + projectNumber);
 				}
 				
-				dfm.setProjID(Integer.parseInt(projectNumber));
-				dfm.registerSensors(mSensorManager, CarRampPhysicsV2.this);
-
 			}
 
 		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
@@ -530,14 +558,11 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 		} else if (reqCode == RECORDING_LENGTH_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				length = Integer.parseInt(data.getStringExtra("input"));
-				countdown = length;
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("length", length);
-				editor.putInt("Interval", INTERVAL);
-				editor.commit();
+				setLengthText();
+			}
+		} else if (reqCode == RECORDING_RATE_REQUESTED) {
+			if (resultCode == RESULT_OK) {
+				setRateText();
 			}
 		} else if (reqCode == RESULT_GOT_NAME) {
 			if (resultCode == RESULT_OK) {
@@ -552,6 +577,9 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 
 					firstName = user.name;
 					lastInitial = "";
+					
+					nameB.setText(firstName + " " + lastInitial);
+
 
 				} else {
 					firstName = namePrefs.getString(
@@ -561,26 +589,40 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 							.getString(
 									EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
 									"");
+					
+					nameB.setText(firstName + " " + lastInitial);
+
 				}
 
 			}
 		} else if (reqCode == RESET_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				countdown = length = prefs.getInt("length", 10);
+				/*Logout*/
+				CredentialManager.logout(this, api);
 
-				CredentialManager.login(this, api);
-
+				/*reset project*/
 				SharedPreferences eprefs = getSharedPreferences("PROJID", 0);
 				SharedPreferences.Editor editor = eprefs.edit();
 				projectNumber = DEFAULT_PROJ;
 				editor.putString("project_id", projectNumber);
 				editor.commit();
-				INTERVAL = 50;
-
-				dfm.setUpDFMWithAllSensorFields(mContext);
+				projNumB.setText("Generic Project");
 				
+				/*reset rate*/
+				SharedPreferences ratePrefs = getSharedPreferences("RECORD_RATE", 0);
+				SharedPreferences.Editor editor2 = ratePrefs.edit();
+				editor2.putInt("rate", DEFAULT_RATE);
+				editor2.commit();
+				setRateText();
+				
+				/*reset recording length*/
+				SharedPreferences lengthPrefs = getSharedPreferences("RECORD_LENGTH", 0);
+				SharedPreferences.Editor editor3 = lengthPrefs.edit();
+				editor3.putInt("length", DEFAULT_LENGTH);
+				editor3.commit();
+				setLengthText();
+
+				/*reset name*/
 				Intent iEnterName = new Intent(mContext, EnterName.class);
 				SharedPreferences classPrefs = getSharedPreferences(
 						ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
@@ -602,7 +644,7 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
 			startActivityForResult(i, QUEUE_UPLOAD_REQUESTED);
 		} else {
-			w.make("There are no data to upload!", Waffle.LENGTH_LONG,
+			w.make("There is no data to upload!", Waffle.LENGTH_LONG,
 					Waffle.IMAGE_X);
 		}
 	}
@@ -615,43 +657,67 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		startActivityForResult(i, reqCode);
 	}
 
-	public void createSingleInputDialog(String title, String message,
-			int reqCode) {
-
-		Intent i = new Intent(mContext, SingleInputDialogTemplate.class);
-		i.putExtra("title", title);
-		i.putExtra("message", message);
-		startActivityForResult(i, reqCode);
-
-	}
-
-
-	@Override
-	public void onProviderDisabled(String arg0) {
-	}
-
-	@Override
-	public void onProviderEnabled(String arg0) {
-	}
-
-	@Override
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-	}
+@Override
+public void onAccuracyChanged(Sensor sensor, int accuracy) {
 	
-	
-/**
- * Initialize DataFieldManager Object
- */
-	private void initDfm() {
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
-		dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
-		dfm.enableAllSensorFields();
+}
+
+private void setRateText() {
+	SharedPreferences ratePrefs = getSharedPreferences("RECORD_RATE", 0);
+	int rate = ratePrefs.getInt("rate", DEFAULT_RATE);
+
+	switch (rate) {
+	case 50:
+		rateB.setText("50 mili");
+		break;
+	case 100:
+		rateB.setText("100 mili");
+		break;
+	case 500:
+		rateB.setText("500 mili");
+		break;
+	case 1000:
+		rateB.setText("1 sec");
+	break;
+	case 5000:
+		rateB.setText("5 sec");
+		break;
+	case 30000:
+		rateB.setText("30 sec");
+		break;
+	default:
+		rateB.setText("1 min");
+		break;
 	}
+}
+
+private void setLengthText() {
+	SharedPreferences lengthPrefs = getSharedPreferences("RECORD_LENGTH", 0);
+	int length = lengthPrefs.getInt("length", DEFAULT_LENGTH);
 	
+	switch (length) {
+	case 1:
+		lengthB.setText("1 sec");
+		break;
+	case 2:
+		lengthB.setText("2 sec");
+		break;
+	case 5:
+		lengthB.setText("5 sec");
+		break;
+	case 10:
+		lengthB.setText("10 sec");
+	break;
+	case 30:
+		lengthB.setText("30 sec");
+		break;
+	case 60:
+		lengthB.setText("1 min");
+		break;
+	default:
+		lengthB.setText("Push to Stop");
+		break;
+	}
+}
 	
 }

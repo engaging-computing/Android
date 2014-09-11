@@ -146,7 +146,7 @@
             android:label="Create New Project"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name="edu.uml.cs.isense.proj.ProjectNameDialog"
+            android:name="edu.uml.cs.isense.proj.ProjectFieldDialog"
             android:label="Create New Project"
             android:theme="@style/AppThemeDialog" />
         <activity

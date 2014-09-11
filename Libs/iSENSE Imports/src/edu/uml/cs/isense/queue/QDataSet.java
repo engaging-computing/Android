@@ -162,6 +162,7 @@ public class QDataSet implements Serializable {
         // if the data is already in a forced order and just needs to be labeled
 		// with the
 		// project's field IDs, we'll do so here
+		//TODO why are fields for heading being messed up
 		if (this.requestDataLabelInOrder) {
 			try {
 				// see if the elements of the JSONArray are JSONArrays

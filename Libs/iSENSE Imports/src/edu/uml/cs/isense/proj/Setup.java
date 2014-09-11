@@ -3,13 +3,13 @@ package edu.uml.cs.isense.proj;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,9 +50,10 @@ public class Setup extends Activity implements OnClickListener {
 
 	private Button okay;
 	private Button cancel;
-	private Button qrCode;
+//	private Button qrCode;
 	private Button browse;
 	private Button createProject;
+	private Button projLater;
 
 	private LinearLayout oklayout;
 
@@ -106,14 +107,17 @@ public class Setup extends Activity implements OnClickListener {
 		cancel = (Button) findViewById(R.id.project_cancel);
 		cancel.setOnClickListener(this);
 
-		qrCode = (Button) findViewById(R.id.project_qr);
-		qrCode.setOnClickListener(this);
+//		qrCode = (Button) findViewById(R.id.project_qr);
+//		qrCode.setOnClickListener(this);
 
 		browse = (Button) findViewById(R.id.project_browse);
 		browse.setOnClickListener(this);
 
 		createProject = (Button) findViewById(R.id.createProjectBtn);
 		createProject.setOnClickListener(this);
+		
+		projLater = (Button) findViewById(R.id.project_later);
+		projLater.setOnClickListener(this);
 
 		oklayout = (LinearLayout) findViewById(R.id.OKCancelLayout);
 		oklayout.setVisibility(View.VISIBLE);
@@ -179,24 +183,33 @@ public class Setup extends Activity implements OnClickListener {
 		} else if (id == R.id.project_cancel) {
 			setResult(RESULT_CANCELED);
 			finish();
-		} else if (id == R.id.project_qr) {
-			try {
-				Intent intent = new Intent(
-						"com.google.zxing.client.android.SCAN");
-
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-				intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-				startActivityForResult(intent, QR_CODE_REQUESTED);
-			} catch (ActivityNotFoundException e) {
-				Intent iNoQR = new Intent(Setup.this, NoQR.class);
-				startActivityForResult(iNoQR, NO_QR_REQUESTED);
-			}
+		//Find project id by QR code (currently website does not have QR codes anymore)
+//		} else if (id == R.id.project_qr) {
+//			try {
+//				Intent intent = new Intent(
+//						"com.google.zxing.client.android.SCAN");
+//
+//				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+//
+//				intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+//				startActivityForResult(intent, QR_CODE_REQUESTED);
+//			} catch (ActivityNotFoundException e) {
+//				Intent iNoQR = new Intent(Setup.this, NoQR.class);
+//				startActivityForResult(iNoQR, NO_QR_REQUESTED);
+//			}
 		} else if (id == R.id.project_browse) {
 			Intent iProject = new Intent(getApplicationContext(),
 					BrowseProjects.class);
 			
 			startActivityForResult(iProject, PROJECT_CODE);
+			
+		} else if (id == R.id.project_later) {
+			SharedPreferences.Editor mEditor = mPrefs.edit();
+			mEditor.putString(PROJECT_ID, "-1")
+					.commit();
+			setResult(RESULT_OK);
+			finish();
+			
 		} else if (id == R.id.createProjectBtn) {
 			if (!Connection.hasConnectivity(mContext))
 				w.make("Internet connection required to create project",
@@ -206,8 +219,7 @@ public class Setup extends Activity implements OnClickListener {
 						Waffle.LENGTH_LONG, Waffle.IMAGE_WARN);
 				startActivityForResult(new Intent(this, CredentialManager.class),
 						LOGIN_STATUS_REQUESTED);
-			}
-			else {
+			} else {
 				if (!constrictFields) {
 					Intent iProjCreate = new Intent(getApplicationContext(),
 							ProjectCreate.class);
@@ -216,7 +228,7 @@ public class Setup extends Activity implements OnClickListener {
 					startActivityForResult(iProjCreate, NEW_PROJ_REQUESTED);
 				} else {
 					Intent iNewProjName = new Intent(getApplicationContext(),
-							ProjectNameDialog.class);
+							ProjectFieldDialog.class);
 					startActivityForResult(iNewProjName,
 							NAME_FOR_NEW_PROJECT_REQUESTED);
 				}
@@ -226,6 +238,7 @@ public class Setup extends Activity implements OnClickListener {
 	}
 
 	// Performs tasks after returning to main UI from previous activities
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -264,7 +277,12 @@ public class Setup extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == NAME_FOR_NEW_PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				ArrayList<RProjectField> fields = getArrayOfFields();
+				ArrayList<RProjectField> fields = null;
+				try {
+					fields = (ArrayList<RProjectField>) data.getSerializableExtra("fields");
+				} catch (Exception e) {
+					Log.e("Exception in Setup.java", e.toString());
+				}
 				if (data.hasExtra("new_proj_name")) {
 					new CreateProjectTask().execute(
 							data.getStringExtra("new_proj_name"), fields);
@@ -304,9 +322,9 @@ public class Setup extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(Integer projNum) {
 			super.onPostExecute(projNum);
-
-			SharedPreferences.Editor mEditor = mPrefs.edit();
-			mEditor.putString(PROJECT_ID, projNum + "").commit();
+			SharedPreferences mEditor = getSharedPreferences("PROJID", 0);
+			SharedPreferences.Editor editor = mEditor.edit();
+			editor.putString(PROJECT_ID, projNum + "").commit();
 			setResult(RESULT_OK);
 			finish();
 		}
@@ -326,141 +344,6 @@ public class Setup extends Activity implements OnClickListener {
 		}
 	}
 
-	private ArrayList<RProjectField> getArrayOfFields() {
-		ArrayList<RProjectField> fields = new ArrayList<RProjectField>();
-
-		if (APPNAME.equals("CRP")) {
-			RProjectField time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			RProjectField aX, aY, aZ, aT;
-			aX = new RProjectField();
-			aY = new RProjectField();
-			aZ = new RProjectField();
-			aT = new RProjectField();
-
-			String b = "Accel-";
-			aX.name = b + "X";
-			aY.name = b + "Y";
-			aZ.name = b + "Z";
-			aT.name = b + "Total";
-
-			aX.type = aY.type = aZ.type = aT.type = RProjectField.TYPE_NUMBER;
-			aX.unit = aY.unit = aZ.unit = aT.unit = "m/s^2";
-
-			fields.add(aX);
-			fields.add(aY);
-			fields.add(aZ);
-			fields.add(aT);
-
-		} else if (APPNAME.equals("DataWalk")) {
-			RProjectField time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			RProjectField aT, Vel, TD, Lat, Lon;
-
-			aT = new RProjectField();
-			aT.name = "Accel-Magnitude";
-			aT.type = RProjectField.TYPE_NUMBER;
-			aT.unit = "m/s^2";
-
-			Vel = new RProjectField();
-			Vel.name = "Velocity";
-			Vel.type = RProjectField.TYPE_NUMBER;
-			Vel.unit = "m/s";
-
-			TD = new RProjectField();
-			TD.name = "Total Distance";
-			TD.type = RProjectField.TYPE_NUMBER;
-			TD.unit = "m";
-
-			Lat = new RProjectField();
-			Lat.name = "Latitude";
-			Lat.type = RProjectField.TYPE_LAT;
-			Lat.unit = "deg";
-
-			Lon = new RProjectField();
-			Lon.name = "Longitude";
-			Lon.type = RProjectField.TYPE_LON;
-			Lon.unit = "deg";
-
-			fields.add(aT);
-			fields.add(Vel);
-			fields.add(TD);
-			fields.add(Lat);
-			fields.add(Lon);
-
-		} else if (APPNAME.equals("Canobie")) {
-
-			RProjectField time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			RProjectField aX, aY, aZ, aT;
-			aX = new RProjectField();
-			aY = new RProjectField();
-			aZ = new RProjectField();
-			aT = new RProjectField();
-
-			String b = "Accel-";
-			aX.name = b + "X";
-			aY.name = b + "Y";
-			aZ.name = b + "Z";
-			aT.name = b + "Total";
-
-			aX.type = aY.type = aZ.type = aT.type = RProjectField.TYPE_NUMBER;
-			aX.unit = aY.unit = aZ.unit = aT.unit = "m/s^2";
-
-			RProjectField Lat, Lon;
-
-			Lat = new RProjectField();
-			Lat.name = "Latitude";
-			Lat.type = RProjectField.TYPE_LAT;
-			Lat.unit = "deg";
-
-			Lon = new RProjectField();
-			Lon.name = "Longitude";
-			Lon.type = RProjectField.TYPE_LON;
-			Lon.unit = "deg";
-
-			fields.add(aX);
-			fields.add(aY);
-			fields.add(aZ);
-			fields.add(aT);
-			fields.add(Lat);
-			fields.add(Lon);
-
-		} else if (APPNAME.equals("Pictures")) {
-
-			RProjectField time, Lat, Lon;
-
-			time = new RProjectField();
-			time.name = "Time";
-			time.type = RProjectField.TYPE_TIMESTAMP;
-			fields.add(time);
-
-			Lat = new RProjectField();
-			Lat.name = "Latitude";
-			Lat.type = RProjectField.TYPE_LAT;
-			Lat.unit = "deg";
-
-			Lon = new RProjectField();
-			Lon.name = "Longitude";
-			Lon.type = RProjectField.TYPE_LON;
-			Lon.unit = "deg";
-
-			fields.add(time);
-			fields.add(Lat);
-			fields.add(Lon);
-		}
-
-		return fields;
-	}
 
 	@Override
 	public void onBackPressed() {

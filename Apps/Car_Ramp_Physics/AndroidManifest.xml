@@ -2,14 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="edu.uml.cs.isense.carphysicsv2"
-    android:versionCode="24"
-    android:versionName="3.1.4">
+    android:versionCode="27"
+    android:versionName="3.1.5">
 
     <uses-sdk
         android:minSdkVersion="9"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="20" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -18,12 +22,11 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/display_name" >
         
+        <service android:enabled="true" android:name=".RecordingService" />
         <uses-library android:name="android.test.runner" />
-        
         
         <activity
             android:name=".CarRampPhysicsV2"
-            android:configChanges="orientation|keyboardHidden"
             android:label="@string/display_name"
             android:theme="@style/AppTheme" >
             <intent-filter>
@@ -114,7 +117,11 @@
             android:label="Output a message"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name=".SingleInputDialogTemplate"
+            android:name="edu.uml.cs.isense.carphysicsv2.dialogs.DurationDialog"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+         <activity
+            android:name="edu.uml.cs.isense.carphysicsv2.dialogs.RateDialog"
             android:label="Single input"
             android:theme="@style/AppThemeDialog" />
         <activity
@@ -134,10 +141,12 @@
             android:label="Delete Selected Data Sets"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name="edu.uml.cs.isense.proj.ProjectNameDialog"
+            android:name="edu.uml.cs.isense.proj.ProjectFieldDialog"
             android:label="@string/new_proj_name_title"
+            android:configChanges="keyboard|keyboardHidden"
+            android:windowSoftInputMode="stateHidden"
             tools:ignore="MissingRegistered"
-            android:theme="@style/AppThemeDialog" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name="edu.uml.cs.isense.credentials.ClassroomMode"
             android:label="@string/classroom_mode"
@@ -148,6 +157,11 @@
             android:label="Credential Manager"
             android:configChanges="screenSize|orientation"
             android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.proj.ProjectCreate"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Create New Project"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.credentials.CredentialManagerKey"

@@ -10,10 +10,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -46,6 +50,9 @@ import edu.uml.cs.isense.proj.Setup;
  */
 @SuppressLint("UseValueOf")
 public class DataFieldManager extends Application {
+    private MySensorListener sensorListener;
+    private MyLocationListener locationListener;
+	
 	private float rawAccel[] = new float[4];
 	private float rawMag[] = new float[3];
 	private float accel[] = new float[4];
@@ -59,6 +66,10 @@ public class DataFieldManager extends Application {
 	private float distance = 0;
 	private float totalDistance = 0;
 	private float velocity = 0;
+	private float humidity = 0;
+	
+    private SensorManager mSensorManager;
+    private LocationManager mLocationManager;
 	
 	long dataSetRate = 0;
 	
@@ -96,7 +107,7 @@ public class DataFieldManager extends Application {
 	 */
 	public boolean[] enabledFields = { false, false, false, false, false,
 			false, false, false, false, false, false, false, false, false,
-			false, false, false, false, false, false, false };
+			false, false, false, false, false, false, false, false };
 
 	/**
 	 * Constructor for the DataFieldManager class.
@@ -187,6 +198,8 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.temperature_k));
 			order.add(mContext.getString(R.string.velocity));
 			order.add(mContext.getString(R.string.distance));
+			order.add(mContext.getString(R.string.humidity));
+
 		} else {
 			// Execute a new task
 			new GetOrderTask().execute();
@@ -227,10 +240,13 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.temperature_k));
 			order.add(mContext.getString(R.string.velocity));
 			order.add(mContext.getString(R.string.distance));
+			order.add(mContext.getString(R.string.humidity));
+
 		} else {
 			// Function is being called within an AsyncTask already, so
 			// no need to create a new task for the API call
 			projFields = api.getProjectFields(projID);
+			Log.e("DFM", "proj fields: " + projFields);
 			getProjectFieldOrder();
 
 		}
@@ -291,12 +307,12 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.LATITUDE])
+			if (enabledFields[Fields.LATITUDE] && f.latitude != 0)
 				dataJSON.put(f.latitude);
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.LONGITUDE])
+			if (enabledFields[Fields.LONGITUDE] && f.longitude != 0)
 				dataJSON.put(f.longitude);
 			else
 				dataJSON.put("");
@@ -321,15 +337,19 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.HEADING_DEG] && f.angle_deg != null)
+			if (enabledFields[Fields.HEADING_DEG] && f.angle_deg != null) {
+				Log.e("","deg" + f.angle_deg);
 				dataJSON.put(f.angle_deg);
-			else
+			} else {
 				dataJSON.put("");
+			}
 
-			if (enabledFields[Fields.HEADING_RAD] && f.angle_rad != null)
+			if (enabledFields[Fields.HEADING_RAD] && f.angle_rad != null) {
+				Log.e("","rad" + f.angle_rad);
 				dataJSON.put(f.angle_rad);
-			else
+			} else {
 				dataJSON.put("");
+			}
 
 			if (enabledFields[Fields.TEMPERATURE_C] && f.temperature_c != null)
 				dataJSON.put(f.temperature_c);
@@ -341,8 +361,7 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.ALTITUDE] && f.altitude != null)
-
+			if (enabledFields[Fields.ALTITUDE] && f.altitude != 0)
 				dataJSON.put(f.altitude);
 			else
 				dataJSON.put("");
@@ -362,15 +381,22 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 			
-			if (enabledFields[Fields.Velocity])
+			if (enabledFields[Fields.VELOCITY])
 				dataJSON.put(f.velocity);
 			else
 				dataJSON.put("");
 			
-			if (enabledFields[Fields.Distance])
+			if (enabledFields[Fields.DISTANCE])
 				dataJSON.put(f.distance);
 			else
 				dataJSON.put("");
+			
+			if (enabledFields[Fields.HUMIDITY]) {
+				dataJSON.put(Fields.HUMIDITY);
+			} else {
+				dataJSON.put("");
+
+			}
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -552,6 +578,13 @@ public class DataFieldManager extends Application {
 					b.append(f.distance);
 				else
 					b.append(", ").append(f.distance);
+				
+			} else if (s.equals(mContext.getString(R.string.humidity))) {
+					firstLineWritten = true;
+					if (start)
+						b.append(f.humidity);
+					else
+						b.append(", ").append(f.humidity);
 
 			} else {
 				firstLineWritten = true;
@@ -672,8 +705,6 @@ public class DataFieldManager extends Application {
 						if (s.equals(a.getResources().getString(
 								R.string.accel_x))) {
 							outRow.put(id + "", row.getString(Fields.ACCEL_X));
-							Log.e("DFM",s + " " + a.getResources().getString(
-									R.string.accel_x)); 
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.accel_y))) {
@@ -755,15 +786,16 @@ public class DataFieldManager extends Application {
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.velocity))) {
-							outRow.put(id + "", row.getString(Fields.Velocity));
+							outRow.put(id + "", row.getString(Fields.VELOCITY));
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.distance))) {
-							outRow.put(id + "", row.getString(Fields.Distance));
+							outRow.put(id + "", row.getString(Fields.DISTANCE));
+							continue;
+						} else if (s.equals(a.getResources().getString(R.string.humidity))) {
+							outRow.put(id + "", row.getString(Fields.HUMIDITY));
 							continue;
 						} else {
-							Log.e("DFM", s + " " + a.getResources().getString(
-									R.string.time));
 							outRow.put(id + "", "");
 						}
 					} catch (JSONException e) {
@@ -892,7 +924,7 @@ public class DataFieldManager extends Application {
 				}
 
 				// Potential Altitude
-				else if (field.name.toLowerCase(Locale.US).contains("altitude")) {
+				else if (field.name.toLowerCase(Locale.US).contains("alt")) {
 					order.add(mContext.getString(R.string.altitude));
 					break;
 				}
@@ -947,23 +979,30 @@ public class DataFieldManager extends Application {
 				}
 
 				// Pressure
-				else if (field.name.toLowerCase(Locale.US).contains("pressure")) {
+				else if (field.name.toLowerCase(Locale.US).contains("pres")) {
 					order.add(mContext.getString(R.string.pressure));
 					break;
 				}
 
 				// velocity
-				else if (field.name.toLowerCase(Locale.US).contains("velocity")) {
+				else if (field.name.toLowerCase(Locale.US).contains("vel")) {
 					order.add(mContext.getString(R.string.velocity));
 					break;
 				}
 				
 				// distance
-				else if (field.name.toLowerCase(Locale.US).contains("distance")) {
+				else if (field.name.toLowerCase(Locale.US).contains("dist")) {
 					order.add(mContext.getString(R.string.distance));
 					break;
 				}
 				
+				// humidity
+				else if (field.name.toLowerCase(Locale.US).contains("humidity")) {
+					order.add(mContext.getString(R.string.humidity));
+					break;
+				}
+				
+			
 				else {
 					order.add(mContext.getString(R.string.null_string)
 							+ field.name);
@@ -1184,8 +1223,9 @@ public class DataFieldManager extends Application {
 		enabledFields[Fields.PRESSURE] = true;
 		enabledFields[Fields.ALTITUDE] = true;
 		enabledFields[Fields.LIGHT] = true;
-		enabledFields[Fields.Velocity]= true;
-		enabledFields[Fields.Distance] = true;
+		enabledFields[Fields.VELOCITY]= true;
+		enabledFields[Fields.DISTANCE] = true;
+		enabledFields[Fields.HUMIDITY] = true;
 	}
 
 	/**
@@ -1236,9 +1276,12 @@ public class DataFieldManager extends Application {
 			if (s.equals(mContext.getString(R.string.luminous_flux)))
 				enabledFields[Fields.LIGHT] = true;	
 			if (s.equals(mContext.getString(R.string.velocity)))
-				enabledFields[Fields.Velocity] = true;	
-			if (s.equals(mContext.getString(R.string.luminous_flux)))
-				enabledFields[Fields.Distance] = true;	
+				enabledFields[Fields.VELOCITY] = true;	
+			if (s.equals(mContext.getString(R.string.distance)))
+				enabledFields[Fields.DISTANCE] = true;
+			if (s.equals(mContext.getString(R.string.humidity)))
+				enabledFields[Fields.HUMIDITY] = true;
+
 		}
 	}
 
@@ -1280,7 +1323,9 @@ public class DataFieldManager extends Application {
 	 * @param location
 	 */
 	public void updateLoc(Location location) {
-		loc = location;
+		if (loc != null) {
+			loc = location;
+		}
 	}
 	
 	
@@ -1343,6 +1388,10 @@ public class DataFieldManager extends Application {
 		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
 			if (enabledFields[Fields.LIGHT])
 				light = toThou.format(event.values[0]);
+		} else if (event.sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY) {
+			if (enabledFields[Fields.HUMIDITY]) {
+				humidity = event.values[0];
+			}
 		}
 	}
 	
@@ -1394,19 +1443,19 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.ACCEL_TOTAL])
                 f.accel_total = toThou.format(accel[3]);
         if (enabledFields[Fields.LATITUDE])
-        	if(loc != null)
+        	if(loc != null && f.latitude != 0)
                 f.latitude = loc.getLatitude();
         if (enabledFields[Fields.LONGITUDE])
         	if(loc != null)
                 f.longitude = loc.getLongitude();
         if (enabledFields[Fields.HEADING_DEG])
-				 f.angle_deg = toThou.format(orientation[0]);
+				 f.angle_deg = toThou.format(orientation[0] * (180 / Math.PI ));
         if (enabledFields[Fields.HEADING_RAD])
-       	 if (!f.angle_deg.equals(""))
-				f.angle_rad = toThou
-						.format((Double.parseDouble(f.angle_deg) * (Math.PI / 180)));
-			else
+       	 if (!f.angle_deg.equals("")) {
+				f.angle_rad = toThou.format(orientation[0]);
+       	 } else {
 				f.angle_rad = "";
+       	 }
         if (enabledFields[Fields.MAG_X])
                 f.mag_x = "" + mag[0];
         if (enabledFields[Fields.MAG_Y])
@@ -1423,24 +1472,24 @@ public class DataFieldManager extends Application {
                 f.temperature_c = temperature;
         if (enabledFields[Fields.TEMPERATURE_F])
                 if (temperature.equals(""))
-                        f.temperature_f = temperature;
+                    f.temperature_f = temperature;
                 else
-                        f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
+                    f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
         if (enabledFields[Fields.TEMPERATURE_K])
                 if (temperature.equals(""))
-                        f.temperature_k = temperature;
+                	f.temperature_k = temperature;
                 else
-                        f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
+                   	f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
         if (enabledFields[Fields.PRESSURE])
                 f.pressure = pressure;
         if (enabledFields[Fields.ALTITUDE])
         	if(loc != null)
-                f.altitude = "" + loc.getAltitude();
+                f.altitude = loc.getAltitude();
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
-        if (enabledFields[Fields.Distance] || enabledFields[Fields.Velocity]) {
+        if (enabledFields[Fields.DISTANCE] || enabledFields[Fields.VELOCITY]) {
         	//calculations required for distance and velocity
-        	if (prevLoc != null) {
+        	if (prevLoc != null && loc != null) {
         		distance = loc.distanceTo((prevLoc));
         		totalDistance += distance;
         	} else {
@@ -1448,16 +1497,19 @@ public class DataFieldManager extends Application {
         	}
         	prevLoc = loc;
         	
-	        if (enabledFields[Fields.Distance]) {
+	        if (enabledFields[Fields.DISTANCE]) {
 	        	f.distance = totalDistance;
 	        }
 	        
-	        if (enabledFields[Fields.Velocity]) {
+	        if (enabledFields[Fields.VELOCITY]) {
 	        	velocity = distance/dataSetRate;
 	        	f.velocity = velocity;
 	        }
 	        //TODO create some kind of event listener for velocity and distance so that apps can display the values
         
+        }
+        if (enabledFields[Fields.HUMIDITY] || enabledFields[Fields.HUMIDITY]) {
+        	f.humidity = humidity; 
         }
         
         return putData();
@@ -1495,8 +1547,6 @@ public class DataFieldManager extends Application {
 
 			/* get timestamp from picture */		
 			String dateTime = exifInterface.getAttribute(ExifInterface.TAG_DATETIME);
-
-			Log.e("Time: ", dateTime);
 			
 			try {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
@@ -1607,7 +1657,8 @@ public class DataFieldManager extends Application {
 				+ appContext.getResources().getString(R.string.temperature_f) + ","
 				+ appContext.getResources().getString(R.string.temperature_k) + ","
 				+ appContext.getResources().getString(R.string.velocity) + ","
-				+ appContext.getResources().getString(R.string.distance);
+				+ appContext.getResources().getString(R.string.distance) + ","
+				+ appContext.getResources().getString(R.string.humidity);
 
 		mEdit.putString("accepted_fields", acceptedFields).commit();
 	}
@@ -1618,12 +1669,23 @@ public class DataFieldManager extends Application {
 		 * @param appContext
 		 */
 		@SuppressLint("InlinedApi")
-		public void registerSensors(SensorManager mSensorManager, SensorEventListener appContext) {
+		public void registerSensors() {
+			//just to be sure
+			unRegisterSensors(); 
+			
+			//Initialize sensor managers
+			sensorListener = new MySensorListener();
+	        locationListener = new MyLocationListener();
+			
+			mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+		    mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+		        
+	        
 			if (enabledFields[Fields.ACCEL_X]
 					|| enabledFields[Fields.ACCEL_Y]
 					|| enabledFields[Fields.ACCEL_Z]
 					|| enabledFields[Fields.ACCEL_TOTAL]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager
 								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 						SensorManager.SENSOR_DELAY_FASTEST);
@@ -1635,7 +1697,7 @@ public class DataFieldManager extends Application {
 					|| enabledFields[Fields.MAG_TOTAL]
 					|| enabledFields[Fields.HEADING_DEG]
 					|| enabledFields[Fields.HEADING_RAD]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager
 								.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
 						SensorManager.SENSOR_DELAY_FASTEST);
@@ -1643,35 +1705,109 @@ public class DataFieldManager extends Application {
 
 			if (enabledFields[Fields.TEMPERATURE_C]
 					|| enabledFields[Fields.TEMPERATURE_F]
-					|| enabledFields[Fields.TEMPERATURE_K]
-					|| enabledFields[Fields.ALTITUDE]) {
+					|| enabledFields[Fields.TEMPERATURE_K]) {
 				if (getApiLevel() >= 14) {
 					mSensorManager.registerListener(
-									appContext,
-									mSensorManager
+							sensorListener,
+							        mSensorManager 
 											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
 									SensorManager.SENSOR_DELAY_FASTEST);
 				}
 			}
+			
+			if (enabledFields[Fields.HUMIDITY]) {
+				mSensorManager.registerListener(
+						sensorListener,
+						        mSensorManager 
+										.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
+								SensorManager.SENSOR_DELAY_FASTEST);
+			}
 
 			if (enabledFields[Fields.PRESSURE]
 					|| enabledFields[Fields.ALTITUDE]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
 
 			if (enabledFields[Fields.LIGHT]) {
-				mSensorManager.registerListener(appContext,
+				mSensorManager.registerListener(sensorListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
+			
+			if (enabledFields[Fields.LATITUDE] || enabledFields[Fields.LONGITUDE] || enabledFields[Fields.ALTITUDE]) {
+				 Criteria criteria = new Criteria();
+			     criteria.setAccuracy(Criteria.ACCURACY_FINE);
+				
+				 mLocationManager.requestLocationUpdates(
+			                mLocationManager.getBestProvider(criteria, true), 0, 0,
+			                locationListener);			
+				 }
+			if (enabledFields[Fields.HUMIDITY]) {
+				mSensorManager.registerListener(sensorListener,
+						mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+		}
+		
+		/**
+		 * Disables all active sensors and turns off gps
+		 */
+		public void unRegisterSensors() {
+			if (mLocationManager != null)
+	            mLocationManager.removeUpdates(locationListener);
+
+	        if (mSensorManager != null)
+	            mSensorManager.unregisterListener(sensorListener);
 		}
 		
 		// Assists with differentiating between displays for dialogues
 		private int getApiLevel() {
 			return android.os.Build.VERSION.SDK_INT;
 		}
+		
+		/**
+		 * You can not implement a LocationListener to a service so that is why
+		 * There is a separate class here that implements a LocationListener
+		 */
+		public class MyLocationListener implements LocationListener
+		{
+
+		    public void onLocationChanged(final Location location) {
+				updateLoc(location);
+		    }
+
+		    public void onProviderDisabled(String provider) {
+		    }
+
+		    public void onProviderEnabled(String provider) {
+		    }
+
+		    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+		    }
+
+		}
+
+		/**
+		 * You can not implement a SensorEventListener to a service so that is why
+		 * There is a separate class here that implements a SensorEventListener
+		 */
+		public class MySensorListener implements SensorEventListener {
+
+		    @Override
+		    public void onSensorChanged(SensorEvent event) {
+		    	updateValues(event);
+		    }
+
+		    @Override
+		    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+		    }
+		}
 }
+
+
 
 

@@ -1,12 +1,18 @@
 package edu.uml.cs.isense.objects;
 
+import java.io.Serializable;
+
 /**
  * Class that includes information about a Data Set Field on iSENSE.
  * 
  * @author iSENSE Android Development Team
  */
-public class RProjectField {
-    public long field_id;
+public class RProjectField implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2223711670490818827L;
+	public long field_id;
     public String name="";
     public int type;
     public String unit="";  

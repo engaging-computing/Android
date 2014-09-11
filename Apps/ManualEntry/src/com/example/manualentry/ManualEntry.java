@@ -70,7 +70,6 @@ public class ManualEntry extends Activity implements LocationListener {
 	
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
-	
 	public static final int LOGIN_STATUS_REQUESTED = 6005;
 	public static final int PROJECT_REQUESTED = 6009;
 	public static final int QUEUE_UPLOAD_REQUESTED = 7021;
@@ -90,8 +89,7 @@ public class ManualEntry extends Activity implements LocationListener {
 		}
 		mContext = this;
 		api = API.getInstance();
-		api.useDev(useDev);
-		
+				
 		uq = new UploadQueue("ManualEntry", mContext, api);
 		uq.buildQueueFromFile();
 		
@@ -351,9 +349,10 @@ public class ManualEntry extends Activity implements LocationListener {
 				datapoint.addView(singlefield, i+1);	
 
 			} else if (field.type == RProjectField.TYPE_TEXT) {
-				
-				if (field.restrictions == null) {
-				
+				//if no restrictions we get back a string "null"
+				if (field.restrictions == "null") {
+				Log.e("manual entry", "restrictions are null");
+
 				ViewGroup singlefield = new RelativeLayout(mContext);
 				inflater.inflate(R.layout.field, singlefield);
 				

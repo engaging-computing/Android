@@ -296,42 +296,22 @@ public class ManualEntry extends Activity implements LocationListener {
 		Button removeDataPoint = (Button) datapoint.findViewById(R.id.deletePoint);
 		removeDataPoint.setOnClickListener(new OnClickListener(){
 
-			@TargetApi(Build.VERSION_CODES.KITKAT)
 			@Override
 			public void onClick(View v) {
 				
 				if (datapoints == 1) {
 					w.make("Must have one data point", Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 				} else {
-					FrameLayout dataPointFrame = (FrameLayout) v.getParent().getParent().getParent();
-
+					final FrameLayout dataPointFrame = (FrameLayout) v.getParent().getParent().getParent();
 
 					Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
 					animation.setDuration(200);
 					
-					animation.setAnimationListener(new AnimationListener() {
-					    @Override
-					    public void onAnimationEnd(final Animation animation)
-					    {
-					    	datapointsLayout.removeView(animation.View);
-							renumberDataPoints();
-					    }
-
-						@Override
-						public void onAnimationRepeat(Animation animation) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void onAnimationStart(Animation animation) {
-							// TODO Auto-generated method stub
-					    	Log.e("This", "THIS");
-
-						}
-					});
 					dataPointFrame.startAnimation(animation);
-				
+					datapointsLayout.removeView(dataPointFrame);
+					renumberDataPoints();
+
+
 				}
 			}
 			

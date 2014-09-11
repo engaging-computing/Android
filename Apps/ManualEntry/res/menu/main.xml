@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.manualentry.MainActivity" >
+
+    <item android:id="@+id/MENU_ITEM_LOGIN"
+          android:title="Credentials"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/MENU_ITEM_UPLOAD"
+          android:title="Upload"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/MENU_ITEM_PROJECT"
+          android:title="Project"
+          android:showAsAction="ifRoom"/>
+    
+
+</menu>

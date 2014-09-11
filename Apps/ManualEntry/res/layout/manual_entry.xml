@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.manualentry.ManualEntry" >
+     <LinearLayout
+    	android:id="@+id/dataset_name_layout"
+    	android:orientation="horizontal"
+		android:layout_width="match_parent"
+   		android:layout_height="wrap_content"
+   		android:padding="10dp">
+	    <TextView
+	           android:id="@+id/textView1"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:text="Dataset Name:" />
+	
+	    <EditText
+	        android:id="@+id/dataset_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:lines="1"
+	        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    </LinearLayout>
+    
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_above="@+id/buttons"
+       android:layout_below="@+id/dataset_name_layout"
+       tools:context="com.example.manualentry.ManualEntry" >
+
+   <LinearLayout
+    	android:id="@+id/datapoints_sv"
+    	android:orientation="vertical"
+		android:layout_width="match_parent"
+   		android:layout_height="wrap_content"/>
+      
+    </ScrollView>
+    
+   
+  <LinearLayout
+   	android:id="@+id/buttons"
+   	android:orientation="horizontal"
+	android:layout_width="match_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_alignParentBottom="true"
+  	android:weightSum="2">
+   
+	   <Button
+	       android:id="@+id/adddatapoint"
+	       android:layout_width="match_parent"
+	       android:layout_height="wrap_content"
+	       android:background="@drawable/button_bar_rsense"
+	       android:layout_weight="1"
+	       android:text="Add Data Point" />
+	   
+	    <Button
+	       android:id="@+id/save"
+	       android:layout_width="match_parent"
+	       android:layout_height="wrap_content"
+	       android:background="@drawable/button_bar_rsense"
+	       android:layout_weight="1"
+	       android:text="Save" />
+    
+    </LinearLayout>
+
+</RelativeLayout>

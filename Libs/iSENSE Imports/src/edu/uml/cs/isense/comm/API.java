@@ -6,6 +6,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -301,6 +303,7 @@ public class API {
 		try {
 			String reqResult = makeRequest(baseURL, "projects/" + projectId,
 					"?recur=true", "GET", null);
+			
 			JSONObject j = new JSONObject(reqResult);
 			JSONArray j2 = j.getJSONArray("fields");
 			for (int i = 0; i < j2.length(); i++) {
@@ -316,7 +319,8 @@ public class API {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
+		
 		return rpfs;
 	}
 
@@ -806,8 +810,11 @@ public class API {
 		} catch (ConnectException ce) {
 			System.err.println("Connection failed: ENETUNREACH (network not reachable)");
 			ce.printStackTrace();
+			Log.e("API", "exception1");
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.e("API", "exception2");
+
 		}
 
 		return "Error: status " + mstat;

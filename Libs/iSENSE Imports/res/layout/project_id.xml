@@ -48,22 +48,30 @@
             android:textSize="18sp" />
     </LinearLayout>
     
-    <TextView
-        android:id="@+id/selectLaterLbl"
+     <LinearLayout
+        android:id="@+id/select_later_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/noConnection"
-        android:textSize="16sp" />
-    
-    <Button
-        android:id="@+id/project_later"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:text="@string/projLater"
-        android:textSize="18sp" />
+        android:orientation="vertical" >
+        
+	    <TextView
+	        android:id="@+id/selectLaterLbl"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center"
+	        android:text="@string/noConnection"
+	        android:textSize="16sp" />
+	    
+	    <Button
+	        android:id="@+id/project_later"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="8dp"
+	        android:layout_marginRight="8dp"
+	        android:text="@string/projLater"
+	        android:textSize="18sp" />
+	    
+	    </LinearLayout>
 
     <TextView
         android:id="@+id/noProjectYetLbl"

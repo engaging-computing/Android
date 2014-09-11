@@ -27,7 +27,7 @@ import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
 
-public class Recording_Service extends Service {
+public class RecordingService extends Service {
 	private DataFieldManager dfm;
     private JSONArray dataSet;
     
@@ -166,7 +166,7 @@ public class Recording_Service extends Service {
         	     }
 
         	     public void onFinish() {
-        	         serviceContext.stopService(new Intent(serviceContext, Recording_Service.class));
+        	         serviceContext.stopService(new Intent(serviceContext, RecordingService.class));
         	     }
         	     
         	  }.start();

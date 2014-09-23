@@ -297,7 +297,6 @@ public class ManualEntry extends Activity implements LocationListener {
 					datapointsLayout.removeView(dataPointFrame);
 					renumberDataPoints();
 
-
 				}
 			}
 

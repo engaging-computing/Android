@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.carphysicsv2.dialogs;
+package edu.uml.cs.isense.motion.dialogs;
 
 import android.app.Activity;
 import android.os.Bundle;

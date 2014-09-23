@@ -15,10 +15,15 @@
         android:showAsAction="ifRoom"
         android:title="@string/about_title">
     </item> -->
+    <item android:id="@+id/presets" 
+        android:showAsAction="ifRoom"
+        android:title="Presets">
+    </item>
     <item
         android:id="@+id/helpMenuItem"
         android:showAsAction="ifRoom"
         android:title="Help">
     </item>
+  
 
 </menu>

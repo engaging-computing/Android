@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.carphysicsv2;
+package edu.uml.cs.isense.motion;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 
+import edu.uml.cs.isense.carphysicsv2.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.proj.Setup;
@@ -76,8 +77,8 @@ public class RecordingService extends Service {
 
         /*Persistent notification while recording*/
         if (android.os.Build.VERSION.SDK_INT >= 11) {
-            Intent intent = new Intent(CarRampPhysicsV2.mContext, CarRampPhysicsV2.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(CarRampPhysicsV2.mContext, NOTIFICATION_ID, intent, 0);
+            Intent intent = new Intent(Motion.mContext, Motion.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(Motion.mContext, NOTIFICATION_ID, intent, 0);
 
             Notification.Builder builder = new Notification.Builder(getApplicationContext());
             builder.setContentIntent(pendingIntent);
@@ -106,7 +107,7 @@ public class RecordingService extends Service {
 			
 			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
-			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, CarRampPhysicsV2.mContext);
+			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, Motion.mContext);
 			dfm.enableAllSensorFields();
 		}
     
@@ -153,7 +154,7 @@ public class RecordingService extends Service {
 		SharedPreferences prefs2 = getSharedPreferences("RECORD_RATE", 0);
 		rate = prefs2.getInt("rate", 50);
 
-		dfm.setProjID(Integer.parseInt(CarRampPhysicsV2.projectNumber));
+		dfm.setProjID(Integer.parseInt(Motion.projectNumber));
         
         //record data        
         dfm.recordData(rate);
@@ -195,14 +196,14 @@ public class RecordingService extends Service {
             updateButtonStop("Stop");
 
             // Create the name of the session using the entered name
-            dataSetName = CarRampPhysicsV2.firstName + " " + CarRampPhysicsV2.lastInitial;
+            dataSetName = Motion.firstName + " " + Motion.lastInitial;
 			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 			String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataSet.length();
 			Type type = Type.DATA;
 
 			//add new dataset to queue
-			CarRampPhysicsV2.uq.buildQueueFromFile();
-			CarRampPhysicsV2.uq.addToQueue(dataSetName, description, type, dataSet, null, CarRampPhysicsV2.projectNumber, null);
+			Motion.uq.buildQueueFromFile();
+			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, Motion.projectNumber, null);
         }
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

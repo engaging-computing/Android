@@ -15,7 +15,7 @@ import java.util.Random;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.API.TargetType;
-import edu.uml.cs.isense.comm.uploadInfo;
+import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
 import edu.uml.cs.isense.dfm.DataFieldManager;
@@ -151,8 +151,8 @@ public class QDataSet implements Serializable {
 	 * @return The ID of the data set created on iSENSE, or -1 if the upload
 	 *         failed
 	 */
-	public uploadInfo upload(API api, Context c) {
-        uploadInfo info = new uploadInfo();
+	public UploadInfo upload(API api, Context c) {
+        UploadInfo info = new UploadInfo();
 		// if no project is associated with this data set yet, we can't upload
 		// it
 		if (this.projID.equals("-1")) {
@@ -232,8 +232,8 @@ public class QDataSet implements Serializable {
 	 * @return The ID of the data set created on iSENSE, or -1 if the upload
 	 *         failed
 	 */
-	private uploadInfo uploadDataAndMedia() {
-        uploadInfo info = new uploadInfo();
+	private UploadInfo uploadDataAndMedia() {
+        UploadInfo info = new UploadInfo();
 		if (this.rdyForUpload) {
 			switch (type) {
 			case DATA:
@@ -256,7 +256,7 @@ public class QDataSet implements Serializable {
 			case BOTH:
 				info = uploadData();
 
-                uploadInfo picInfo = new uploadInfo();
+                UploadInfo picInfo = new UploadInfo();
 				if (CredentialManager.isLoggedIn() && info.dataSetId != -1) {
 					picInfo = UploadQueue.getAPI().uploadMedia(
 							info.dataSetId, picture, TargetType.DATA_SET);
@@ -275,9 +275,9 @@ public class QDataSet implements Serializable {
 		return info;
 	}
 
-	private uploadInfo uploadData() {
+	private UploadInfo uploadData() {
 //		int dataSetID = -1;
-        uploadInfo info = new uploadInfo();
+        UploadInfo info = new UploadInfo();
 
 		JSONArray dataJSON = prepDataForUpload();
 		if (!(dataJSON.isNull(0))) {

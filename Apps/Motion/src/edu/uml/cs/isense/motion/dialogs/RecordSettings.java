@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.carphysicsv2;
+package edu.uml.cs.isense.motion.dialogs;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import edu.uml.cs.isense.carphysicsv2.R;
 
 public class RecordSettings extends Activity {
 
@@ -18,6 +19,7 @@ public class RecordSettings extends Activity {
 	private CheckedTextView MagcheckBox;
 	public static String RECORD_SETTINGS = "RECORD_SETTINGS";
 
+	@Override
 	public void onCreate(Bundle savedInstanceBundle) {
 		super.onCreate(savedInstanceBundle);
 		setContentView(R.layout.record_settings);
@@ -120,6 +122,7 @@ public class RecordSettings extends Activity {
 
 	}
 
+	@Override
 	public void onResume() {
 
 		super.onResume();

@@ -19,12 +19,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.Connection;
-import edu.uml.cs.isense.objects.RNews;
-import edu.uml.cs.isense.objects.RPerson;
+import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.objects.RProject;
 import edu.uml.cs.isense.objects.RProjectField;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class API_Test extends Activity implements OnClickListener {
 
 	Button btnDev, btnProd;
 	TextView status;
@@ -49,7 +48,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		btnProd.setOnClickListener(this);
 
 		api = API.getInstance();
-		//api.setBaseUrl("http://129.63.17.17:3000");
 	}
 
 	@Override
@@ -93,7 +91,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private class LoginTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			return api.createSession("mobile", "mobile") != null;
+			return api.createSession("mobile.fake@example.com", "mobile") != null;
 		}
 
 		@Override
@@ -103,6 +101,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else {
 				status.append(Html.fromHtml("<font color=\"#dd0000\">Login failed, aborting test.</font><br>"));
 			}
+			new CreateProjectTask().execute();
 		}
 	}
 	
@@ -161,32 +160,33 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		@Override
 		protected void onPostExecute(Void result) {
-			
+			new DeleteProjectTask().execute();
 		}
 	}
 	
-	private class UploadTask extends AsyncTask<Void, Void, Integer> {
+	private class UploadTask extends AsyncTask<Void, Void, UploadInfo> {
 		@Override
-		protected Integer doInBackground(Void... params) {
+		protected UploadInfo doInBackground(Void... params) {
 			JSONObject j = new JSONObject();
 			try {
 				j.put("1", new JSONArray().put("45"));
 				j.put("0", new JSONArray().put("2013/08/02 09:50:01"));
 			} catch (JSONException e) {
 				e.printStackTrace();
-				return -1;
+				UploadInfo info = new UploadInfo();
+				return info;
 			}
 			return api.uploadDataSet(projectId, j, "mobile upload test");
 		}
 
 		@Override
-		protected void onPostExecute(Integer result) {
-			if(result == -1) {
+		protected void onPostExecute(UploadInfo result) {
+			if(result.dataSetId == -1) {
 				status.append(Html.fromHtml("<font color=\"#dd0000\">Upload data set fail.</font><br>"));
 			} else {
 				status.append(Html.fromHtml("<font color=\"#00aa00\">Upload data set success.</font><br>"));
-				new DeleteProjectTask().execute();
 			}
+			new DeleteProjectTask().execute();
 		}
 	}
 	
@@ -199,7 +199,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		@Override
 		protected void onPostExecute(Void result) {
-			
+			new AppendTask().execute();
 		}
 	}
 	
@@ -242,8 +242,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else {
 				status.append(Html.fromHtml("<font color=\"#00aa00\">Create project success.</font><br>"));
 				projectId = result;
-				new UploadTask().execute();
 			}
+			new UploadTask().execute();
 		}
 	}
 	private class DeleteProjectTask extends AsyncTask<Void, Void, Integer> {

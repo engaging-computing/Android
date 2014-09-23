@@ -255,7 +255,7 @@ public class API {
 				mField.put("project_id", pid);
 				mField.put("field_type", rpf.type);
 				mField.put("name", rpf.name);
-				mField.put("units", rpf.unit);
+				mField.put("unit", rpf.unit);
 				JSONObject postData2 = new JSONObject();
 				postData2.put("email", email);
 				postData2.put("password", password);
@@ -404,8 +404,8 @@ public class API {
 	 * @return The integer ID of the newly uploaded dataset, or -1 if upload
 	 *         fails
 	 */
-	public uploadInfo uploadDataSet(int projectId, JSONObject data, String datasetName) {
-        uploadInfo info = new uploadInfo();
+	public UploadInfo uploadDataSet(int projectId, JSONObject data, String datasetName) {
+        UploadInfo info = new UploadInfo();
 		datasetName += appendedTimeStamp();
         String reqResult = "";
 		JSONObject requestData = new JSONObject();
@@ -456,8 +456,8 @@ public class API {
 	 * @return The integer ID of the newly uploaded dataset, or -1 if upload
 	 *         fails
 	 */
-	public uploadInfo uploadDataSet(int projectId, JSONObject data, String dataName, String conKey,  String conName) {
-        uploadInfo info = new uploadInfo();
+	public UploadInfo uploadDataSet(int projectId, JSONObject data, String dataName, String conKey,  String conName) {
+        UploadInfo info = new UploadInfo();
 		JSONObject requestData = new JSONObject();
         String reqResult = "";
 		try {
@@ -561,8 +561,8 @@ public class API {
 	 * 			The type of the target (project or dataset)
 	 * @return The media object ID for the media uploaded or -1 if upload fails
 	 */
-	public uploadInfo uploadMedia(int dataId, File mediaToUpload, TargetType ttype) {
-        uploadInfo info = new uploadInfo();
+	public UploadInfo uploadMedia(int dataId, File mediaToUpload, TargetType ttype) {
+        UploadInfo info = new UploadInfo();
         String output = "";
 		try {
 			URL url = new URL(baseURL + "/media_objects/");
@@ -657,8 +657,8 @@ public class API {
 	 * 			The contributor name
 	 * @return The media object ID for the media uploaded or -1 if upload fails
 	 */
-	public uploadInfo uploadMedia(int projectId, File mediaToUpload, TargetType ttype, String conKey, String conName) {
-        uploadInfo info = new uploadInfo();
+	public UploadInfo uploadMedia(int projectId, File mediaToUpload, TargetType ttype, String conKey, String conName) {
+        UploadInfo info = new UploadInfo();
         String output = "";
 		try {
 			URL url = new URL(baseURL + "/media_objects/");

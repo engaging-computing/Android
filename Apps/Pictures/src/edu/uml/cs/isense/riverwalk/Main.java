@@ -635,7 +635,6 @@ public class Main extends Activity implements LocationListener {
 		case R.id.MENU_ITEM_BROWSE:
 			Intent iproject = new Intent(getApplicationContext(),
 					Setup.class);
-			iproject.putExtra("constrictFields", true);
 			iproject.putExtra("app_name", "Pictures");
 			startActivityForResult(iproject, PROJECT_REQUESTED);
 			return true;

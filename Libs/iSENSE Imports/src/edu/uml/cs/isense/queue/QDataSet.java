@@ -161,7 +161,6 @@ public class QDataSet implements Serializable {
         // if the data is already in a forced order and just needs to be labeled
 		// with the
 		// project's field IDs, we'll do so here
-		//TODO why are fields for heading being messed up
 		if (this.requestDataLabelInOrder) {
 			try {
 				// see if the elements of the JSONArray are JSONArrays
@@ -201,7 +200,7 @@ public class QDataSet implements Serializable {
 			// otherwise, if we have a JSONArray for data, we must reOrder it as
 			// well using fields
 			try {
-				Log.e("Upload Time", data.toString());
+				System.out.print("QDataSet.java before reOrderData: " + data.toString() + "\n");
 
 				// see if the elements of the JSONArray are JSONArrays
 				if (data != null) {
@@ -212,12 +211,15 @@ public class QDataSet implements Serializable {
 					// reOrder it
 					this.data = DataFieldManager.reOrderData(ja, this.projID,
 							c, this.fields, null);
+					System.out.print("QDataSet.java after reOrderData: " + this.data.toString() + "\n");
+
 				}
 
 			} catch (JSONException e) {
                 Log.w("QDataSet in iSENSEImports: ", "we already have a JSONArray of JSONObjects, should continue to upload anyways");
 				// we have a JSONArray of JSONObjects for data already -
 				// continue without reOrdering
+
 			}
 		}
 
@@ -275,7 +277,6 @@ public class QDataSet implements Serializable {
 	}
 
 	private UploadInfo uploadData() {
-//		int dataSetID = -1;
         UploadInfo info = new UploadInfo();
 
 		JSONArray dataJSON = prepDataForUpload();
@@ -290,9 +291,11 @@ public class QDataSet implements Serializable {
                 info.errorMessage = "JSON Error";
 				return info;
 			}
+			System.out.println("In QDataSet before rowsToCols JOBJ: " + jobj.toString());
+
 			jobj = UploadQueue.getAPI().rowsToCols(jobj);
 
-			Log.e("JOBJ: " + jobj.toString());
+			System.out.println("In QDataSet after rowsToCols JOBJ: " + jobj.toString());
 
 			//If not logged in open key dialog and onActivityResult call with credential keys
 			if (CredentialManager.isLoggedIn()) {

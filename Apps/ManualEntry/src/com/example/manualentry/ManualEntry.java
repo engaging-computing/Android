@@ -143,7 +143,7 @@ public class ManualEntry extends Activity implements LocationListener {
 
 						//add new dataset to queue
 						uq.buildQueueFromFile();
-						uq.addToQueue(dataSetName, description, type, uploadData, null, Integer.toString(projectID), null);
+						uq.addToQueue(dataSetName, description, type, uploadData, null, Integer.toString(projectID), null, true);
 
 						clearFields();
 						new getNewFieldsTask().execute();

@@ -203,7 +203,7 @@ public class RecordingService extends Service {
 
 			//add new dataset to queue
 			Motion.uq.buildQueueFromFile();
-			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, Motion.projectNumber, null);
+			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, Motion.projectNumber, null, false);
         }
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

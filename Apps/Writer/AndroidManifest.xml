@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ManualEntry"
+            android:name="edu.uml.cs.isense.writer.ManualEntry"
             android:label="@string/app_name" 
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="adjustPan">
@@ -85,7 +85,7 @@
             android:label="Delete Selected Data Sets"
             android:theme="@style/AppThemeDialog" />
          <activity
-            android:name=".NoProject"
+            android:name="edu.uml.cs.isense.writer.NoProject"
             android:label="@string/app_name" />
           <activity
             android:name="edu.uml.cs.isense.queue.QueueSummary"

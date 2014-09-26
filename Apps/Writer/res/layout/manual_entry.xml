@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.manualentry.ManualEntry" >
+    tools:context="edu.uml.cs.isense.writer.ManualEntry" >
      <LinearLayout
     	android:id="@+id/dataset_name_layout"
     	android:orientation="horizontal"
@@ -33,7 +33,7 @@
        android:layout_height="wrap_content"
        android:layout_above="@+id/buttons"
        android:layout_below="@+id/dataset_name_layout"
-       tools:context="com.example.manualentry.ManualEntry" >
+       tools:context="edu.uml.cs.isense.writer.ManualEntry" >
 
    <LinearLayout
     	android:id="@+id/datapoints_sv"

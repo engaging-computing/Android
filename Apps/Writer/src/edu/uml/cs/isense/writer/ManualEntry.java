@@ -1,4 +1,4 @@
-package com.example.manualentry;
+package edu.uml.cs.isense.writer;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -7,6 +7,8 @@ import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import com.example.manualentry.R;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;

@@ -73,7 +73,7 @@ public class QDataSet implements Serializable {
 	private boolean rdyForUpload = true;
 	protected long key;
 	private boolean hasInitialProject = true;
-	private boolean requestDataLabelInOrder = false;
+	private boolean dataAlreadyInOrder = false;
 
 	/**
 	 * String in JSONArray.toString() format containing all the data to upload
@@ -106,9 +106,11 @@ public class QDataSet implements Serializable {
 	 *            - If type is QDataSet.DATA, we look here.
 	 * @param picture
 	 *            - If type is QDataSet.PIC, we look here.
+	 * @param requestDataLabelInOrder
+	 * 			  - If data is already in the correct order and just needs to be given field IDs
 	 */
 	public QDataSet(String name, String desc, Type type, String data,
-			File picture, String projID, LinkedList<String> fields) {
+			File picture, String projID, LinkedList<String> fields, Boolean dataAlreadyInOrder) {
 		// name and description of data set
 		this.name = name;
 		this.desc = desc;
@@ -129,7 +131,7 @@ public class QDataSet implements Serializable {
 		else
 			fields = new LinkedList<String>();
 		this.hasInitialProject = projID.equals("-1") ? false : true;
-		this.requestDataLabelInOrder = false;
+		this.dataAlreadyInOrder = dataAlreadyInOrder;
 
 		// randomized key
 		this.key = new Random().nextLong();
@@ -161,7 +163,7 @@ public class QDataSet implements Serializable {
         // if the data is already in a forced order and just needs to be labeled
 		// with the
 		// project's field IDs, we'll do so here
-		if (this.requestDataLabelInOrder) {
+		if (this.dataAlreadyInOrder) {
 			try {
 				// see if the elements of the JSONArray are JSONArrays
 				if (data != null) {
@@ -174,7 +176,7 @@ public class QDataSet implements Serializable {
 							Integer.parseInt(this.projID), api, c);
 					this.data = dfm.convertInternalDataToJSONObject(ja)
 							.toString();
-                    requestDataLabelInOrder = false;
+					dataAlreadyInOrder = false;
 				}
 			} catch (JSONException e) {
 				// we have a JSONArray of JSONObjects: this is bad
@@ -484,8 +486,8 @@ public class QDataSet implements Serializable {
 	 *
 	 * @param rdlio
 	 */
-	public void setRequestDataLabelInOrder(boolean rdlio) {
-		this.requestDataLabelInOrder = rdlio;
+	public void setdataAlreadyInOrder(boolean rdlio) {
+		this.dataAlreadyInOrder = rdlio;
 	}
 
 }

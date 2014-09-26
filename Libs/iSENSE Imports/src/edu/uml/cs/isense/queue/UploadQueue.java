@@ -304,8 +304,26 @@ public class UploadQueue implements Serializable {
 		return (queue.size());
 	}
 	
-	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields) {	
-		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields);
+	/**
+
+	/**	 
+	 * @param name
+	 *            - The name of the of the data set
+	 * @param desc
+	 *            - A description for the data set
+	 * @param type
+	 *            - QDataSet.DATA QDataSet.PIC, or QDataSet.BOTH           
+	 * @param projID
+	 *            - The associated project ID for the data set
+	 * @param data
+	 *            - If type is QDataSet.DATA, we look here.
+	 * @param picture
+	 *            - If type is QDataSet.PIC, we look here.
+	 * @param requestDataLabelInOrder
+	 * 			  - If data is already in the correct order and just needs to be given field IDs
+	 */
+	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields, Boolean dataAlreadyInOrder) {	
+		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields, dataAlreadyInOrder);
 		
 		//Add data to Queue to be uploaded
 		new AddToQueueTask().execute(); 

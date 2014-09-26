@@ -11,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import edu.uml.cs.isense.carphysicsv2.R;
+import edu.uml.cs.isense.motion.Motion;
 
 public class DurationDialog extends Activity {
 
@@ -18,44 +19,45 @@ public class DurationDialog extends Activity {
 	EditText input;
 	Spinner spinner;
 	int length;
-	
+
 	public void onRadioButtonClicked(View view) {
-		
+
     	Log.e("duration dialog", "" + view.getId());
-		
+
 	    switch (view.getId()) {
 	    case R.id.radio0:
 	    	length = 1;
 	    	break;
-	    
+
 	    case R.id.radio1:
 	    	length = 2;
 	    	break;
-	    
+
 	    case R.id.radio2:
     		length = 5;
 	    	break;
-	    
+
 	    case R.id.radio3:
     		length = 10;
 	    	break;
-	    
+
 	    case R.id.radio4:
 	    	length = 30;
 	    	break;
-	    
+
 	    case R.id.radio5:
 	    	length = 60;
 	    	break;
-	    
-	    default: 
+
+	    default:
 	    	length = -1;
 	    	break;
 	    }
-	  
+
 	}
 
-	
+
+	@Override
 	public void onCreate(Bundle b) {
 		super.onCreate(b);
 		setContentView(R.layout.duration_dialog);
@@ -67,13 +69,13 @@ public class DurationDialog extends Activity {
 		ok = (Button) findViewById(R.id.positive2);
 		cancel = (Button) findViewById(R.id.negative2);
 		RadioButton defaultR;
-		
-		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
+
+		SharedPreferences prefs = getSharedPreferences(Motion.MY_SAVED_PREFERENCES,
 				0);
-		length = prefs.getInt("length", 10);
-		
+		length = prefs.getInt(Motion.LENGTH_PREFS_KEY, 10);
+
 		switch(length){
-		
+
 			case 1:
 				defaultR = (RadioButton) findViewById(R.id.radio0);
 				break;
@@ -96,7 +98,7 @@ public class DurationDialog extends Activity {
 				defaultR = (RadioButton) findViewById(R.id.radio6);
 				break;
 		}
-		
+
 		defaultR.setChecked(true);
 
 
@@ -104,14 +106,14 @@ public class DurationDialog extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
+
+				SharedPreferences prefs = getSharedPreferences(Motion.MY_SAVED_PREFERENCES,
 						0);
 				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("length", length);
+				editor.putInt(Motion.LENGTH_PREFS_KEY, length);
 				editor.commit();
-				
-			
+
+
 				setResult(RESULT_OK);
 				finish();
 

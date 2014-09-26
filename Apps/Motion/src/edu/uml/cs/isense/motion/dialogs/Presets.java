@@ -9,6 +9,11 @@ import android.widget.Button;
 import edu.uml.cs.isense.carphysicsv2.R;
 
 public class Presets extends Activity{
+	public static final String PROJECT = "project";
+	public static final String LENGTH = "length";
+	public static final String RATE = "rate";
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -23,9 +28,9 @@ public class Presets extends Activity{
 			@Override
 			public void onClick(View v) {
 				Intent resultIntent = new Intent();
-				resultIntent.putExtra("rate", 50);
-				resultIntent.putExtra("length", 10);
-				resultIntent.putExtra("project", "570");
+				resultIntent.putExtra(RATE, 50);
+				resultIntent.putExtra(LENGTH, 10);
+				resultIntent.putExtra(PROJECT, "570");
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			}
@@ -37,9 +42,9 @@ public class Presets extends Activity{
 			@Override
 			public void onClick(View v) {
 				Intent resultIntent = new Intent();
-				resultIntent.putExtra("rate", 1000);
-				resultIntent.putExtra("length", -1);
-				resultIntent.putExtra("project", "13");
+				resultIntent.putExtra(RATE, 1000);
+				resultIntent.putExtra(LENGTH, -1);
+				resultIntent.putExtra(PROJECT, "13");
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			}

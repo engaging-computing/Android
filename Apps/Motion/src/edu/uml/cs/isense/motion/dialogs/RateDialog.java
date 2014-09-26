@@ -10,6 +10,7 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import edu.uml.cs.isense.carphysicsv2.R;
+import edu.uml.cs.isense.motion.Motion;
 
 public class RateDialog extends Activity {
 
@@ -17,41 +18,42 @@ public class RateDialog extends Activity {
 	EditText input;
 	Spinner spinner;
 	int rate;
-	
+
 	public void onRadioButtonClicked(View view) {
 	    switch (view.getId()) {
 	    case R.id.radio0:
 	    	rate = 50;
 	    	break;
-	    
+
 	    case R.id.radio1:
 	    	rate = 100;
 	    	break;
-	    
+
 	    case R.id.radio2:
 	    	rate = 500;
 	    	break;
-	    
+
 	    case R.id.radio3:
 	    	rate = 1000;
 	    	break;
-	    
+
 	    case R.id.radio4:
 	    	rate = 5000;
 	    	break;
-	    
+
 	    case R.id.radio5:
 	    	rate = 30000;
 	    	break;
-	    
-	    default: 
+
+	    default:
 	    	rate = 60000;
 	    	break;
 	    }
-	  
+
 	}
 
 
+	@Override
 	public void onCreate(Bundle b) {
 		super.onCreate(b);
 		setContentView(R.layout.rate_dialog);
@@ -64,8 +66,8 @@ public class RateDialog extends Activity {
 		cancel = (Button) findViewById(R.id.negative2);
 		RadioButton defaultR;
 
-		SharedPreferences prefs = getSharedPreferences("RECORD_RATE", 0);
-		rate = prefs.getInt("rate", 50);
+		SharedPreferences prefs = getSharedPreferences(Motion.MY_SAVED_PREFERENCES, 0);
+		rate = prefs.getInt(Motion.RATE_PREFS_KEY, 50);
 
 		switch (rate) {
 
@@ -98,10 +100,10 @@ public class RateDialog extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				SharedPreferences prefs = getSharedPreferences("RECORD_RATE",
+				SharedPreferences prefs = getSharedPreferences(Motion.MY_SAVED_PREFERENCES,
 						0);
 				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("rate", rate);
+				editor.putInt(Motion.RATE_PREFS_KEY, rate);
 				editor.commit();
 
 				setResult(RESULT_OK);

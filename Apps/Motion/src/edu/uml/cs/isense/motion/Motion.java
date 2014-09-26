@@ -90,8 +90,13 @@ public class Motion extends Activity implements SensorEventListener {
 	private TextView x, y, z;
 	public static Boolean running = false;
 
-	private SensorManager mSensorManager;
+	//saved pref keys
+	public static final String MY_SAVED_PREFERENCES = "MyPrefs" ;
+	public static final String PROJECT_PREFS_KEY = "project";
+	public static final String LENGTH_PREFS_KEY = "length";
+	public static final String RATE_PREFS_KEY = "rate";
 
+	private SensorManager mSensorManager;
 
 	private Timer timeTimer;
 
@@ -100,16 +105,16 @@ public class Motion extends Activity implements SensorEventListener {
 	static String firstName = "";
 	static String lastInitial = "";
 
-	public static final int RESULT_GOT_NAME = 1098;
-	public static final int UPLOAD_OK_REQUESTED = 90000;
-	public static final int LOGIN_STATUS_REQUESTED = 6005;
-	public static final int RECORDING_LENGTH_REQUESTED = 4009;
-	public static final int RECORDING_RATE_REQUESTED = 4010;
-	public static final int PROJECT_REQUESTED = 9000;
-	public static final int QUEUE_UPLOAD_REQUESTED = 5000;
-	public static final int RESET_REQUESTED = 6003;
-	public static final int SAVE_MODE_REQUESTED = 10005;
-	public static final int PRESETS_REQUESTED = 10532;
+	public static final int RESULT_GOT_NAME = 1000;
+	public static final int UPLOAD_OK_REQUESTED = 1001;
+	public static final int LOGIN_STATUS_REQUESTED = 1002;
+	public static final int RECORDING_LENGTH_REQUESTED = 1003;
+	public static final int RECORDING_RATE_REQUESTED = 1004;
+	public static final int PROJECT_REQUESTED = 1005;
+	public static final int QUEUE_UPLOAD_REQUESTED = 1006;
+	public static final int RESET_REQUESTED = 1007;
+	public static final int SAVE_MODE_REQUESTED = 1008;
+	public static final int PRESETS_REQUESTED = 1009;
 
 
 	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
@@ -212,7 +217,7 @@ public class Motion extends Activity implements SensorEventListener {
 			useMenu = true;
 
 
-		uq = new UploadQueue("carrampphysics", mContext, api);
+		uq = new UploadQueue("motion", mContext, api);
 		uq.buildQueueFromFile();
 
 		w = new Waffle(mContext);
@@ -263,8 +268,8 @@ public class Motion extends Activity implements SensorEventListener {
 		y = (TextView) findViewById(R.id.y);
 		z = (TextView) findViewById(R.id.z);
 
-		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-		String projId = mPrefs.getString(Setup.PROJECT_ID, "-1");
+		SharedPreferences mPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+		String projId = mPrefs.getString(PROJECT_PREFS_KEY, "-1");
 
 		if (projId.equals("-1")) {
 			projNumB.setText("Generic Project");
@@ -285,6 +290,7 @@ public class Motion extends Activity implements SensorEventListener {
                 if(intent.hasExtra("BUTTON")) {
                     String s = intent.getStringExtra("BUTTON");
                     startStop.setText(s);
+
                 } else if(intent.hasExtra("BUTTONSTART")) {
 					startStop.setBackgroundResource(R.drawable.button_rsense_green);
                     startStop.setText("Recording");
@@ -295,8 +301,6 @@ public class Motion extends Activity implements SensorEventListener {
                 }
             }
         };
-
-
 
 		new DecimalFormat("#,##0.0");
 
@@ -551,8 +555,8 @@ public class Motion extends Activity implements SensorEventListener {
 
 		if (reqCode == PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences("PROJID", 0);
-				projectNumber = prefs.getString("project_id", "-1");
+				SharedPreferences prefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+				projectNumber = prefs.getString(PROJECT_PREFS_KEY, "-1");
 
 				if (projectNumber.equals("-1")) {
 					w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
@@ -586,26 +590,26 @@ public class Motion extends Activity implements SensorEventListener {
 			if (resultCode == RESULT_OK) {
 
 				/*set project*/
-				SharedPreferences eprefs = getSharedPreferences("PROJID", 0);
+				SharedPreferences eprefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor = eprefs.edit();
-				projectNumber = data.getExtras().getString("project");
-				editor.putString("project_id", projectNumber);
+				projectNumber = data.getExtras().getString(Presets.PROJECT);
+				editor.putString(PROJECT_PREFS_KEY, projectNumber);
 				editor.commit();
 				projNumB.setText("Project: " + projectNumber);
 				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
 
 				/*set rate*/
-				SharedPreferences ratePrefs = getSharedPreferences("RECORD_RATE", 0);
+				SharedPreferences ratePrefs = getSharedPreferences(RATE_PREFS_KEY, 0);
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
-				int rate = data.getExtras().getInt("rate");
+				int rate = data.getExtras().getInt(Presets.RATE);
 				editor2.putInt("rate", rate);
 				editor2.commit();
 				setRateText();
 
 				/*set recording length*/
-				SharedPreferences lengthPrefs = getSharedPreferences("RECORD_LENGTH", 0);
+				SharedPreferences lengthPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
-				int length = data.getExtras().getInt("length");
+				int length = data.getExtras().getInt(Presets.LENGTH);
 				editor3.putInt("length", length);
 				editor3.commit();
 				setLengthText();
@@ -647,24 +651,24 @@ public class Motion extends Activity implements SensorEventListener {
 				CredentialManager.logout(this, api);
 
 				/*reset project*/
-				SharedPreferences eprefs = getSharedPreferences("PROJID", 0);
+				SharedPreferences eprefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor = eprefs.edit();
 				projectNumber = DEFAULT_PROJ;
-				editor.putString("project_id", projectNumber);
+				editor.putString(PROJECT_PREFS_KEY, projectNumber);
 				editor.commit();
 				projNumB.setText("Generic Project");
 
 				/*reset rate*/
-				SharedPreferences ratePrefs = getSharedPreferences("RECORD_RATE", 0);
+				SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
-				editor2.putInt("rate", DEFAULT_RATE);
+				editor2.putInt(RATE_PREFS_KEY, DEFAULT_RATE);
 				editor2.commit();
 				setRateText();
 
 				/*reset recording length*/
-				SharedPreferences lengthPrefs = getSharedPreferences("RECORD_LENGTH", 0);
+				SharedPreferences lengthPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
-				editor3.putInt("length", DEFAULT_LENGTH);
+				editor3.putInt(LENGTH_PREFS_KEY, DEFAULT_LENGTH);
 				editor3.commit();
 				setLengthText();
 
@@ -709,8 +713,8 @@ public void onAccuracyChanged(Sensor sensor, int accuracy) {
 }
 
 private void setRateText() {
-	SharedPreferences ratePrefs = getSharedPreferences("RECORD_RATE", 0);
-	int rate = ratePrefs.getInt("rate", DEFAULT_RATE);
+	SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+	int rate = ratePrefs.getInt(RATE_PREFS_KEY, DEFAULT_RATE);
 
 	switch (rate) {
 	case 50:
@@ -738,8 +742,8 @@ private void setRateText() {
 }
 
 private void setLengthText() {
-	SharedPreferences lengthPrefs = getSharedPreferences("RECORD_LENGTH", 0);
-	int length = lengthPrefs.getInt("length", DEFAULT_LENGTH);
+	SharedPreferences lengthPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+	int length = lengthPrefs.getInt(LENGTH_PREFS_KEY, DEFAULT_LENGTH);
 
 	switch (length) {
 	case 1:

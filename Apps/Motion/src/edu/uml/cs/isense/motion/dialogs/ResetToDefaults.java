@@ -1,7 +1,6 @@
 package edu.uml.cs.isense.motion.dialogs;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,14 +24,8 @@ public class ResetToDefaults extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				int length = 10;
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("length", length).commit();
 				setResult(RESULT_OK);
 				finish();
-
 			}
 		});
 

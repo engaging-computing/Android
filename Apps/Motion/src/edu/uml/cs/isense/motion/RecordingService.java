@@ -1,5 +1,14 @@
 package edu.uml.cs.isense.motion;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Timer;
+
+import org.json.JSONArray;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -11,17 +20,6 @@ import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-
-import org.json.JSONArray;
-
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Timer;
-
-import edu.uml.cs.isense.carphysicsv2.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.proj.Setup;
@@ -31,7 +29,7 @@ import edu.uml.cs.isense.queue.QDataSet.Type;
 public class RecordingService extends Service {
 	private DataFieldManager dfm;
     private JSONArray dataSet;
-    
+
     final int NOTIFICATION_ID = 5001;
 
     public static boolean running = false;
@@ -46,7 +44,7 @@ public class RecordingService extends Service {
 
     Intent intent;
     Context serviceContext;
-    
+
     Timer recordLength;
 
     private String dataSetName = "";
@@ -62,17 +60,17 @@ public class RecordingService extends Service {
     @SuppressLint("NewApi")
     @Override
 	public void onCreate() {
-		super.onCreate();    
+		super.onCreate();
         //initialize dfm which handles project fields and data recording
         initDfm();
-        
+
         serviceContext = this;
-        
+
         //enables all sensors and gps based on the fields
 		dfm.registerSensors();
 
         broadcaster = LocalBroadcastManager.getInstance(this);
-        
+
         updateButtonStart("Start");
 
         /*Persistent notification while recording*/
@@ -98,19 +96,19 @@ public class RecordingService extends Service {
 
 
 	}
-    
+
     /**
 	 * Initialize DataFieldManager Object
 	 */
 		private void initDfm() {
 			API api = API.getInstance();
-			
+
 			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
 			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, Motion.mContext);
 			dfm.enableAllSensorFields();
 		}
-    
+
     public void updateButtonTimer(String message) {
         Intent intent = new Intent(RESULT);
         if(message != null)
@@ -124,7 +122,7 @@ public class RecordingService extends Service {
             intent.putExtra("BUTTONSTART", message);
         broadcaster.sendBroadcast(intent);
     }
-    
+
     public void updateButtonStop(String message) {
         Intent intent = new Intent(RESULT);
         if(message != null)
@@ -144,35 +142,37 @@ public class RecordingService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
     	int length; //length of dataset
     	int rate; //interval between datapoints
-    	
+
         running = true;
-        
+
 		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
 				0);
 		length = prefs.getInt("length", 10);
-		
+
 		SharedPreferences prefs2 = getSharedPreferences("RECORD_RATE", 0);
 		rate = prefs2.getInt("rate", 50);
 
 		dfm.setProjID(Integer.parseInt(Motion.projectNumber));
-        
-        //record data        
+
+        //record data
         dfm.recordData(rate);
-        
+
         if(length != -1) {
         	mTimer =  new CountDownTimer(length * 1000, 1000) {
 
-        	     public void onTick(long millisUntilFinished) {
+        	     @Override
+				public void onTick(long millisUntilFinished) {
         	    	 updateButtonTimer("" + millisUntilFinished / 1000);
         	     }
 
-        	     public void onFinish() {
+        	     @Override
+				public void onFinish() {
         	         serviceContext.stopService(new Intent(serviceContext, RecordingService.class));
         	     }
-        	     
+
         	  }.start();
         }
-        
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -189,10 +189,10 @@ public class RecordingService extends Service {
         	if (mTimer != null) {
         		mTimer.cancel();
         	}
-        	
+
             // Cancel the recording timer and get back the data
             dataSet = dfm.stopRecording();
-            
+
             updateButtonStop("Stop");
 
             // Create the name of the session using the entered name
@@ -242,7 +242,7 @@ public class RecordingService extends Service {
         return Double.valueOf(twoDForm.format(d));
     }
 
-   
+
 }
 
 

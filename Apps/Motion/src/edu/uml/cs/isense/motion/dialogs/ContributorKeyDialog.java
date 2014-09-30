@@ -10,12 +10,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import edu.uml.cs.isense.carphysicsv2.R;
 import edu.uml.cs.isense.comm.API;
+import edu.uml.cs.isense.motion.R;
 import edu.uml.cs.isense.waffle.Waffle;
 
 public class ContributorKeyDialog extends Activity {
-	
+
 	Button ok, cancel;
 	EditText keyField;
 	String key;
@@ -30,7 +30,7 @@ public class ContributorKeyDialog extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contrib_key);
-		
+
 		ok = (Button) findViewById(R.id.button2);
 		cancel = (Button) findViewById(R.id.button1);
 		keyField = (EditText) findViewById(R.id.editText1);
@@ -44,19 +44,19 @@ public class ContributorKeyDialog extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		cancel.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				w.make("Data discarded", Waffle.LENGTH_SHORT, Waffle.IMAGE_X);
 				finish();
-				
+
 			}
 		});
-		
+
 		ok.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				if (keyField.getText().length() != 0) {
@@ -68,9 +68,9 @@ public class ContributorKeyDialog extends Activity {
 			}
 		});
 	}
-	
+
 	public class UploadViaContributorKeyTask extends AsyncTask<Void,Void,Void> {
-		
+
 		ProgressDialog dia;
 
 		@Override
@@ -96,7 +96,7 @@ public class ContributorKeyDialog extends Activity {
 			w.make("Data uploaded!", Waffle.LENGTH_SHORT, Waffle.IMAGE_CHECK);
 			finish();
 		}
-		
+
 	}
 
 }

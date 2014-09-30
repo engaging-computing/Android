@@ -48,7 +48,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import edu.uml.cs.isense.carphysicsv2.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;

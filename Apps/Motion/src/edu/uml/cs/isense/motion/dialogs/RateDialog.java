@@ -9,8 +9,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import edu.uml.cs.isense.carphysicsv2.R;
 import edu.uml.cs.isense.motion.Motion;
+import edu.uml.cs.isense.motion.R;
 
 public class RateDialog extends Activity {
 

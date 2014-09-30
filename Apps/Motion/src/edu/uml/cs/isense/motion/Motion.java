@@ -293,10 +293,17 @@ public class Motion extends Activity implements SensorEventListener {
                 } else if(intent.hasExtra("BUTTONSTART")) {
 					startStop.setBackgroundResource(R.drawable.button_rsense_green);
                     startStop.setText("Recording");
+                    useMenu = false;
+                    if (android.os.Build.VERSION.SDK_INT >= 11)
+						invalidateOptionsMenu();
 
                 } else if(intent.hasExtra("BUTTONSTOP")) {
 					startStop.setBackgroundResource(R.drawable.button_rsense);
                     startStop.setText("Hold to Start");
+
+        			useMenu = true;
+        			if (android.os.Build.VERSION.SDK_INT >= 11)
+						invalidateOptionsMenu();
                 }
             }
         };
@@ -436,9 +443,20 @@ public class Motion extends Activity implements SensorEventListener {
 				SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onResume() {
 		super.onResume();
+		//this sets the layout the correct layout for when it is not recording
+		//this is relevant if recording finishes while the app is in the background
+		if(!RecordingService.running) {
+			startStop.setBackgroundResource(R.drawable.button_rsense);
+	        startStop.setText("Hold to Start");
+
+			useMenu = true;
+			if (android.os.Build.VERSION.SDK_INT >= 11)
+				invalidateOptionsMenu();
+		}
 	}
 
 	@Override
@@ -598,10 +616,10 @@ public class Motion extends Activity implements SensorEventListener {
 				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
 
 				/*set rate*/
-				SharedPreferences ratePrefs = getSharedPreferences(RATE_PREFS_KEY, 0);
+				SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
 				int rate = data.getExtras().getInt(Presets.RATE);
-				editor2.putInt("rate", rate);
+				editor2.putInt(RATE_PREFS_KEY, rate);
 				editor2.commit();
 				setRateText();
 
@@ -609,7 +627,7 @@ public class Motion extends Activity implements SensorEventListener {
 				SharedPreferences lengthPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
 				int length = data.getExtras().getInt(Presets.LENGTH);
-				editor3.putInt("length", length);
+				editor3.putInt(LENGTH_PREFS_KEY, length);
 				editor3.commit();
 				setLengthText();
 			}

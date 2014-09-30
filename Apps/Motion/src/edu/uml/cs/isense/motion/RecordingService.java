@@ -145,12 +145,12 @@ public class RecordingService extends Service {
 
         running = true;
 
-		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
+		SharedPreferences prefs = getSharedPreferences(Motion.MY_SAVED_PREFERENCES,
 				0);
-		length = prefs.getInt("length", 10);
+		length = prefs.getInt(Motion.LENGTH_PREFS_KEY, 10);
 
-		SharedPreferences prefs2 = getSharedPreferences("RECORD_RATE", 0);
-		rate = prefs2.getInt("rate", 50);
+		SharedPreferences prefs2 = getSharedPreferences(Motion.MY_SAVED_PREFERENCES, 0);
+		rate = prefs2.getInt(Motion.RATE_PREFS_KEY, 50);
 
 		dfm.setProjID(Integer.parseInt(Motion.projectNumber));
 

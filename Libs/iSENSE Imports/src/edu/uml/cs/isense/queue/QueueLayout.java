@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.Connection;
-import edu.uml.cs.isense.comm.uploadInfo;
+import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.dfm.FieldMatching;
@@ -70,7 +70,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 	private static LinearLayout scrollQueue;
 	private Runnable sdUploader;
 	private static UploadQueue uq;
-	private uploadInfo info = new uploadInfo();
+	private UploadInfo info = new UploadInfo();
 	private static String parentName = "";
 
 	protected static QDataSet lastDataSetLongClicked;

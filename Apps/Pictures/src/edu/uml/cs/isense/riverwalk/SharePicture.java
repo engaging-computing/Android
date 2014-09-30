@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.API.TargetType;
-import edu.uml.cs.isense.comm.uploadInfo;
+import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
 import edu.uml.cs.isense.proj.Setup;
@@ -34,7 +34,7 @@ public class SharePicture extends Activity {
 	private ProgressDialog dia;
 
 	int project = -1;
-	uploadInfo info = new uploadInfo();
+	UploadInfo info = new UploadInfo();
 	private String key = "";
 
 	boolean loggedIn;

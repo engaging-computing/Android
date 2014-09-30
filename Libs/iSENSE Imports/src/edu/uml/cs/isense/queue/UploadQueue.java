@@ -29,16 +29,16 @@ import edu.uml.cs.isense.queue.QDataSet.Type;
  * at any time from the serializable file it is stored on.  In order
  * to use the iSENSE-Imports-Queue-Saving technology, an UploadQueue
  * object is necessary.
- * 
+ *
  * @author Jeremy Poulin and Mike Stowell of the iSENSE team.
  *
  */
 public class UploadQueue implements Serializable {
-	
+
 	// serializable key for UploadQueue class - DO NOT CHANGE
 	private static final long serialVersionUID = -3036173866992721309L;
 	public static final String SERIAL_ID = "upload_queue_object";
-	
+
 	protected Queue<QDataSet> queue;
 	protected Queue<QDataSet> mirrorQueue;
 	private static String parentName;
@@ -50,43 +50,43 @@ public class UploadQueue implements Serializable {
 	 * This is the constructor for an UploadQueue object.
 	 * All parameters are necessary and essential to ensure that
 	 * this object works properly.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param parentName
-	 * 			Name of the parent activity the UploadQueue is being made 
+	 * 			Name of the parent activity the UploadQueue is being made
 	 * 			in.  This name is also used in making the serializable file
 	 * 			where this UploadQueue will be stored
-	 * 
+	 *
 	 * @param context
 	 * 			Context of the activity instantiating this object.
-	 * 
+	 *
 	 * @param api
 	 * 			An API object that this UploadQueue object may utilize
 	 * 			to upload data.
-	 * 
+	 *
 	 */
 	public UploadQueue(String parentName, Context context,
 			API api) {
 		this.queue = new LinkedList<QDataSet>();
 		this.mirrorQueue = new LinkedList<QDataSet>();
-		
+
 		UploadQueue.parentName = parentName;
 		UploadQueue.mContext = context;
 		UploadQueue.api = api;
 	}
-	
+
 	/**
 	 * Getter for the parent name of the object.
-	 * 
+	 *
 	 * @return The parent name of the object
 	 */
 	public String getParentName() {
 		return parentName;
 	}
-	
+
 	/**
 	 * Getter for the context passed to the object.
-	 * 
+	 *
 	 * @return The context this object was instantiated with.
 	 */
 	public Context getContext() {
@@ -96,7 +96,7 @@ public class UploadQueue implements Serializable {
 	/**
 	 * Adds a data set to the queue and updates the serializable file
 	 * the queue is stored on.
-	 * 
+	 *
 	 * @param ds
 	 * 			The QDataSet object to be added to the UploadQueue.
 	 */
@@ -111,7 +111,7 @@ public class UploadQueue implements Serializable {
 
 		Queue<QDataSet> backupQueue = new LinkedList<QDataSet>();
 		backupQueue.addAll(queue);
-		
+
 		// save Q_COUNT in SharedPrefs
 		final SharedPreferences mPrefs = mContext.getSharedPreferences(
 				parentName, Context.MODE_PRIVATE);
@@ -120,11 +120,11 @@ public class UploadQueue implements Serializable {
 		int Q_COUNT_BACKUP = Q_COUNT;
 		mPrefsEditor.putInt(parentName + "Q_COUNT", Q_COUNT);
 		mPrefsEditor.commit();
-		
+
 		// obtain storage directory and file for the uploadqueue
 		File folder = new File(Environment.getExternalStorageDirectory()
 				+ "/iSENSE");
-		
+
 		if (!folder.exists()) {
 			folder.mkdir();
 		}
@@ -136,7 +136,7 @@ public class UploadQueue implements Serializable {
 		ObjectOutput out = null;
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(uploadQueueFile));
-			
+
 			// serializes DataSets
 			while (Q_COUNT > 0) {
 				QDataSet ds = backupQueue.remove();
@@ -145,7 +145,7 @@ public class UploadQueue implements Serializable {
 			}
 
 			out.flush();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -153,12 +153,12 @@ public class UploadQueue implements Serializable {
 		// re-retrieve the queue
 		queue = new LinkedList<QDataSet>();
 		Q_COUNT = Q_COUNT_BACKUP;
-		
+
 		try {
 			// Deserialize the file as a whole
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(
 					uploadQueueFile));
-			
+
 			// Deserialize the objects one by one
 			for (int i = 0; i < Q_COUNT; i++) {
 				QDataSet dataSet = (QDataSet) in.readObject();
@@ -173,13 +173,13 @@ public class UploadQueue implements Serializable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		if (rebuildMirrorQueue) {
 			mirrorQueue.clear();
 			mirrorQueue.addAll(queue);
 		}
-		
-		
+
+
 		try {
 			if (out != null)
 				out.close();
@@ -187,7 +187,7 @@ public class UploadQueue implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// removes the dataset with the associated key: true if removed, false if not found
 	protected boolean removeItemWithKey(long keyVal) {
 		LinkedList<QDataSet> backup = new LinkedList<QDataSet>();
@@ -200,26 +200,26 @@ public class UploadQueue implements Serializable {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Rebuilds the UploadQueue from the serializable file it
 	 * is saved on.
-	 * 
-	 * @return 
+	 *
+	 * @return
 	 * 			@true if the UploadQueue is rebuilt successfully
-	 * 			@false if the rebuilding fails 
+	 * 			@false if the rebuilding fails
 	 */
 	public boolean buildQueueFromFile() {
-		
+
 		// reset the queues but save a backup
 		Queue<QDataSet> backupQueue = new LinkedList<QDataSet>();
 		backupQueue.addAll(queue);
 		queue       = new LinkedList<QDataSet>();
 		mirrorQueue = new LinkedList<QDataSet>();
-		
+
 		// get Q_COUNT from the SharedPrefs
 		final SharedPreferences mPrefs = mContext.getSharedPreferences(
 				parentName, Context.MODE_PRIVATE);
@@ -238,15 +238,15 @@ public class UploadQueue implements Serializable {
 			mirrorQueue.addAll(backupQueue);
 			return false;
 		}
-		
+
 		File uploadQueueFile = new File(folder.getAbsolutePath() + "/"
 				+ parentName + ".ser");
-		
+
 		try {
 			// Deserialize the file as a whole
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(
 					uploadQueueFile));
-			
+
 			// Deserialize the objects one by one
 			for (int i = 0; i < Q_COUNT; i++) {
 				QDataSet dataSet = (QDataSet) in.readObject();
@@ -270,23 +270,23 @@ public class UploadQueue implements Serializable {
 			mirrorQueue.addAll(backupQueue);
 			return false;
 		}
-		
+
 		mirrorQueue.addAll(queue);
 		return true;
 	}
 
 	/**
 	 * Getter for the API object.
-	 * 
+	 *
 	 * @return The API object the UploadQueue was instantiated with.
 	 */
 	public static API getAPI() {
 		return api;
 	}
-	
+
 	/**
 	 * Determines if the queue of data sets is empty.
-	 * 
+	 *
 	 * @return
 	 * 			@true if the queue is empty
 	 * 			@false if the queue has data sets
@@ -297,23 +297,39 @@ public class UploadQueue implements Serializable {
 
 	/**
 	 * Determines the amount of data sets in the queue.
-	 * 
+	 *
 	 * @return	The amount of data sets stored in the queue.
 	 */
 	public int queueSize() {
 		return (queue.size());
 	}
-	
-	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields) {	
-		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields);
-		
+
+	/**
+	 * @param name
+	 *            - The name of the of the data set
+	 * @param desc
+	 *            - A description for the data set
+	 * @param type
+	 *            - QDataSet.DATA QDataSet.PIC, or QDataSet.BOTH
+	 * @param projID
+	 *            - The associated project ID for the data set
+	 * @param data
+	 *            - If type is QDataSet.DATA, we look here.
+	 * @param picture
+	 *            - If type is QDataSet.PIC, we look here.
+	 * @param requestDataLabelInOrder
+	 * 			  - If data is already in the correct order and just needs to be given field IDs
+	 */
+	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields, Boolean dataAlreadyInOrder) {
+		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields, dataAlreadyInOrder);
+
 		//Add data to Queue to be uploaded
-		new AddToQueueTask().execute(); 
+		new AddToQueueTask().execute();
 	}
-	
+
 	/**
 	 * Saves Data to upload Queue
-	 * 
+	 *
 	 * @author jpoulin
 	 * moved to UploadQueue - BDonald
 	 */
@@ -324,7 +340,7 @@ public class UploadQueue implements Serializable {
 		@Override
 		protected void onPreExecute() {
 		}
-		
+
 		@Override
 		protected String doInBackground(String... strings) {
 			uploader.run();
@@ -338,15 +354,15 @@ public class UploadQueue implements Serializable {
 			mContext.startActivity(i);
 		}
 	}
-	
+
 	// Calls the api primitives for actual uploading
-		private Runnable uploader = new Runnable() {
+		private final Runnable uploader = new Runnable() {
 			@Override
 			public void run() {
 				addDataSetToQueue(ds);
 			}
 		};
 
-	
-	
+
+
 }

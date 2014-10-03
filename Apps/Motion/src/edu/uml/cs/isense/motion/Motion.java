@@ -59,7 +59,7 @@ import edu.uml.cs.isense.motion.dialogs.Presets;
 import edu.uml.cs.isense.motion.dialogs.RateDialog;
 import edu.uml.cs.isense.motion.dialogs.ResetToDefaults;
 import edu.uml.cs.isense.objects.RPerson;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -91,7 +91,6 @@ public class Motion extends Activity implements SensorEventListener {
 
 	//saved pref keys
 	public static final String MY_SAVED_PREFERENCES = "MyPrefs" ;
-	public static final String PROJECT_PREFS_KEY = "project";
 	public static final String LENGTH_PREFS_KEY = "length";
 	public static final String RATE_PREFS_KEY = "rate";
 
@@ -267,8 +266,8 @@ public class Motion extends Activity implements SensorEventListener {
 		y = (TextView) findViewById(R.id.y);
 		z = (TextView) findViewById(R.id.z);
 
-		SharedPreferences mPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
-		String projId = mPrefs.getString(PROJECT_PREFS_KEY, "-1");
+		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+		String projId = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
 
 		if (projId.equals("-1")) {
 			projNumB.setText("Generic Project");
@@ -357,7 +356,7 @@ public class Motion extends Activity implements SensorEventListener {
 			@Override
 			public void onClick(View v) {
 				// Allows the user to pick a project to upload to
-				Intent setup = new Intent(mContext, Setup.class);
+				Intent setup = new Intent(mContext, ProjectManager.class);
 				setup.putExtra("constrictFields", true);
 				startActivityForResult(setup, PROJECT_REQUESTED);
 			}
@@ -572,8 +571,8 @@ public class Motion extends Activity implements SensorEventListener {
 
 		if (reqCode == PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
-				projectNumber = prefs.getString(PROJECT_PREFS_KEY, "-1");
+				SharedPreferences prefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+				projectNumber = prefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
 
 				if (projectNumber.equals("-1")) {
 					w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
@@ -607,10 +606,10 @@ public class Motion extends Activity implements SensorEventListener {
 			if (resultCode == RESULT_OK) {
 
 				/*set project*/
-				SharedPreferences eprefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+				SharedPreferences eprefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
 				SharedPreferences.Editor editor = eprefs.edit();
 				projectNumber = data.getExtras().getString(Presets.PROJECT);
-				editor.putString(PROJECT_PREFS_KEY, projectNumber);
+				editor.putString(ProjectManager.PROJECT_ID_KEY, projectNumber);
 				editor.commit();
 				projNumB.setText("Project: " + projectNumber);
 				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
@@ -668,10 +667,10 @@ public class Motion extends Activity implements SensorEventListener {
 				CredentialManager.logout(this, api);
 
 				/*reset project*/
-				SharedPreferences eprefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+				SharedPreferences eprefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
 				SharedPreferences.Editor editor = eprefs.edit();
 				projectNumber = DEFAULT_PROJ;
-				editor.putString(PROJECT_PREFS_KEY, projectNumber);
+				editor.putString(ProjectManager.PROJECT_ID_KEY, projectNumber);
 				editor.commit();
 				projNumB.setText("Generic Project");
 

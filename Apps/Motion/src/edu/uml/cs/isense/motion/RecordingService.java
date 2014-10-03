@@ -22,7 +22,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
 
@@ -103,8 +103,8 @@ public class RecordingService extends Service {
 		private void initDfm() {
 			API api = API.getInstance();
 
-			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
+			SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+			String projectInput = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, Motion.mContext);
 			dfm.enableAllSensorFields();
 		}

@@ -15,13 +15,13 @@ import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.objects.RProject;
 
 /**
- * This is the class designed to browse projects on the iSENSE website. 
+ * This is the class designed to browse projects on the iSENSE website.
  * Projects will be displayed by their title and respective owner on iSENSE.
  *
  * This class has already been implemented in the
- * {@link edu.uml.cs.isense.proj.Setup Setup} class, so no public implementation
+ * {@link edu.uml.cs.isense.proj.ProjectManager Setup} class, so no public implementation
  * is necessary.
- * 
+ *
  * @author iSENSE Android Development Team
  *
  */
@@ -33,7 +33,7 @@ public class BrowseProjects extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.projects);
-		
+
 		setResult(Activity.RESULT_CANCELED);
 
 		m_projects = new ArrayList<RProject>();
@@ -47,11 +47,14 @@ public class BrowseProjects extends ListActivity {
 		et.setSingleLine(true);
 		et.addTextChangedListener(new TextWatcher() {
 
+			@Override
 			public void afterTextChanged(Editable s) {}
 
+			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {}
 
+			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
 				if (s == null || s.length() == 0) {
@@ -80,8 +83,7 @@ public class BrowseProjects extends ListActivity {
 		RProject p = m_projects.get(position);
 
 		Intent intent = new Intent();
-		intent.putExtra("project_id", p.project_id);
-
+		intent.putExtra(ProjectManager.PROJECT_ID_KEY, String.valueOf(p.project_id));
 		setResult(Activity.RESULT_OK, intent);
 		finish();
 	}

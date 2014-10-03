@@ -42,7 +42,7 @@ import android.widget.TextView;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.objects.RProjectField;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
@@ -137,8 +137,8 @@ public class ManualEntry extends Activity implements LocationListener {
 						Type type = Type.DATA;
 
 						SharedPreferences setupPrefs = getSharedPreferences(
-								Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-						int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
+								ProjectManager.PROJ_PREFS_ID, Context.MODE_PRIVATE);
+						int projectID = Integer.parseInt(setupPrefs.getString(ProjectManager.PROJECT_ID_KEY,
 									"-1"));
 
 						//add new dataset to queue
@@ -172,7 +172,7 @@ public class ManualEntry extends Activity implements LocationListener {
 			return true;
 		}
 		if (id == R.id.MENU_ITEM_PROJECT) {
-			Intent setup = new Intent(mContext, Setup.class);
+			Intent setup = new Intent(mContext, ProjectManager.class);
 			setup.putExtra("showSelectLater", false);
 			this.startActivityForResult(setup, PROJECT_REQUESTED);
 			return true;
@@ -303,8 +303,8 @@ public class ManualEntry extends Activity implements LocationListener {
 		});
 
 		SharedPreferences setupPrefs = getSharedPreferences(
-				Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-		int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
+				ProjectManager.PROJ_PREFS_ID, Context.MODE_PRIVATE);
+		int projectID = Integer.parseInt(setupPrefs.getString(ProjectManager.PROJECT_ID_KEY,
 					"-1"));
 		if (fields.size() == 0 && projectID != -1) {
 			w.make("This Project Doesn't Have Any Fields", Waffle.IMAGE_X);
@@ -445,8 +445,8 @@ public class ManualEntry extends Activity implements LocationListener {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			SharedPreferences setupPrefs = getSharedPreferences(
-					Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-			int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
+					ProjectManager.PROJ_PREFS_ID, Context.MODE_PRIVATE);
+			int projectID = Integer.parseInt(setupPrefs.getString(ProjectManager.PROJECT_ID_KEY,
 						"514"));
 			try {
 				fields = api.getProjectFields(projectID);

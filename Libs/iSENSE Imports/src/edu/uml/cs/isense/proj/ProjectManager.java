@@ -27,13 +27,13 @@ import edu.uml.cs.isense.waffle.Waffle;
  * features an EditText that the user may manually enter a project ID into, a
  * Browse feature to pick from a list of projects, and a QR code scanning
  * feature to find the project ID from a project on iSENSE.
- * 
+ *
  * To use this Activity, launch an Intent to this class and catch it in your
  * onActivityResult() method. To obtain the project ID returned by this
  * Activity, create a SharedPreferences object using the PREFS_ID variable as
  * the "name" parameter. Then, request a String with the PROJECT_ID "key"
  * parameter. For example:
- * 
+ *
  * <pre>
  * {
  * 	&#064;code
@@ -41,10 +41,10 @@ import edu.uml.cs.isense.waffle.Waffle;
  * 	String projID = mPrefs.getString(Setup.PROJECT_ID, &quot;-1&quot;);
  * }
  * </pre>
- * 
+ *
  * @author iSENSE Android Development Team
  */
-public class Setup extends Activity implements OnClickListener {
+public class ProjectManager extends Activity implements OnClickListener {
 
 	private EditText projInput;
 
@@ -62,7 +62,12 @@ public class Setup extends Activity implements OnClickListener {
 	private Waffle w;
 	private API api;
 
+	private String projectID = "-1";
+
 	private SharedPreferences mPrefs;
+	public static final String PROJECT_ID_KEY = "projectKey";
+	public static final String PROJ_PREFS_ID = "projectPrefsId";
+
 
 	private static final int QR_CODE_REQUESTED = 100;
 	private static final int PROJECT_CODE = 101;
@@ -70,20 +75,6 @@ public class Setup extends Activity implements OnClickListener {
 	private static final int NAME_FOR_NEW_PROJECT_REQUESTED = 103;
 	private static final int NEW_PROJ_REQUESTED = 104;
 	private static final int LOGIN_STATUS_REQUESTED = 105;
-
-	/**
-	 * The constant for the "name" parameter in a SharedPreference's
-	 * getSharedPreferences(name, mode) call. Use this String constant to build
-	 * a SharedPreferences object in which you may obtain the project ID
-	 * returned by this Activity.
-	 */
-	public static String PROJ_PREFS_ID = "PROJID";
-	/**
-	 * The constant for the "key" parameter in a SharedPreference's
-	 * getString(key, defValue) call. Use this String constant to retrieve the
-	 * project ID, in the form of a String, returned by this Activity.
-	 */
-	public static String PROJECT_ID = "project_id";
 
 	public static String APPNAME;
 
@@ -117,13 +108,13 @@ public class Setup extends Activity implements OnClickListener {
 
 		createProject = (Button) findViewById(R.id.createProjectBtn);
 		createProject.setOnClickListener(this);
-		
+
 		projLater = (Button) findViewById(R.id.project_later);
 		projLater.setOnClickListener(this);
 
 		oklayout = (LinearLayout) findViewById(R.id.OKCancelLayout);
 		oklayout.setVisibility(View.VISIBLE);
-		
+
 		selectLaterLayout = (LinearLayout) findViewById(R.id.select_later_layout);
 
 		Bundle extras = getIntent().getExtras();
@@ -135,41 +126,25 @@ public class Setup extends Activity implements OnClickListener {
 
 			if (!showOKCancel)
 				oklayout.setVisibility(View.GONE);
-			
+
 			if(!showSelectLater)
 				selectLaterLayout.setVisibility(View.GONE);
 
-			String fromWhere = extras.getString("from_where");
-			if (fromWhere != null) {
-				if (fromWhere.equals("manual")) {
-					PROJ_PREFS_ID = "PROJID_MANUAL";
-				} else if (fromWhere.equals("queue")) {
-					PROJ_PREFS_ID = "PROJID_QUEUE";
-				} else if (fromWhere.equals("welcome")) {
-					PROJ_PREFS_ID = "PROJID_WELCOME";
-				} else {
-					PROJ_PREFS_ID = "PROJID";
-				}
+		//TODO remove shared prefs
+		mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+		projectID = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "").equals("-1") ? ""
+				: mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "");
 
-			} else {
-				PROJ_PREFS_ID = "PROJID";
-			}
 
-			APPNAME = extras.getString("app_name");
 
-		} else {
-			PROJ_PREFS_ID = "PROJID";
+			projInput = (EditText) findViewById(R.id.projectInput);
+			projInput.setText(projectID);
+
 		}
-
-		mPrefs = getSharedPreferences(PROJ_PREFS_ID, 0);
-		String projID = mPrefs.getString(PROJECT_ID, "").equals("-1") ? ""
-				: mPrefs.getString(PROJECT_ID, "");
-
-		projInput = (EditText) findViewById(R.id.projectInput);
-		projInput.setText(projID);
-
 	}
 
+
+	@Override
 	public void onClick(View v) {
 
 		int id = v.getId();
@@ -180,10 +155,10 @@ public class Setup extends Activity implements OnClickListener {
 				pass = false;
 			}
 			if (pass) {
-
-				SharedPreferences.Editor mEditor = mPrefs.edit();
-				mEditor.putString(PROJECT_ID, projInput.getText().toString())
-						.commit();
+				mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+				SharedPreferences mEditor = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+				SharedPreferences.Editor editor = mEditor.edit();
+				editor.putString(ProjectManager.PROJECT_ID_KEY, projInput.getText().toString()).commit();
 
 				setResult(RESULT_OK);
 				finish();
@@ -208,16 +183,17 @@ public class Setup extends Activity implements OnClickListener {
 		} else if (id == R.id.project_browse) {
 			Intent iProject = new Intent(getApplicationContext(),
 					BrowseProjects.class);
-			
+
 			startActivityForResult(iProject, PROJECT_CODE);
-			
+
 		} else if (id == R.id.project_later) {
+			//TODO Remove shared prefs
+			mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
 			SharedPreferences.Editor mEditor = mPrefs.edit();
-			mEditor.putString(PROJECT_ID, "-1")
-					.commit();
-			setResult(RESULT_OK);
+			mEditor.putString(ProjectManager.PROJECT_ID_KEY, "-1").commit();
+			setResult(Activity.RESULT_OK);
 			finish();
-			
+
 		} else if (id == R.id.createProjectBtn) {
 			if (!Connection.hasConnectivity(mContext))
 				w.make("Internet connection required to create project",
@@ -272,8 +248,8 @@ public class Setup extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == PROJECT_CODE) {
 			if (resultCode == Activity.RESULT_OK) {
-				int projID = data.getExtras().getInt(PROJECT_ID);
-				projInput.setText("" + projID);
+				String projID = data.getExtras().getString(ProjectManager.PROJECT_ID_KEY);
+				projInput.setText(projID);
 
 			}
 		} else if (requestCode == NO_QR_REQUESTED) {
@@ -299,12 +275,9 @@ public class Setup extends Activity implements OnClickListener {
 		} else if (requestCode == NEW_PROJ_REQUESTED) {
 			if (resultCode == RESULT_OK) {
 				if (data.hasExtra(ProjectCreate.NEW_PROJECT_ID)) {
-					String pid = data
-							.getStringExtra(ProjectCreate.NEW_PROJECT_ID);
-					SharedPreferences.Editor mEditor = mPrefs.edit();
-					mEditor.putString(PROJECT_ID, pid).commit();
-					setResult(RESULT_OK);
-					finish();
+					//TODO remove s
+					String projID = data.getExtras().getString(ProjectManager.PROJECT_ID_KEY);
+					projInput.setText(projID);
 				}
 			} else {
 				setResult(RESULT_CANCELED);
@@ -312,7 +285,7 @@ public class Setup extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == LOGIN_STATUS_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				
+
 				w.make("Login successful", Waffle.LENGTH_SHORT,
 						Waffle.IMAGE_CHECK);
 
@@ -330,10 +303,15 @@ public class Setup extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(Integer projNum) {
 			super.onPostExecute(projNum);
-			SharedPreferences mEditor = getSharedPreferences("PROJID", 0);
+			//TODO remove shared prefs
+			mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
+			SharedPreferences mEditor = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
 			SharedPreferences.Editor editor = mEditor.edit();
-			editor.putString(PROJECT_ID, projNum + "").commit();
-			setResult(RESULT_OK);
+			editor.putString(ProjectManager.PROJECT_ID_KEY, String.valueOf(projNum)).commit();
+
+			projInput.setText(String.valueOf(projNum));
+
+			setResult(Activity.RESULT_OK);
 			finish();
 		}
 

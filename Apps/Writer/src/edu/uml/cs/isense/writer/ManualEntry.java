@@ -8,8 +8,6 @@ import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.example.manualentry.R;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;

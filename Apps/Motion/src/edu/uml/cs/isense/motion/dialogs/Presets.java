@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import edu.uml.cs.isense.carphysicsv2.R;
+import edu.uml.cs.isense.motion.R;
 
 public class Presets extends Activity{
 	public static final String PROJECT = "project";

@@ -80,7 +80,7 @@ public class RecordingService extends Service {
 
             Notification.Builder builder = new Notification.Builder(getApplicationContext());
             builder.setContentIntent(pendingIntent);
-            builder.setContentTitle("iSense DataWalk");
+            builder.setContentTitle("iSense Motion");
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
             builder.setSmallIcon(R.drawable.ic_launcher);
@@ -102,9 +102,7 @@ public class RecordingService extends Service {
 	 */
 		private void initDfm() {
 			API api = API.getInstance();
-
-			SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-			String projectInput = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+			String projectInput = ProjectManager.getProject(this);
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, Motion.mContext);
 			dfm.enableAllSensorFields();
 		}

@@ -439,9 +439,8 @@ public class ProjectCreate extends Activity {
 
 			if (newProjID != 0) {
 
-				Intent iRet = new Intent();
-				iRet.putExtra(ProjectManager.PROJECT_ID_KEY, "" + newProjID);
-				setResult(RESULT_OK, iRet);
+				ProjectManager.setProject(mContext, String.valueOf(newProjID));
+				setResult(RESULT_OK);
 				finish();
 
 			} else

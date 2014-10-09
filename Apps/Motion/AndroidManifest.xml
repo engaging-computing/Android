@@ -179,7 +179,7 @@
     </application>
     
       <instrumentation
-			android:targetPackage="edu.uml.cs.isense.carphysicsv2"
+			android:targetPackage="edu.uml.cs.isense.motion"
 			android:name="android.test.InstrumentationTestRunner" />
         
 

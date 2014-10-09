@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -81,10 +80,8 @@ public class BrowseProjects extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		RProject p = m_projects.get(position);
-
-		Intent intent = new Intent();
-		intent.putExtra(ProjectManager.PROJECT_ID_KEY, String.valueOf(p.project_id));
-		setResult(Activity.RESULT_OK, intent);
+		ProjectManager.setProject(this, String.valueOf(p.project_id));
+		setResult(Activity.RESULT_OK);
 		finish();
 	}
 

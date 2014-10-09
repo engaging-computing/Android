@@ -18,7 +18,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -153,13 +152,13 @@ public class Main extends Activity implements LocationListener {
 
 		uq = new UploadQueue("generalpictures", mContext, api);
 
-		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJECT_ID_KEY, 0);
-		if (mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "").equals("")) {
+		String projId = ProjectManager.getProject(mContext);
+		if (projId.equals("")) {
 			setDefaultProject();
 		} else {
 			projectLabel = (TextView) findViewById(R.id.projectLabel);
 			projectLabel.setText(getResources().getString(R.string.projectLabel)
-					+ mPrefs.getString(ProjectManager.PROJECT_ID_KEY, ""));
+					+ projId);
 		}
 
 		//Initialize DataFieldManager object
@@ -198,10 +197,8 @@ public class Main extends Activity implements LocationListener {
 					name.setError(null);
 				}
 
-				SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-				String projectNum = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "Error");
-
-				if (projectNum.equals("Error")) {
+				String projectNum = ProjectManager.getProject(mContext);
+				if (projectNum.equals("")) {
 					w.make("Please select an project first.",
 							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 					return;
@@ -332,21 +329,14 @@ public class Main extends Activity implements LocationListener {
 
 	private void setDefaultProject(){
 		/*if no project set or using a default project set the correct default project based on live or dev mode*/
-
-		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-
 	     if (api.isUsingDevMode() == true){
-	    	SharedPreferences.Editor editor = mPrefs.edit();
-	     	editor.putString(ProjectManager.PROJECT_ID_KEY, "248");
-	     	editor.commit();
+	     	ProjectManager.setProject(mContext, "248");
 	     } else if (api.isUsingDevMode() == false) {
-	    	 SharedPreferences.Editor editor = mPrefs.edit();
-		     editor.putString(ProjectManager.PROJECT_ID_KEY, "259");
-		     editor.commit();
+		     ProjectManager.setProject(mContext, "259");
 	     }
 
 		projectLabel = (TextView) findViewById(R.id.projectLabel);
-		String project = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "");
+		String project = ProjectManager.getProject(mContext);
 		Log.e("PRoject", project);
 		projectLabel.setText(getResources().getString(R.string.projectLabel)
 				+ project);
@@ -419,11 +409,7 @@ public class Main extends Activity implements LocationListener {
 					});
 
                     if (validPicture) {
-
-
-
-            		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-        			String projId = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+        			String projId = ProjectManager.getProject(mContext);
 
         			String dataSetName;
         			if ( Description.photo_description == null) {
@@ -811,8 +797,7 @@ public class Main extends Activity implements LocationListener {
 	 */
 	private void initDfm() {
 		//get projId from saved prefs
-		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-		String projectInput = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+		String projectInput = ProjectManager.getProject(mContext);
 
 		dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
 				mContext);
@@ -850,8 +835,7 @@ public class Main extends Activity implements LocationListener {
 															// from project on
 															// isense
 			if (resultCode == Activity.RESULT_OK) {
-				SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-				String projIdString = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "");
+				String projIdString = ProjectManager.getProject(mContext);
 
 				projectLabel.setText(getResources().getString(
 						R.string.projectLabel)
@@ -883,8 +867,7 @@ public class Main extends Activity implements LocationListener {
 			dataSet.put(dataPoint);
 			Log.e("Pictures", dataSet.toString());
 
-			SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-			String projId = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+			String projId = ProjectManager.getProject(mContext);
 
 			String dataSetName = name.getText().toString() + " " + Description.photo_description;
 			String description = DateFormat.getDateTimeInstance().format(new Date());
@@ -905,8 +888,7 @@ public class Main extends Activity implements LocationListener {
                 /* turns image uri to file to be uploaded */
         		File picture = convertImageUriToFile(selectedImageUri, mContext);
 
-        		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-    			String projId = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+    			String projId = ProjectManager.getProject(mContext);
 
     			/* add picture and data to queue */
     			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());

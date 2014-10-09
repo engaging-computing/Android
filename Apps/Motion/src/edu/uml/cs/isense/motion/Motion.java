@@ -266,8 +266,7 @@ public class Motion extends Activity implements SensorEventListener {
 		y = (TextView) findViewById(R.id.y);
 		z = (TextView) findViewById(R.id.z);
 
-		SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-		String projId = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+		String projId = ProjectManager.getProject(mContext);
 
 		if (projId.equals("-1")) {
 			projNumB.setText("Generic Project");
@@ -571,8 +570,7 @@ public class Motion extends Activity implements SensorEventListener {
 
 		if (reqCode == PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-				projectNumber = prefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+				projectNumber = ProjectManager.getProject(mContext);
 
 				if (projectNumber.equals("-1")) {
 					w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
@@ -606,11 +604,8 @@ public class Motion extends Activity implements SensorEventListener {
 			if (resultCode == RESULT_OK) {
 
 				/*set project*/
-				SharedPreferences eprefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-				SharedPreferences.Editor editor = eprefs.edit();
 				projectNumber = data.getExtras().getString(Presets.PROJECT);
-				editor.putString(ProjectManager.PROJECT_ID_KEY, projectNumber);
-				editor.commit();
+				ProjectManager.setProject(mContext, projectNumber);
 				projNumB.setText("Project: " + projectNumber);
 				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
 
@@ -667,11 +662,7 @@ public class Motion extends Activity implements SensorEventListener {
 				CredentialManager.logout(this, api);
 
 				/*reset project*/
-				SharedPreferences eprefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-				SharedPreferences.Editor editor = eprefs.edit();
-				projectNumber = DEFAULT_PROJ;
-				editor.putString(ProjectManager.PROJECT_ID_KEY, projectNumber);
-				editor.commit();
+				ProjectManager.setProject(mContext, DEFAULT_PROJ);
 				projNumB.setText("Generic Project");
 
 				/*reset rate*/

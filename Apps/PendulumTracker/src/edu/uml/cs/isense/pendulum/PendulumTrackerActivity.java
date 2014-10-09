@@ -25,7 +25,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -702,8 +701,8 @@ public class PendulumTrackerActivity extends Activity implements
 	 * Initialize DataFieldManager Object
 	 */
 		private void initDfm() {
-			SharedPreferences mPrefs = getSharedPreferences(ProjectManager.PROJ_PREFS_ID, 0);
-			String projectInput = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+
+			String projectInput = ProjectManager.getProject(mContext);
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
 			dfm.enableAllSensorFields();
 		}

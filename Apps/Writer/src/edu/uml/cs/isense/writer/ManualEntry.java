@@ -13,7 +13,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -136,10 +135,7 @@ public class ManualEntry extends Activity implements LocationListener {
 						String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + uploadData.length();
 						Type type = Type.DATA;
 
-						SharedPreferences setupPrefs = getSharedPreferences(
-								ProjectManager.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-						int projectID = Integer.parseInt(setupPrefs.getString(ProjectManager.PROJECT_ID_KEY,
-									"-1"));
+						int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
 
 						//add new dataset to queue
 						uq.buildQueueFromFile();
@@ -302,10 +298,8 @@ public class ManualEntry extends Activity implements LocationListener {
 
 		});
 
-		SharedPreferences setupPrefs = getSharedPreferences(
-				ProjectManager.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-		int projectID = Integer.parseInt(setupPrefs.getString(ProjectManager.PROJECT_ID_KEY,
-					"-1"));
+
+		int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
 		if (fields.size() == 0 && projectID != -1) {
 			w.make("This Project Doesn't Have Any Fields", Waffle.IMAGE_X);
 			ViewGroup noFieldError = new RelativeLayout(mContext);
@@ -444,10 +438,14 @@ public class ManualEntry extends Activity implements LocationListener {
 		 */
 		@Override
 		protected Void doInBackground(Void... arg0) {
-			SharedPreferences setupPrefs = getSharedPreferences(
-					ProjectManager.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-			int projectID = Integer.parseInt(setupPrefs.getString(ProjectManager.PROJECT_ID_KEY,
-						"514"));
+
+			int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
+
+			if (projectID == -1) {
+				projectID = 514;
+				ProjectManager.setProject(mContext, "514");
+			}
+
 			try {
 				fields = api.getProjectFields(projectID);
 			} catch(Exception e) {

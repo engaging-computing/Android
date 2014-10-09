@@ -13,7 +13,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -42,7 +41,7 @@ import android.widget.TextView;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.objects.RProjectField;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
@@ -67,6 +66,8 @@ public class ManualEntry extends Activity implements LocationListener {
 	public static final int LOGIN_STATUS_REQUESTED = 6005;
 	public static final int PROJECT_REQUESTED = 6009;
 	public static final int QUEUE_UPLOAD_REQUESTED = 7021;
+
+	private static final String DEFAULT_PROJ = "514";
 
 	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,10 +137,7 @@ public class ManualEntry extends Activity implements LocationListener {
 						String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + uploadData.length();
 						Type type = Type.DATA;
 
-						SharedPreferences setupPrefs = getSharedPreferences(
-								Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-						int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
-									"-1"));
+						int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
 
 						//add new dataset to queue
 						uq.buildQueueFromFile();
@@ -172,7 +170,7 @@ public class ManualEntry extends Activity implements LocationListener {
 			return true;
 		}
 		if (id == R.id.MENU_ITEM_PROJECT) {
-			Intent setup = new Intent(mContext, Setup.class);
+			Intent setup = new Intent(mContext, ProjectManager.class);
 			setup.putExtra("showSelectLater", false);
 			this.startActivityForResult(setup, PROJECT_REQUESTED);
 			return true;
@@ -302,10 +300,8 @@ public class ManualEntry extends Activity implements LocationListener {
 
 		});
 
-		SharedPreferences setupPrefs = getSharedPreferences(
-				Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-		int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
-					"-1"));
+
+		int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
 		if (fields.size() == 0 && projectID != -1) {
 			w.make("This Project Doesn't Have Any Fields", Waffle.IMAGE_X);
 			ViewGroup noFieldError = new RelativeLayout(mContext);
@@ -444,10 +440,14 @@ public class ManualEntry extends Activity implements LocationListener {
 		 */
 		@Override
 		protected Void doInBackground(Void... arg0) {
-			SharedPreferences setupPrefs = getSharedPreferences(
-					Setup.PROJ_PREFS_ID, Context.MODE_PRIVATE);
-			int projectID = Integer.parseInt(setupPrefs.getString(Setup.PROJECT_ID,
-						"514"));
+
+			int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
+
+			if (projectID == -1) {
+				projectID = Integer.valueOf(DEFAULT_PROJ);
+				ProjectManager.setProject(mContext, DEFAULT_PROJ);
+			}
+
 			try {
 				fields = api.getProjectFields(projectID);
 			} catch(Exception e) {

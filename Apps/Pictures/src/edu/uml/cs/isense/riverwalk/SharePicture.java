@@ -1,5 +1,8 @@
 package edu.uml.cs.isense.riverwalk;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,16 +15,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-
-import java.io.File;
-import java.util.ArrayList;
-
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.API.TargetType;
 import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
@@ -97,7 +96,7 @@ public class SharePicture extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent iproject = new Intent(getApplicationContext(),
-						Setup.class);
+						ProjectManager.class);
 				iproject.putExtra("constrictFields", true);
 				iproject.putExtra("app_name", "Pictures");
 				iproject.putExtra("showOKCancel", true);
@@ -189,7 +188,7 @@ public class SharePicture extends Activity {
                     } else {
                         validPicture = true;
                     }
-                    
+
                     if (validPicture) {
                         info = api.uploadMedia(project, imageFiles.get(i), TargetType.PROJECT);
                     } else {
@@ -198,7 +197,8 @@ public class SharePicture extends Activity {
                     }
 
                     runOnUiThread(new Runnable() {
-                        public void run() {
+                        @Override
+						public void run() {
                             if (info.mediaId == -1) {
                                 w.make(info.errorMessage,
                                         Waffle.LENGTH_LONG, Waffle.IMAGE_X);
@@ -243,13 +243,13 @@ public class SharePicture extends Activity {
                 Log.e("test", "Here");
                 for (int i = 0; i < imageUris.size(); i++) {
                     boolean validPicture;
-                    
+
                     if (imageFiles.get(i) == null) {
                         validPicture = false;
                     } else {
                         validPicture = true;
                     }
-                    
+
                     if (validPicture) {
                         info = api.uploadMedia(project, imageFiles.get(i), TargetType.PROJECT, key, "");
                     } else {
@@ -258,7 +258,8 @@ public class SharePicture extends Activity {
                     }
 
                     runOnUiThread(new Runnable() {
-                        public void run() {
+                        @Override
+						public void run() {
                             if (info.mediaId == -1) {
                                 w.make(info.errorMessage,
                                         Waffle.LENGTH_LONG, Waffle.IMAGE_X);
@@ -268,7 +269,7 @@ public class SharePicture extends Activity {
                             }
                         }
                     });
-                    
+
                 }
                 return null;
             }

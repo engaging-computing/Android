@@ -25,7 +25,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -44,7 +43,7 @@ import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.EnterName;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -54,13 +53,13 @@ public class PendulumTrackerActivity extends Activity implements
 		OnLongClickListener, CvCameraViewListener2 {
 
 	private static final String TAG = "PendulumTracker::Activity";
-	
+
 	private Waffle w;
 
 	public static UploadQueue uq;
 
 	Paint paint;
-	
+
 	private DataFieldManager dfm;
 
 	public static Context mContext;
@@ -68,10 +67,10 @@ public class PendulumTrackerActivity extends Activity implements
 	// iSENSE member variables
 	// use development site
 	Boolean useDevSite = false;
-	
+
 	// iSENSE uploader
 	API api;
-	
+
 	private TextView initInstr;
 
 	// create session name based upon first name and last initial user enters
@@ -80,13 +79,13 @@ public class PendulumTrackerActivity extends Activity implements
 	private static final int ENTERNAME_REQUEST = 1098;
 	private static final int LOGIN_REQUESTED  = 2000;
 	private final int QUEUE_UPLOAD_REQUESTED = 2001;
-	
+
 	//Project fields pulled from project when user starts recording
-	
+
 	Boolean sessionNameEntered = false;
 
 //	private static String projId = "29"; // production = 29, dev = 39
-		
+
 //	private String dateString;
 
 	// upload progress dialogue
@@ -101,7 +100,7 @@ public class PendulumTrackerActivity extends Activity implements
 	private int mImgWidth = 0;
 //	private int mImgHeight = 0;
 
-	private boolean mIsColorSelected = false;
+	private final boolean mIsColorSelected = false;
 	private Mat mRgba;
 	private Scalar mBlobColorRgba;
 //	private Scalar mBlobColorHsv;
@@ -128,7 +127,7 @@ public class PendulumTrackerActivity extends Activity implements
 
 	Handler mHandler;
 
-	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+	private final BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 		@Override
 		public void onManagerConnected(int status) {
 			switch (status) {
@@ -163,19 +162,19 @@ public class PendulumTrackerActivity extends Activity implements
 
 		// set context (for starting new Intents,etc)
 		mContext = this;
-		
+
 		// iSENSE network connectivity stuff
 		api = API.getInstance();
 		api.useDev(false);
 //		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
 
 		w = new Waffle(mContext); //Waffle is our version of android toast (message that pops up on screen)
-		
+
 		// Create a new upload queue
 		uq = new UploadQueue("PendulumTrackerActivity", mContext, api);
 		uq.buildQueueFromFile();
 
-		
+
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		// set CBD activity content from xml layout file.
 		// all Views, e.g. JavaCameraView will be inflated (e.g. created)
@@ -193,7 +192,7 @@ public class PendulumTrackerActivity extends Activity implements
 		mOpenCvCameraView.setMaxFrameSize(320, 240);
 
 		initDfm();
-		
+
 
 		// TextView for instruction overlay
 		initInstr = (TextView) findViewById(R.id.instructions);
@@ -202,16 +201,16 @@ public class PendulumTrackerActivity extends Activity implements
 		// set start and stop icons for data collections
 		startIcon = getResources().getDrawable(R.drawable.start_icon);
 		stopIcon = getResources().getDrawable(R.drawable.stop_icon);
-		
+
 		//Loggin to api if info is saved in prefs
 		CredentialManager.login(mContext, api);
-		
+
 		//Pull fields from project that is selected
 //		pf = api.getProjectFields(Integer.parseInt(experimentNumber));
-	
+
 		// Event handler
 		mHandler = new Handler();
-		
+
 		// Create session with first name/last initial
 		if (PendulumTrackerActivity.mSessionCreated == false) {
 			if (firstName.length() == 0 || lastInitial.length() == 0) {
@@ -235,7 +234,7 @@ public class PendulumTrackerActivity extends Activity implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		if (uq != null)
 			uq.buildQueueFromFile();
 
@@ -246,12 +245,14 @@ public class PendulumTrackerActivity extends Activity implements
 		}
 	}
 
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		if (mOpenCvCameraView != null)
 			mOpenCvCameraView.disableView();
 	}
 
+	@Override
 	public void onCameraViewStarted(int width, int height) {
 
 		mImgWidth = width;
@@ -268,6 +269,7 @@ public class PendulumTrackerActivity extends Activity implements
 
 	}
 
+	@Override
 	public void onCameraViewStopped() {
 		mRgba.release();
 	}
@@ -278,6 +280,7 @@ public class PendulumTrackerActivity extends Activity implements
 	}
 
 	// invoked when camera frame delivered
+	@Override
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) { // processFrame(VideoCapture
 																// vc)
 		boolean useGrey = true; // debug = false;
@@ -310,7 +313,7 @@ public class PendulumTrackerActivity extends Activity implements
 
 				addStatusOverlay(mRgba);
 				// add data point to final data set
-				
+
 				Point[] params = {point};
 				new RecordPointsTask().execute(params);
 
@@ -366,16 +369,16 @@ public class PendulumTrackerActivity extends Activity implements
 		@Override
 		protected void onPreExecute() {
 		}
-		
+
 		@Override
 		protected String doInBackground(Point...params) {
 			Point point = params[0];
-			
+
 			// yScale, -xScale
 			if (point.x != 0 && point.y != 0) {
 				// shift x-axis so center vertical axis is set to x=0 in
 				// pendulum coordinates
-				final int shiftX = (int) mImgWidth / 2;
+				final int shiftX = mImgWidth / 2;
 				if (mDataCollectionEnabled ) {
 					addDataPoint(point.x - shiftX, point.y);
 				}
@@ -386,11 +389,11 @@ public class PendulumTrackerActivity extends Activity implements
 		@Override
 		protected void onPostExecute(String sdFileName) {
 
-			
+
 		}
 	}
-	
-	
+
+
 	@SuppressWarnings("unused")
 	private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
 		Mat pointMatRgba = new Mat();
@@ -456,7 +459,7 @@ public class PendulumTrackerActivity extends Activity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.layout.menu, menu);
-		
+
 		return true;
 	}
 
@@ -469,13 +472,13 @@ public class PendulumTrackerActivity extends Activity implements
 		// UPLOAD data
 		/*
 		 * case R.id.menu_upload:
-		 * 
+		 *
 		 * mDataCollectionEnabled = false;
-		 * 
+		 *
 		 * new LoginBeforeUploadTask().execute(); return true;
 		 */
 		// START experiment and data collection
-		case R.id.menu_start:			
+		case R.id.menu_start:
 			// Selected item becomes start/stop button (for onActivityResult())
 			startStopButton = item;
 
@@ -495,7 +498,7 @@ public class PendulumTrackerActivity extends Activity implements
 				// be sure to disable data collection before uploading data to
 				// iSENSE
 				 mDataSet = new JSONArray();
-				
+
 				mDataCollectionEnabled = true;
 
 				// set STOP button and text
@@ -509,31 +512,31 @@ public class PendulumTrackerActivity extends Activity implements
 				// set START button and text
 				item.setIcon(startIcon);
 				item.setTitle(R.string.startCollection);
-				
-				
+
+
 				if (mDataSet.length() > 0) {
 					Log.e("Start Stop button pressed", "About to try and add to queue");
 					//TODO queue dfm stuff
-//					new AddToQueueTask().execute();					
+//					new AddToQueueTask().execute();
 				} else {
 					w.make("You must first START data collection to upload data.",
 							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 				}
-				
+
 			}
-			
+
 			return true;
-			
+
 		case R.id.menu_upload:
 		//Show upload queue
 		manageUploadQueue();
-		
+
 		return true;
 		case R.id.menu_login:
 			startActivityForResult(new Intent(getApplicationContext(),
 					CredentialManager.class), LOGIN_REQUESTED);
-			return true;	
-			
+			return true;
+
 		case R.id.menu_exit:
 
 			// Exit app neatly
@@ -553,6 +556,7 @@ public class PendulumTrackerActivity extends Activity implements
 					.setPositiveButton("OK",
 							new DialogInterface.OnClickListener() {
 								// @Override
+								@Override
 								public void onClick(DialogInterface dialog,
 										int id) {
 									// grab position of target and pass it along
@@ -573,6 +577,7 @@ public class PendulumTrackerActivity extends Activity implements
 	}
 
 	// do these things after an Activity is finished
+	@Override
 	public void onActivityResult(int reqCode, int resultCode, Intent data) {
 
 		super.onActivityResult(reqCode, resultCode, data);
@@ -592,7 +597,7 @@ public class PendulumTrackerActivity extends Activity implements
 		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
 			uq.buildQueueFromFile();
 		} else if (reqCode == LOGIN_REQUESTED) {
-		
+
 		} else {
 			if (resultCode == RESULT_OK) {
 				//TODO Queue DFM stuff
@@ -616,23 +621,23 @@ public class PendulumTrackerActivity extends Activity implements
 
 		JSONArray dataPoint = new JSONArray();
 		// Calendar c = Calendar.getInstance();
-		long currentTime = (long) System.currentTimeMillis(); // (c.getTimeInMillis()
+		long currentTime = System.currentTimeMillis(); // (c.getTimeInMillis()
 																// /*-
 																// 14400000*/);
-		
+
 			/* Convert floating point to String to send data via HTML */
 			try {
 				/* Time */dataPoint.put("u " + currentTime);
 				/* Posn-x */dataPoint.put(x);
 				/* Posn-y */dataPoint.put(y);
-				
+
 				//TODO Hardcoding fields is bad. This app needs to use dfm
-				
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		
-		
+
+
 		mDataSet.put(dataPoint);
 
 		Log.i(TAG, "--------------- ADDING DATA POINT ---------------");
@@ -649,22 +654,22 @@ public class PendulumTrackerActivity extends Activity implements
 //						SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
 //						Date dt = new Date();
 //						dateString = sdf.format(dt);
-//						
+//
 //						final SharedPreferences mPrefs = getSharedPreferences(
 //										EnterName.PREFERENCES_KEY_USER_INFO,
 //										Context.MODE_PRIVATE);
-//					
-//						String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "") 
+//
+//						String nameOfSession = mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME, "")
 //												+ mPrefs.getString(EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL, "")
 //												+ " - " + dateString;
-//			
+//
 //						// Create name from time stamp
 //						String name = "Test Name";//dataName;
-//						
+//
 //						Log.e("DATASET", mDataSet.toString());
-//						
+//
 //						Date date = new Date();
-//						
+//
 //						// Saves data to queue for later upload
 //						QDataSet ds = new QDataSet(nameOfSession, "Pendulum Tracker",QDataSet.Type.DATA,
 //								mDataSet.toString(), null, experimentNumber, null);
@@ -676,8 +681,8 @@ public class PendulumTrackerActivity extends Activity implements
 //
 //				};
 
-				
-	
+
+
 	/**
 	 * Prompts the user to upload the rest of their content
 	 * upon successful upload of data.
@@ -691,20 +696,20 @@ public class PendulumTrackerActivity extends Activity implements
 			w.make("No data to upload!", Waffle.IMAGE_X);
 		}
 	}
-	
+
 	/**
 	 * Initialize DataFieldManager Object
 	 */
 		private void initDfm() {
-			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
+
+			String projectInput = ProjectManager.getProject(mContext);
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, mContext);
 			dfm.enableAllSensorFields();
 		}
-	
+
 //	/**
 //	 * Uploads data to iSENSE or something.
-//	 * 
+//	 *
 //	 * @author jpoulin
 //	 */
 //	private class AddToQueueTask extends AsyncTask<String, Void, String> {
@@ -721,7 +726,7 @@ public class PendulumTrackerActivity extends Activity implements
 //			dia.show();
 //
 //		}
-//		
+//
 //		@Override
 //		protected String doInBackground(String... strings) {
 //			uploader.run();
@@ -733,11 +738,11 @@ public class PendulumTrackerActivity extends Activity implements
 //
 //			dia.setMessage("Done");
 //			dia.dismiss();
-//			
+//
 //			w.make("Data Saved to Queue", Waffle.LENGTH_SHORT,
 //					Waffle.IMAGE_CHECK);
 //			manageUploadQueue();
-//			
+//
 //		}
 //	}
 }

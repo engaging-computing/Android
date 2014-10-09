@@ -24,7 +24,7 @@ import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.dfm.FieldMatching;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
@@ -507,7 +507,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 				case QueueAlter.SELECT_PROJECT:
 
 					if (Connection.hasConnectivity(mContext)) {
-						Intent iProj = new Intent(mContext, Setup.class);
+						Intent iProj = new Intent(mContext, ProjectManager.class);
 						iProj.putExtra("from_where", "queue");
 						startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 					} else
@@ -604,11 +604,11 @@ public class QueueLayout extends Activity implements OnClickListener {
 		} else if (requestCode == FIELD_MATCHING_REQUESTED) {
 			if (resultCode == RESULT_OK) {
 				if (FieldMatching.acceptedFields.isEmpty()) {
-					Intent iProj = new Intent(mContext, Setup.class);
+					Intent iProj = new Intent(mContext, ProjectManager.class);
 					iProj.putExtra("from_where", "queue");
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else if (!FieldMatching.compatible) {
-					Intent iProj = new Intent(mContext, Setup.class);
+					Intent iProj = new Intent(mContext, ProjectManager.class);
 					iProj.putExtra("from_where", "queue");
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else {
@@ -633,7 +633,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 				}
 			} else if (resultCode == RESULT_CANCELED) {
-				Intent iProj = new Intent(mContext, Setup.class);
+				Intent iProj = new Intent(mContext, ProjectManager.class);
 				iProj.putExtra("from_where", "queue");
 				startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 			}

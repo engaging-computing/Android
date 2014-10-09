@@ -22,7 +22,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
 
@@ -80,7 +80,7 @@ public class RecordingService extends Service {
 
             Notification.Builder builder = new Notification.Builder(getApplicationContext());
             builder.setContentIntent(pendingIntent);
-            builder.setContentTitle("iSense DataWalk");
+            builder.setContentTitle("iSENSE Motion");
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
             builder.setSmallIcon(R.drawable.ic_launcher);
@@ -102,9 +102,7 @@ public class RecordingService extends Service {
 	 */
 		private void initDfm() {
 			API api = API.getInstance();
-
-			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
-			String projectInput = mPrefs.getString(Setup.PROJECT_ID, "-1");
+			String projectInput = ProjectManager.getProject(this);
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api, Motion.mContext);
 			dfm.enableAllSensorFields();
 		}

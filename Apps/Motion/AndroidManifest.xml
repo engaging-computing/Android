@@ -28,7 +28,8 @@
         <activity
             android:name="edu.uml.cs.isense.motion.Motion"
             android:label="@string/display_name"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/AppTheme" 
+            android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

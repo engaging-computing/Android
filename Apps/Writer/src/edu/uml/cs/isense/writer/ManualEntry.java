@@ -67,6 +67,8 @@ public class ManualEntry extends Activity implements LocationListener {
 	public static final int PROJECT_REQUESTED = 6009;
 	public static final int QUEUE_UPLOAD_REQUESTED = 7021;
 
+	private static final String DEFAULT_PROJ = "514";
+
 	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -442,8 +444,8 @@ public class ManualEntry extends Activity implements LocationListener {
 			int projectID = Integer.parseInt(ProjectManager.getProject(mContext));
 
 			if (projectID == -1) {
-				projectID = 514;
-				ProjectManager.setProject(mContext, "514");
+				projectID = Integer.valueOf(DEFAULT_PROJ);
+				ProjectManager.setProject(mContext, DEFAULT_PROJ);
 			}
 
 			try {

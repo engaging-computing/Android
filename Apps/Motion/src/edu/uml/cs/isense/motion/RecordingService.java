@@ -80,7 +80,7 @@ public class RecordingService extends Service {
 
             Notification.Builder builder = new Notification.Builder(getApplicationContext());
             builder.setContentIntent(pendingIntent);
-            builder.setContentTitle("iSense Motion");
+            builder.setContentTitle("iSENSE Motion");
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
             builder.setSmallIcon(R.drawable.ic_launcher);

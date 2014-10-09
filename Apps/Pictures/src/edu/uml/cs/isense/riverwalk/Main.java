@@ -72,6 +72,9 @@ public class Main extends Activity implements LocationListener {
 	private static final int DESCRIPTION_REQUESTED = 106;
 	private static final int SELECT_PICTURE_REQUESTED = 107;
 
+	private final String DEFAULT_PROJ_DEV = "248";
+	private final String DEFAULT_PROJ_LIVE = "259";
+
 	private MediaPlayer mMediaPlayer;
 
 	public static boolean continuous = false;
@@ -330,9 +333,9 @@ public class Main extends Activity implements LocationListener {
 	private void setDefaultProject(){
 		/*if no project set or using a default project set the correct default project based on live or dev mode*/
 	     if (api.isUsingDevMode() == true){
-	     	ProjectManager.setProject(mContext, "248");
+	     	ProjectManager.setProject(mContext, DEFAULT_PROJ_DEV);
 	     } else if (api.isUsingDevMode() == false) {
-		     ProjectManager.setProject(mContext, "259");
+		     ProjectManager.setProject(mContext, DEFAULT_PROJ_LIVE);
 	     }
 
 		projectLabel = (TextView) findViewById(R.id.projectLabel);

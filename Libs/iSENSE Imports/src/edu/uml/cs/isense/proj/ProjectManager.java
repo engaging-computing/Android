@@ -75,6 +75,8 @@ public class ProjectManager extends Activity implements OnClickListener {
 	private static final int NEW_PROJ_REQUESTED = 104;
 	private static final int LOGIN_STATUS_REQUESTED = 105;
 
+	private static final String DEFAULT_NO_PROJ = "-1";
+
 	public static String APPNAME;
 
 	private boolean showOKCancel = true;
@@ -153,7 +155,7 @@ public class ProjectManager extends Activity implements OnClickListener {
 		SharedPreferences mPrefs = new ObscuredSharedPreferences(
 				appContext, appContext.getSharedPreferences(ProjectManager.PROJ_PREFS_ID,
 						MODE_PRIVATE));
-		String projID = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, "-1");
+		String projID = mPrefs.getString(ProjectManager.PROJECT_ID_KEY, DEFAULT_NO_PROJ);
 
 		return projID;
 	}

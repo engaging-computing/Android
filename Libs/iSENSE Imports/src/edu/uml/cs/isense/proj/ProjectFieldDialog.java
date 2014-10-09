@@ -2,31 +2,35 @@ package edu.uml.cs.isense.proj;
 
 import java.util.ArrayList;
 
-import edu.uml.cs.isense.R;
-import edu.uml.cs.isense.objects.RProjectField;
 import android.app.Activity;
-import android.content.Intent;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import edu.uml.cs.isense.R;
+import edu.uml.cs.isense.comm.API;
+import edu.uml.cs.isense.objects.RProjectField;
+import edu.uml.cs.isense.supplements.OrientationManager;
 
 /**
  * Dialog that displays allowing the implementor to name a custom project
  * created with the fields designated by the "Constrict Fields" extra
- * passed to the {@link edu.uml.cs.isense.proj.Setup Setup} class.
- * 
+ * passed to the {@link edu.uml.cs.isense.proj.ProjectManager Setup} class.
+ *
  * @author iSENSE Android Development Team
- * 
+ *
  */
 public class ProjectFieldDialog extends Activity {
-	
+
 	private EditText nameInput;
 	private Button ok,cancel, selectAll;
 	private boolean allchecked = false;
-	
-	
+
+
 	private CheckBox timestamp;
 	private CheckBox acceleration;
 	private CheckBox magnetic;
@@ -39,18 +43,25 @@ public class ProjectFieldDialog extends Activity {
 	private CheckBox heading;
 	private CheckBox temp;
 	private CheckBox light;
+	private ProgressDialog dia;
 
+	private Context mContext;
+	private API api;
 
-	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.project_fields_checklist);
-		
+
+		mContext = this;
+
+		api = API.getInstance();
+
 		nameInput = (EditText) findViewById(R.id.new_proj_name);
 		ok = (Button) findViewById(R.id.okB);
 		cancel = (Button) findViewById(R.id.clB);
 		selectAll = (Button) findViewById(R.id.select_deselect_all);
-		
+
 		timestamp = (CheckBox) findViewById(R.id.cbTimestamp);
 		acceleration = (CheckBox) findViewById(R.id.cbAcceleration);
 		magnetic = (CheckBox) findViewById(R.id.cbMagnetic);
@@ -63,17 +74,18 @@ public class ProjectFieldDialog extends Activity {
 		heading = (CheckBox) findViewById(R.id.cbHeading);
 		temp = (CheckBox) findViewById(R.id.cbTemp);
 		light = (CheckBox) findViewById(R.id.cbLuminuous);
-		
-		
+
+
 		ok.setOnClickListener(new View.OnClickListener() {
-			
+
+			@Override
 			public void onClick(View v) {
 				String name = nameInput.getText().toString();
 				if (name.equals("")){
 					nameInput.setError("Project Name Cannot Be Empty");
 				} else {
 					ArrayList<RProjectField> fields = new ArrayList<RProjectField>();
-					
+
 					if (timestamp.isChecked()) {
 						RProjectField time = new RProjectField();
 						time.name = "Timestamp";
@@ -86,28 +98,28 @@ public class ProjectFieldDialog extends Activity {
 						accelx.type = RProjectField.TYPE_NUMBER;
 						accelx.unit = "m/s^2";
 						fields.add(accelx);
-						
+
 						RProjectField accely = new RProjectField();
 						accely.name = "Accel-y";
 						accely.type = RProjectField.TYPE_NUMBER;
 						accely.unit = "m/s^2";
 						fields.add(accely);
 
-						
+
 						RProjectField accelz = new RProjectField();
 						accelz.name = "Accel-z";
 						accelz.type = RProjectField.TYPE_NUMBER;
 						accelz.unit = "m/s^2";
 						fields.add(accelz);
 
-						
+
 						RProjectField accelmag = new RProjectField();
 						accelmag.name = "Accel-magnitude";
 						accelmag.type = RProjectField.TYPE_NUMBER;
 						accelmag.unit = "m/s^2";
 						fields.add(accelmag);
 
-						
+
 					}
 					if (magnetic.isChecked()) {
 						RProjectField magx = new RProjectField();
@@ -116,27 +128,27 @@ public class ProjectFieldDialog extends Activity {
 						magx.unit = "μT";
 						fields.add(magx);
 
-						
+
 						RProjectField magy = new RProjectField();
 						magy.name = "Magnetic-y";
 						magy.type = RProjectField.TYPE_NUMBER;
 						magy.unit = "μT";
 						fields.add(magy);
 
-						
+
 						RProjectField magz = new RProjectField();
 						magz.name = "Magnetic-z";
 						magz.type = RProjectField.TYPE_NUMBER;
 						magz.unit = "μT";
 						fields.add(magz);
 
-						
+
 						RProjectField magmag = new RProjectField();
 						magmag.name = "Magnetic-magnitude";
 						magmag.type = RProjectField.TYPE_NUMBER;
 						magmag.unit = "μT";
 						fields.add(magmag);
-						
+
 					}
 					if (location.isChecked()) {
 						RProjectField lat = new RProjectField();
@@ -145,7 +157,7 @@ public class ProjectFieldDialog extends Activity {
 						lat.unit = "Degrees";
 						fields.add(lat);
 
-						
+
 						RProjectField lon = new RProjectField();
 						lon.name = "Longitude";
 						lon.type = RProjectField.TYPE_LON;
@@ -200,7 +212,7 @@ public class ProjectFieldDialog extends Activity {
 						headingdeg.unit = "Deg";
 						fields.add(headingdeg);
 
-						
+
 						RProjectField headingrad = new RProjectField();
 						headingrad.name = "Heading Radians";
 						headingrad.type = RProjectField.TYPE_NUMBER;
@@ -215,14 +227,14 @@ public class ProjectFieldDialog extends Activity {
 						tempf.unit = "Fahrenheit";
 						fields.add(tempf);
 
-						
+
 						RProjectField tempc = new RProjectField();
 						tempc.name = "Temperature C";
 						tempc.type = RProjectField.TYPE_NUMBER;
 						tempc.unit = "Celsius";
 						fields.add(tempc);
 
-						
+
 						RProjectField tempk = new RProjectField();
 						tempk.name = "Temperature K";
 						tempk.type = RProjectField.TYPE_NUMBER;
@@ -238,28 +250,24 @@ public class ProjectFieldDialog extends Activity {
 						fields.add(l);
 
 					}
-					
-					
-					
+
 					nameInput.setError(null);
-					Intent data = new Intent();
-					data.putExtra("fields", fields);
-					data.putExtra("new_proj_name", name);
-					setResult(RESULT_OK, data);
-					finish();
+
+					new CreateProjectTask().execute(name, fields);
 				}
-				
+
 			}
 		});
-		
+
 		cancel.setOnClickListener(new View.OnClickListener() {
-			
+
+			@Override
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);
 				finish();
 			}
 		});
-		
+
 		selectAll.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -296,8 +304,47 @@ public class ProjectFieldDialog extends Activity {
 					light.setChecked(true);
 				}
 			}
-			
+
 		});
 	}
 
+	public class CreateProjectTask extends AsyncTask<Object, Void, Integer> {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			OrientationManager.disableRotation(ProjectFieldDialog.this);
+
+			dia = new ProgressDialog(ProjectFieldDialog.this);
+			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			dia.setMessage("Creating your new project...");
+			dia.setCancelable(false);
+			dia.show();
+		}
+		@Override
+		protected void onPostExecute(Integer projNum) {
+			super.onPostExecute(projNum);
+			if (dia != null)
+				dia.cancel();
+			OrientationManager.enableRotation(ProjectFieldDialog.this);
+
+			setResult(Activity.RESULT_OK);
+			finish();
+		}
+
+		@Override
+		protected Integer doInBackground(Object... params) {
+			String projName = (String) params[0];
+
+			// Make sure there are RProjectFields
+			if (params[1] instanceof ArrayList<?>) {
+				@SuppressWarnings("unchecked")
+				ArrayList<RProjectField> fields = (ArrayList<RProjectField>) params[1];
+				int projID = api.createProject(projName, fields);
+				ProjectManager.setProject(mContext, String.valueOf(projID));
+				return projID;
+			} else {
+				return -1;
+			}
+		}
+	}
 }

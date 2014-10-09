@@ -48,7 +48,7 @@
             android:launchMode="singleTop"
             android:theme="@style/AppThemeDialog"/>
     	<activity
-            android:name="edu.uml.cs.isense.proj.Setup"
+            android:name="edu.uml.cs.isense.proj.ProjectManager"
             android:label="Choose Project"
             android:theme="@style/AppThemeDialog"/>
         <activity

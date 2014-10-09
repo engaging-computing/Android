@@ -125,7 +125,7 @@
             android:label="No QR Code Scanner Found"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name="edu.uml.cs.isense.proj.Setup"
+            android:name="edu.uml.cs.isense.proj.ProjectManager"
             android:label="Select a Project"
             android:theme="@style/AppThemeDialog" />
         <activity

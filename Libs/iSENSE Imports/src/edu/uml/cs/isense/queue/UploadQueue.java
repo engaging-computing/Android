@@ -324,8 +324,7 @@ public class UploadQueue implements Serializable {
 	 * 			  - If data is already in the correct order and just needs to be given field IDs
 	 */
 	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields, Boolean dataAlreadyInOrder) {
-		name += appendedTimeStamp();
-		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields, dataAlreadyInOrder);
+		ds = new QDataSet(name + appendedTimeStamp(), description, type, dataSet.toString(), picture, projID, fields, dataAlreadyInOrder);
 
 		//Add data to Queue to be uploaded
 		new AddToQueueTask().execute();
@@ -342,7 +341,7 @@ public class UploadQueue implements Serializable {
 				"MM/dd/yy, HH:mm:ss.SSS", Locale.US);
 		Calendar cal = Calendar.getInstance();
 
-		return " - " + dateFormat.format(cal.getTime());
+		return " " + dateFormat.format(cal.getTime());
 	}
 
 	/**

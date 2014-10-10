@@ -63,7 +63,7 @@ import edu.uml.cs.isense.waffle.Waffle;
 
 //import android.app.ProgressDialog;
 
-public class Main extends Activity implements LocationListener {
+public class Pictures extends Activity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
@@ -123,6 +123,8 @@ public class Main extends Activity implements LocationListener {
 	private static Camera mCamera;
 	private CameraPreview mPreview;
 	private FrameLayout preview;
+	
+	private final String queueDescription = "Picture and Data";
 
     Boolean validPicture = false;
 
@@ -229,7 +231,7 @@ public class Main extends Activity implements LocationListener {
 								Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 					}
 
-					OrientationManager.enableRotation(Main.this);
+					OrientationManager.enableRotation(Pictures.this);
 
 					// Continuously take pictures
 				} else if (continuous == true) {
@@ -269,9 +271,9 @@ public class Main extends Activity implements LocationListener {
 
 						// Stop continuously taking pictures
 					} else {
-						Main.takePicture.setText(R.string.takePicContinuous);
-						Main.takePicture.setTextColor(0xFF0066FF);
-						Main.takePicture.setBackgroundResource(R.drawable.button_rsense);
+						Pictures.takePicture.setText(R.string.takePicContinuous);
+						Pictures.takePicture.setTextColor(0xFF0066FF);
+						Pictures.takePicture.setBackgroundResource(R.drawable.button_rsense);
 						recording = false;
 					}
 				}
@@ -351,7 +353,7 @@ public class Main extends Activity implements LocationListener {
 		protected void onPreExecute() {
 			super.onPreExecute();
 
-			OrientationManager.disableRotation(Main.this);
+			OrientationManager.disableRotation(Pictures.this);
 		}
 
 		@Override
@@ -421,14 +423,13 @@ public class Main extends Activity implements LocationListener {
         				dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
         			}
 
-        			String description = DateFormat.getDateTimeInstance().format(new Date());
 
         			JSONArray dataPoint = dfm.recordDataPoint();
         			JSONArray dataSet = new JSONArray();
         			dataSet.put(dataPoint);
 
         			//add image and data to upload queue
-    				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
+    				uq.addToQueue(dataSetName, queueDescription, Type.BOTH, dataSet, picture, projId, null, false);
                 	uq.buildQueueFromFile();
 
                         runOnUiThread(new Runnable() {
@@ -462,11 +463,11 @@ public class Main extends Activity implements LocationListener {
 			if (android.os.Build.VERSION.SDK_INT >= 11)
 				invalidateOptionsMenu();
 
-			Main.takePicture.setText(R.string.takePicContinuous);
-			Main.takePicture.setTextColor(0xFF0066FF);
-			Main.takePicture.setBackgroundResource(R.drawable.button_rsense);
+			Pictures.takePicture.setText(R.string.takePicContinuous);
+			Pictures.takePicture.setTextColor(0xFF0066FF);
+			Pictures.takePicture.setBackgroundResource(R.drawable.button_rsense);
 
-			OrientationManager.enableRotation(Main.this);
+			OrientationManager.enableRotation(Pictures.this);
 			preview.removeView(mPreview);
 			preview.setVisibility(View.GONE);
 
@@ -478,7 +479,7 @@ public class Main extends Activity implements LocationListener {
 			mCamera.release();
 			mCamera = null;
 
-			OrientationManager.enableRotation(Main.this);
+			OrientationManager.enableRotation(Pictures.this);
 		}
 	}
 
@@ -829,7 +830,7 @@ public class Main extends Activity implements LocationListener {
 			if (resultCode == RESULT_OK) {
 				picture = convertImageUriToFile(imageUri, mContext);
 
-				Intent iDesc = new Intent(Main.this, Description.class);
+				Intent iDesc = new Intent(Pictures.this, Description.class);
 				startActivityForResult(iDesc, DESCRIPTION_REQUESTED);
 
 			}
@@ -873,10 +874,9 @@ public class Main extends Activity implements LocationListener {
 			String projId = ProjectManager.getProject(mContext);
 
 			String dataSetName = name.getText().toString() + " " + Description.photo_description;
-			String description = DateFormat.getDateTimeInstance().format(new Date());
 
 			//add image and data to upload queue
-			uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
+			uq.addToQueue(dataSetName, queueDescription, Type.BOTH, dataSet, picture, projId, null, false);
 
 		} else if (requestCode == SELECT_PICTURE_REQUESTED) {
 			if (resultCode == Activity.RESULT_OK) {
@@ -896,11 +896,9 @@ public class Main extends Activity implements LocationListener {
     			/* add picture and data to queue */
     			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
     			String dataSetName = name.getText().toString();
-    			String description = currentDateTimeString;
-
 
     			//add image and data to upload queue
-				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
+				uq.addToQueue(dataSetName, queueDescription, Type.BOTH, dataSet, picture, projId, null, false);
 
 			}
 		}
@@ -937,9 +935,9 @@ public class Main extends Activity implements LocationListener {
 						.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 
 			mLocationManager.requestLocationUpdates(
-					mLocationManager.getBestProvider(c, true), 0, 0, Main.this);
+					mLocationManager.getBestProvider(c, true), 0, 0, Pictures.this);
 			mRoughLocManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 0, 0, Main.this);
+					LocationManager.NETWORK_PROVIDER, 0, 0, Pictures.this);
 
 		} else {
 			if (showGpsDialog) {
@@ -957,10 +955,10 @@ public class Main extends Activity implements LocationListener {
 		super.onStop();
 
 		if (mLocationManager != null)
-			mLocationManager.removeUpdates(Main.this);
+			mLocationManager.removeUpdates(Pictures.this);
 
 		if (mRoughLocManager != null)
-			mRoughLocManager.removeUpdates(Main.this);
+			mRoughLocManager.removeUpdates(Pictures.this);
 
 		if (mTimer != null)
 			mTimer.cancel();

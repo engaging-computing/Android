@@ -174,7 +174,7 @@ public class SharePicture extends Activity {
 				 dia.show();
 
 				for(int i = 0; i < imageUris.size(); i++) {
-					imageFiles.add(Main.convertImageUriToFile(imageUris.get(i), mContext));
+					imageFiles.add(Pictures.convertImageUriToFile(imageUris.get(i), mContext));
 				}
 
 			}
@@ -234,7 +234,7 @@ public class SharePicture extends Activity {
 				 dia.show();
 
 				for(int i = 0; i < imageUris.size(); i++) {
-					imageFiles.add(Main.convertImageUriToFile(imageUris.get(i), mContext));
+					imageFiles.add(Pictures.convertImageUriToFile(imageUris.get(i), mContext));
 				}
 			}
 

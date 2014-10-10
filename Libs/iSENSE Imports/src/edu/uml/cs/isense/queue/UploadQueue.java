@@ -9,7 +9,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 
 import org.json.JSONArray;
@@ -321,10 +324,25 @@ public class UploadQueue implements Serializable {
 	 * 			  - If data is already in the correct order and just needs to be given field IDs
 	 */
 	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields, Boolean dataAlreadyInOrder) {
+		name += appendedTimeStamp();
 		ds = new QDataSet(name, description, type, dataSet.toString(), picture, projID, fields, dataAlreadyInOrder);
 
 		//Add data to Queue to be uploaded
 		new AddToQueueTask().execute();
+	}
+
+	/**
+	 * Creates a unique date and timestamp used to append to data sets uploaded
+	 * to the iSENSE website to ensure every data set has a unique identifier.
+	 *
+	 * @return A pretty formatted date and timestamp
+	 */
+	private String appendedTimeStamp() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat(
+				"MM/dd/yy, HH:mm:ss.SSS", Locale.US);
+		Calendar cal = Calendar.getInstance();
+
+		return " - " + dateFormat.format(cal.getTime());
 	}
 
 	/**

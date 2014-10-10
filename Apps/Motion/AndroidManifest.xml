@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="edu.uml.cs.isense.motion"
-    android:versionCode="1"
+    android:versionCode="2"
     android:versionName="1.0">
 
     <uses-sdk
@@ -76,7 +76,7 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueLayout"
             android:label="Upload Data"
-            android:theme="@style/AppThemeQueue"
+            android:theme="@style/AppTheme"
             tools:ignore="MissingRegistered" />
         <activity
             android:name="edu.uml.cs.isense.queue.QueueAlter"

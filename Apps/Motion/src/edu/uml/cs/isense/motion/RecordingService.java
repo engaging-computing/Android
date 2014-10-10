@@ -1,6 +1,5 @@
 package edu.uml.cs.isense.motion;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -195,8 +194,7 @@ public class RecordingService extends Service {
 
             // Create the name of the session using the entered name
             dataSetName = Motion.firstName + " " + Motion.lastInitial;
-			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-			String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + dataSet.length();
+			String description = "Number of Data Points: " + dataSet.length();
 			Type type = Type.DATA;
 
 			//add new dataset to queue

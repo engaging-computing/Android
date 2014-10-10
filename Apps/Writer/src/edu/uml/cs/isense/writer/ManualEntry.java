@@ -1,6 +1,5 @@
 package edu.uml.cs.isense.writer;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -133,8 +132,7 @@ public class ManualEntry extends Activity implements LocationListener {
 						JSONArray uploadData = getDataFromScreen();
 
 						String dataSetName = datasetName.getText().toString();
-						String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-						String description = "Time: " + currentDateTimeString + "\n" + "Number of Data Points: " + uploadData.length();
+						String description = "Number of Data Points: " + uploadData.length();
 						Type type = Type.DATA;
 
 						int projectID = Integer.parseInt(ProjectManager.getProject(mContext));

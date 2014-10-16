@@ -83,7 +83,7 @@ public class RecordingService extends Service {
             builder.setContentTitle("iSENSE Motion");
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
-            builder.setSmallIcon(R.drawable.ic_launcher);
+            builder.setSmallIcon(R.drawable.isense_graph);
             builder.setContentIntent(pendingIntent);
             builder.setOngoing(true);
             builder.setPriority(0);

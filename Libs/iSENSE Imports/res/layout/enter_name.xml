@@ -55,7 +55,7 @@
         android:layout_alignLeft="@id/edittext_name"
         android:layout_below="@id/edittext_name"
         android:inputType="textCapCharacters|textNoSuggestions"
-        android:digits="@string/digits_restriction_no_space"
+        android:digits="@string/digits_restriction"
         android:enabled="false"
         android:imeOptions="actionDone"
         android:maxLength="1"

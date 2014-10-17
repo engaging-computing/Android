@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -131,8 +132,7 @@ public class ProjectManager extends Activity implements OnClickListener {
 			if(!showSelectLater)
 				selectLaterLayout.setVisibility(View.GONE);
 
-			//TODO remove shared prefs
-			projectID = getProject(this);
+			projectID = getProject(mContext);
 
 			projInput = (EditText) findViewById(R.id.projectInput);
 			if (projectID.equals("-1")) {
@@ -257,7 +257,11 @@ public class ProjectManager extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == PROJECT_CODE) {
 			if (resultCode == Activity.RESULT_OK) {
-				String projID = getProject(this);
+				String projID = getProject(mContext);
+				Log.e("Project is - ", projID);
+				if (projInput == null) {
+					Log.e("Project label - ", "null");
+				}
 				projInput.setText(projID);
 
 			}
@@ -270,14 +274,14 @@ public class ProjectManager extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == NAME_FOR_NEW_PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				String projID = getProject(this);
+				String projID = getProject(mContext);
 				projInput.setText(projID);
 			}
 		} else if (requestCode == NEW_PROJ_REQUESTED) {
 			if (resultCode == RESULT_OK) {
 				if (data.hasExtra(ProjectCreate.NEW_PROJECT_ID)) {
 					//TODO remove s
-					String projID = getProject(this);
+					String projID = getProject(mContext);
 					projInput.setText(projID);
 				}
 			} else {

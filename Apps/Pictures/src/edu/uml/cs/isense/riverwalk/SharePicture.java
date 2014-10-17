@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.pictures;
+package edu.uml.cs.isense.riverwalk;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import edu.uml.cs.isense.comm.API.TargetType;
 import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
-import edu.uml.cs.isense.pictures.R;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.waffle.Waffle;
 

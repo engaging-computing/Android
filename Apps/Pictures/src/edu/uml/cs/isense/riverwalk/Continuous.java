@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.pictures;
+package edu.uml.cs.isense.riverwalk;
 
 
 

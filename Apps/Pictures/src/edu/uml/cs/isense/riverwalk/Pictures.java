@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.pictures;
+package edu.uml.cs.isense.riverwalk;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,15 +50,15 @@ import android.widget.TextView;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.pictures.dialogs.About;
-import edu.uml.cs.isense.pictures.dialogs.CameraPreview;
-import edu.uml.cs.isense.pictures.dialogs.Description;
-import edu.uml.cs.isense.pictures.dialogs.Help;
-import edu.uml.cs.isense.pictures.dialogs.NoGps;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
+import edu.uml.cs.isense.riverwalk.dialogs.About;
+import edu.uml.cs.isense.riverwalk.dialogs.CameraPreview;
+import edu.uml.cs.isense.riverwalk.dialogs.Description;
+import edu.uml.cs.isense.riverwalk.dialogs.Help;
+import edu.uml.cs.isense.riverwalk.dialogs.NoGps;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
@@ -626,8 +626,9 @@ public class Pictures extends Activity implements LocationListener {
 			return true;
 
 		case R.id.MENU_ITEM_BROWSE:
-			Intent iproject = new Intent(getApplicationContext(),
+			Intent iproject = new Intent(mContext,
 					ProjectManager.class);
+			iproject.putExtra("constrictFields", false);
 			startActivityForResult(iproject, PROJECT_REQUESTED);
 			return true;
 

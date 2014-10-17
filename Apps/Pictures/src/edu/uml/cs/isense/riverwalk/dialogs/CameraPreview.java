@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.pictures.dialogs;
+package edu.uml.cs.isense.riverwalk.dialogs;
 
 import java.io.IOException;
 

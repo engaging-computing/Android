@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
-import edu.uml.cs.isense.riverwalk.R;
+import edu.uml.cs.isense.pictures.R;
 
 public class ReadyUpload extends Activity {
 	

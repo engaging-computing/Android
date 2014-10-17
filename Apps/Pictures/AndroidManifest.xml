@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.uml.cs.isense.riverwalk"
+    package="edu.uml.cs.isense.pictures"
     android:versionCode="12"
     android:versionName="2.2.4">
 
@@ -35,7 +35,7 @@
         <uses-library android:name="android.test.runner" />
         
         <activity
-            android:name="edu.uml.cs.isense.pictures.Main"
+            android:name="edu.uml.cs.isense.pictures.Pictures"
             android:label="@string/app_name"
             android:theme="@style/AppTheme" >
             <intent-filter>
@@ -62,12 +62,12 @@
         </activity>
         
         <activity
-            android:name="edu.uml.cs.isense.pictures.About"
+            android:name="edu.uml.cs.isense.pictures.dialogs.About"
             android:label="About"
             android:theme="@style/AppTheme" />
             
         <activity
-            android:name="edu.uml.cs.isense.pictures.Help"
+            android:name="edu.uml.cs.isense.pictures.dialogs.Help"
             android:label="Help"
             android:theme="@style/AppTheme" />
         <activity
@@ -87,7 +87,7 @@
             android:label="Describe Photo"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name="edu.uml.cs.isense.pictures.dialogs.Continuous"
+            android:name="edu.uml.cs.isense.pictures.Continuous"
             android:label="Continuous Photo Shooting"
             android:theme="@style/AppThemeDialog" />
 
@@ -95,7 +95,7 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueLayout"
             android:label="Upload Data"
-            android:theme="@style/AppThemeQueue" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name="edu.uml.cs.isense.queue.QueueAlter"
             android:label="Alter Data Set"

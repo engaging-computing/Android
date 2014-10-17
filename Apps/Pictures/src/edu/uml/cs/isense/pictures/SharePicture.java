@@ -20,8 +20,8 @@ import edu.uml.cs.isense.comm.API.TargetType;
 import edu.uml.cs.isense.comm.UploadInfo;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
+import edu.uml.cs.isense.pictures.R;
 import edu.uml.cs.isense.proj.ProjectManager;
-import edu.uml.cs.isense.riverwalk.R;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
@@ -175,7 +175,7 @@ public class SharePicture extends Activity {
 				 dia.show();
 
 				for(int i = 0; i < imageUris.size(); i++) {
-					imageFiles.add(Main.convertImageUriToFile(imageUris.get(i), mContext));
+					imageFiles.add(Pictures.convertImageUriToFile(imageUris.get(i), mContext));
 				}
 
 			}
@@ -235,7 +235,7 @@ public class SharePicture extends Activity {
 				 dia.show();
 
 				for(int i = 0; i < imageUris.size(); i++) {
-					imageFiles.add(Main.convertImageUriToFile(imageUris.get(i), mContext));
+					imageFiles.add(Pictures.convertImageUriToFile(imageUris.get(i), mContext));
 				}
 			}
 

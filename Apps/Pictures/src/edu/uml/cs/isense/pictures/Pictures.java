@@ -50,21 +50,21 @@ import android.widget.TextView;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.dfm.DataFieldManager;
+import edu.uml.cs.isense.pictures.dialogs.About;
 import edu.uml.cs.isense.pictures.dialogs.CameraPreview;
-import edu.uml.cs.isense.pictures.dialogs.Continuous;
 import edu.uml.cs.isense.pictures.dialogs.Description;
+import edu.uml.cs.isense.pictures.dialogs.Help;
 import edu.uml.cs.isense.pictures.dialogs.NoGps;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
-import edu.uml.cs.isense.riverwalk.R;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
 //import android.app.ProgressDialog;
 
-public class Main extends Activity implements LocationListener {
+public class Pictures extends Activity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
@@ -157,7 +157,7 @@ public class Main extends Activity implements LocationListener {
 		uq = new UploadQueue("generalpictures", mContext, api);
 
 		String projId = ProjectManager.getProject(mContext);
-		if (projId.equals("")) {
+		if (projId.equals("-1")) {
 			setDefaultProject();
 		} else {
 			projectLabel = (TextView) findViewById(R.id.projectLabel);
@@ -202,7 +202,7 @@ public class Main extends Activity implements LocationListener {
 				}
 
 				String projectNum = ProjectManager.getProject(mContext);
-				if (projectNum.equals("")) {
+				if (projectNum.equals("-1")) {
 					w.make("Please select an project first.",
 							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 					return;
@@ -230,7 +230,7 @@ public class Main extends Activity implements LocationListener {
 								Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 					}
 
-					OrientationManager.enableRotation(Main.this);
+					OrientationManager.enableRotation(Pictures.this);
 
 					// Continuously take pictures
 				} else if (continuous == true) {
@@ -270,9 +270,9 @@ public class Main extends Activity implements LocationListener {
 
 						// Stop continuously taking pictures
 					} else {
-						Main.takePicture.setText(R.string.takePicContinuous);
-						Main.takePicture.setTextColor(0xFF0066FF);
-						Main.takePicture.setBackgroundResource(R.drawable.button_rsense);
+						Pictures.takePicture.setText(R.string.takePicContinuous);
+						Pictures.takePicture.setTextColor(0xFF0066FF);
+						Pictures.takePicture.setBackgroundResource(R.drawable.button_rsense);
 						recording = false;
 					}
 				}
@@ -341,7 +341,6 @@ public class Main extends Activity implements LocationListener {
 
 		projectLabel = (TextView) findViewById(R.id.projectLabel);
 		String project = ProjectManager.getProject(mContext);
-		Log.e("PRoject", project);
 		projectLabel.setText(getResources().getString(R.string.projectLabel)
 				+ project);
 	}
@@ -352,7 +351,7 @@ public class Main extends Activity implements LocationListener {
 		protected void onPreExecute() {
 			super.onPreExecute();
 
-			OrientationManager.disableRotation(Main.this);
+			OrientationManager.disableRotation(Pictures.this);
 		}
 
 		@Override
@@ -463,11 +462,11 @@ public class Main extends Activity implements LocationListener {
 			if (android.os.Build.VERSION.SDK_INT >= 11)
 				invalidateOptionsMenu();
 
-			Main.takePicture.setText(R.string.takePicContinuous);
-			Main.takePicture.setTextColor(0xFF0066FF);
-			Main.takePicture.setBackgroundResource(R.drawable.button_rsense);
+			Pictures.takePicture.setText(R.string.takePicContinuous);
+			Pictures.takePicture.setTextColor(0xFF0066FF);
+			Pictures.takePicture.setBackgroundResource(R.drawable.button_rsense);
 
-			OrientationManager.enableRotation(Main.this);
+			OrientationManager.enableRotation(Pictures.this);
 			preview.removeView(mPreview);
 			preview.setVisibility(View.GONE);
 
@@ -479,7 +478,7 @@ public class Main extends Activity implements LocationListener {
 			mCamera.release();
 			mCamera = null;
 
-			OrientationManager.enableRotation(Main.this);
+			OrientationManager.enableRotation(Pictures.this);
 		}
 	}
 
@@ -629,7 +628,6 @@ public class Main extends Activity implements LocationListener {
 		case R.id.MENU_ITEM_BROWSE:
 			Intent iproject = new Intent(getApplicationContext(),
 					ProjectManager.class);
-			iproject.putExtra("app_name", "Pictures");
 			startActivityForResult(iproject, PROJECT_REQUESTED);
 			return true;
 
@@ -830,7 +828,7 @@ public class Main extends Activity implements LocationListener {
 			if (resultCode == RESULT_OK) {
 				picture = convertImageUriToFile(imageUri, mContext);
 
-				Intent iDesc = new Intent(Main.this, Description.class);
+				Intent iDesc = new Intent(Pictures.this, Description.class);
 				startActivityForResult(iDesc, DESCRIPTION_REQUESTED);
 
 			}
@@ -938,9 +936,9 @@ public class Main extends Activity implements LocationListener {
 						.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 
 			mLocationManager.requestLocationUpdates(
-					mLocationManager.getBestProvider(c, true), 0, 0, Main.this);
+					mLocationManager.getBestProvider(c, true), 0, 0, Pictures.this);
 			mRoughLocManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 0, 0, Main.this);
+					LocationManager.NETWORK_PROVIDER, 0, 0, Pictures.this);
 
 		} else {
 			if (showGpsDialog) {
@@ -958,10 +956,10 @@ public class Main extends Activity implements LocationListener {
 		super.onStop();
 
 		if (mLocationManager != null)
-			mLocationManager.removeUpdates(Main.this);
+			mLocationManager.removeUpdates(Pictures.this);
 
 		if (mRoughLocManager != null)
-			mRoughLocManager.removeUpdates(Main.this);
+			mRoughLocManager.removeUpdates(Pictures.this);
 
 		if (mTimer != null)
 			mTimer.cancel();

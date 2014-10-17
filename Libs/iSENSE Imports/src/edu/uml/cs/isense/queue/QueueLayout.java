@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -509,7 +508,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 					if (Connection.hasConnectivity(mContext)) {
 						Intent iProj = new Intent(mContext, ProjectManager.class);
-						iProj.putExtra("from_where", "queue");
+						iProj.putExtra("showSelectLater", false);
 						startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 					} else
 						w.make("You need internet connectivity to select a project",
@@ -559,10 +558,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == ALTER_DATA_PROJ_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-
-				SharedPreferences mPrefs = getSharedPreferences("PROJID_QUEUE",
-						0);
-				String projectInput = mPrefs.getString("project_id", "-1");
+				String projectInput = ProjectManager.getProject(mContext);
 
 				Log.e("DataSet -- QLayout -- Pre Change", lastDataSetLongClicked.getData().toString());
 
@@ -606,17 +602,14 @@ public class QueueLayout extends Activity implements OnClickListener {
 			if (resultCode == RESULT_OK) {
 				if (FieldMatching.acceptedFields.isEmpty()) {
 					Intent iProj = new Intent(mContext, ProjectManager.class);
-					iProj.putExtra("from_where", "queue");
+					iProj.putExtra("showSelectLater", false);
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else if (!FieldMatching.compatible) {
 					Intent iProj = new Intent(mContext, ProjectManager.class);
-					iProj.putExtra("from_where", "queue");
+					iProj.putExtra("showSelectLater", false);
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else {
-					SharedPreferences mPrefs = getSharedPreferences(
-							"PROJID_QUEUE", 0);
-					String projectInput = mPrefs.getString("project_id",
-							"No Proj.");
+					String projectInput = ProjectManager.getProject(mContext);
 
 					cfd.addProject(projectInput, FieldMatching.acceptedFields);
 

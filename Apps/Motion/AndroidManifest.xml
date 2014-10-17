@@ -76,7 +76,7 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueLayout"
             android:label="Upload Data"
-            android:theme="@style/AppThemeQueue"
+            android:theme="@style/AppTheme"
             tools:ignore="MissingRegistered" />
         <activity
             android:name="edu.uml.cs.isense.queue.QueueAlter"

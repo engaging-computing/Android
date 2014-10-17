@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import edu.uml.cs.isense.riverwalk.R;
+import edu.uml.cs.isense.pictures.R;
 
 public class Description extends Activity {
 	

@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.riverwalk.dialogs;
+package edu.uml.cs.isense.pictures.dialogs;
 
 import android.app.Activity;
 import android.os.Bundle;

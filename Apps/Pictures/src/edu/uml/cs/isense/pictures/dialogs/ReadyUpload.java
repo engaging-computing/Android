@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.riverwalk.dialogs;
+package edu.uml.cs.isense.pictures.dialogs;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,16 +8,16 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import edu.uml.cs.isense.riverwalk.R;
 
-public class NoGps extends Activity {
+public class ReadyUpload extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.no_gps);
+		setContentView(R.layout.ready_upload);
 		
 		getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		
-		final Button yes = (Button) findViewById(R.id.no_gps_yes);
+		final Button yes = (Button) findViewById(R.id.ready_upload_yes);
 		yes.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -26,7 +26,7 @@ public class NoGps extends Activity {
 			}
 		});
 		
-		final Button no = (Button) findViewById(R.id.no_gps_no);
+		final Button no = (Button) findViewById(R.id.ready_upload_no);
 		no.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

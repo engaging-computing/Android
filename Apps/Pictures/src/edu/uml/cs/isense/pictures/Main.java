@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.riverwalk;
+package edu.uml.cs.isense.pictures;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,14 +50,15 @@ import android.widget.TextView;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.dfm.DataFieldManager;
+import edu.uml.cs.isense.pictures.dialogs.CameraPreview;
+import edu.uml.cs.isense.pictures.dialogs.Continuous;
+import edu.uml.cs.isense.pictures.dialogs.Description;
+import edu.uml.cs.isense.pictures.dialogs.NoGps;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
-import edu.uml.cs.isense.riverwalk.dialogs.CameraPreview;
-import edu.uml.cs.isense.riverwalk.dialogs.Continuous;
-import edu.uml.cs.isense.riverwalk.dialogs.Description;
-import edu.uml.cs.isense.riverwalk.dialogs.NoGps;
+import edu.uml.cs.isense.riverwalk.R;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 

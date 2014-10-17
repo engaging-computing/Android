@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.riverwalk.dialogs;
+package edu.uml.cs.isense.pictures.dialogs;
 
 
 
@@ -11,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import edu.uml.cs.isense.riverwalk.Main;
+import edu.uml.cs.isense.pictures.Main;
 import edu.uml.cs.isense.riverwalk.R;
 
 public class Continuous extends Activity {

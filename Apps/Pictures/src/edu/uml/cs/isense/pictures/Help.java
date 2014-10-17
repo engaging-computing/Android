@@ -1,5 +1,6 @@
-package edu.uml.cs.isense.riverwalk;
+package edu.uml.cs.isense.pictures;
 
+import edu.uml.cs.isense.riverwalk.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;

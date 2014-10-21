@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.riverwalk.dialogs;
+package edu.uml.cs.isense.riverwalk;
 
 
 
@@ -11,30 +11,28 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import edu.uml.cs.isense.riverwalk.Pictures;
-import edu.uml.cs.isense.riverwalk.R;
 
 public class Continuous extends Activity {
 
 	public static int continuous_interval;
-	
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.continuous_shooting);
-		
+
 	if (android.os.Build.VERSION.SDK_INT >= 11)
-		setFinishOnTouchOutside(false);	
-	
+		setFinishOnTouchOutside(false);
+
 	final CheckBox continuous_cb = (CheckBox) findViewById(R.id.checkContinuous);
 	continuous_cb.setChecked(Pictures.continuous); // if true then continuous_cb will be set to checked if not then it will not be checked
-     
+
 	final EditText continuous_time = (EditText) findViewById(R.id.etInterval);
-	continuous_time.setText(String.valueOf(Pictures.continuousInterval));	 
-	
+	continuous_time.setText(String.valueOf(Pictures.continuousInterval));
+
 	continuous_cb.setOnClickListener(new View.OnClickListener() {
-		
+
 		@Override
 		public void onClick(View v) {
 			if (continuous_cb.isChecked()){							//Continuous checkbox is checked
@@ -47,14 +45,14 @@ public class Continuous extends Activity {
 				Pictures.takePicture.setText(R.string.takePicSingle);
 			}
 		}
-	}); 
-		
-		
-		
-	
-	
-	
-	
+	});
+
+
+
+
+
+
+
 	final Button ok = (Button) findViewById(R.id.description_okay);
 	ok.setOnClickListener(new OnClickListener() {
 		@Override
@@ -68,6 +66,6 @@ public class Continuous extends Activity {
 				continuous_time.setError("Please Enter a Value.");
 			}
 		}
-	});	
+	});
 	}
 }

@@ -10,18 +10,18 @@ import android.widget.EditText;
 import edu.uml.cs.isense.riverwalk.R;
 
 public class Description extends Activity {
-	
+
 	public static String photo_description;
-	
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.description);
-	
+
 		if (android.os.Build.VERSION.SDK_INT >= 11)
 			setFinishOnTouchOutside(false);
-		
+
 		final Button ok = (Button) findViewById(R.id.description_okay);
 		ok.setOnClickListener(new OnClickListener() {
 			@Override
@@ -30,6 +30,6 @@ public class Description extends Activity {
 				photo_description = descriptionObject.getText().toString();
 				finish();
 			}
-		});	
+		});
 	}
 }

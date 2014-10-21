@@ -54,9 +54,10 @@ import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
+import edu.uml.cs.isense.riverwalk.dialogs.About;
 import edu.uml.cs.isense.riverwalk.dialogs.CameraPreview;
-import edu.uml.cs.isense.riverwalk.dialogs.Continuous;
 import edu.uml.cs.isense.riverwalk.dialogs.Description;
+import edu.uml.cs.isense.riverwalk.dialogs.Help;
 import edu.uml.cs.isense.riverwalk.dialogs.NoGps;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -123,8 +124,6 @@ public class Pictures extends Activity implements LocationListener {
 	private static Camera mCamera;
 	private CameraPreview mPreview;
 	private FrameLayout preview;
-	
-	private final String queueDescription = "Picture and Data";
 
     Boolean validPicture = false;
 
@@ -158,7 +157,7 @@ public class Pictures extends Activity implements LocationListener {
 		uq = new UploadQueue("generalpictures", mContext, api);
 
 		String projId = ProjectManager.getProject(mContext);
-		if (projId.equals("")) {
+		if (projId.equals("-1")) {
 			setDefaultProject();
 		} else {
 			projectLabel = (TextView) findViewById(R.id.projectLabel);
@@ -203,7 +202,7 @@ public class Pictures extends Activity implements LocationListener {
 				}
 
 				String projectNum = ProjectManager.getProject(mContext);
-				if (projectNum.equals("")) {
+				if (projectNum.equals("-1")) {
 					w.make("Please select an project first.",
 							Waffle.LENGTH_LONG, Waffle.IMAGE_X);
 					return;
@@ -342,7 +341,6 @@ public class Pictures extends Activity implements LocationListener {
 
 		projectLabel = (TextView) findViewById(R.id.projectLabel);
 		String project = ProjectManager.getProject(mContext);
-		Log.e("PRoject", project);
 		projectLabel.setText(getResources().getString(R.string.projectLabel)
 				+ project);
 	}
@@ -423,13 +421,14 @@ public class Pictures extends Activity implements LocationListener {
         				dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
         			}
 
+        			String description = DateFormat.getDateTimeInstance().format(new Date());
 
         			JSONArray dataPoint = dfm.recordDataPoint();
         			JSONArray dataSet = new JSONArray();
         			dataSet.put(dataPoint);
 
         			//add image and data to upload queue
-    				uq.addToQueue(dataSetName, queueDescription, Type.BOTH, dataSet, picture, projId, null, false);
+    				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
                 	uq.buildQueueFromFile();
 
                         runOnUiThread(new Runnable() {
@@ -627,9 +626,9 @@ public class Pictures extends Activity implements LocationListener {
 			return true;
 
 		case R.id.MENU_ITEM_BROWSE:
-			Intent iproject = new Intent(getApplicationContext(),
+			Intent iproject = new Intent(mContext,
 					ProjectManager.class);
-			iproject.putExtra("app_name", "Pictures");
+			iproject.putExtra("constrictFields", false);
 			startActivityForResult(iproject, PROJECT_REQUESTED);
 			return true;
 
@@ -874,9 +873,10 @@ public class Pictures extends Activity implements LocationListener {
 			String projId = ProjectManager.getProject(mContext);
 
 			String dataSetName = name.getText().toString() + " " + Description.photo_description;
+			String description = DateFormat.getDateTimeInstance().format(new Date());
 
 			//add image and data to upload queue
-			uq.addToQueue(dataSetName, queueDescription, Type.BOTH, dataSet, picture, projId, null, false);
+			uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
 
 		} else if (requestCode == SELECT_PICTURE_REQUESTED) {
 			if (resultCode == Activity.RESULT_OK) {
@@ -896,9 +896,11 @@ public class Pictures extends Activity implements LocationListener {
     			/* add picture and data to queue */
     			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
     			String dataSetName = name.getText().toString();
+    			String description = currentDateTimeString;
+
 
     			//add image and data to upload queue
-				uq.addToQueue(dataSetName, queueDescription, Type.BOTH, dataSet, picture, projId, null, false);
+				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
 
 			}
 		}

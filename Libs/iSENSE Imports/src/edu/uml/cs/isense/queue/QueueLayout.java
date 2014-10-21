@@ -663,8 +663,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 			String projectString = ProjectManager.getProject(mContext);
 			int projectInt = Integer.valueOf(projectString);
 
-			dfm = new DataFieldManager(projectInt, api,
-					mContext);
+			dfm = new DataFieldManager(projectInt, api, mContext);
 			dfm.getOrderWithExternalAsyncTask();
 			dfm.writeProjectFields();
 

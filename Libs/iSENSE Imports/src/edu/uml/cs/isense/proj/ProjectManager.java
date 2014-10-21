@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -258,12 +257,7 @@ public class ProjectManager extends Activity implements OnClickListener {
 		} else if (requestCode == PROJECT_CODE) {
 			if (resultCode == Activity.RESULT_OK) {
 				String projID = getProject(mContext);
-				Log.e("Project is - ", projID);
-				if (projInput == null) {
-					Log.e("Project label - ", "null");
-				}
 				projInput.setText(projID);
-
 			}
 		} else if (requestCode == NO_QR_REQUESTED) {
 			if (resultCode == RESULT_OK) {

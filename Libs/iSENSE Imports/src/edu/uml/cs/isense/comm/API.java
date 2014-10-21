@@ -1,5 +1,14 @@
 package edu.uml.cs.isense.comm;
 
+import android.util.Log;
+
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,13 +24,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import android.util.Log;
 import edu.uml.cs.isense.objects.RDataSet;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.objects.RProject;
@@ -198,10 +200,11 @@ public class API {
 	 */
 	public RProject getProject(int projectId) {
 		RProject proj = new RProject();
+        JSONObject j = null;
 		try {
 			String reqResult = makeRequest(baseURL, "projects/" + projectId,
 					"", "GET", null);
-			JSONObject j = new JSONObject(reqResult);
+			j = new JSONObject(reqResult);
 
 			proj.project_id = j.getInt("id");
 			proj.name = j.getString("name");
@@ -214,8 +217,23 @@ public class API {
 			proj.owner_url = j.getString("ownerUrl");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+            try {
+                proj = new RProject();
+                proj.projectExist = false;
+                proj.serverErrorMessage = j.getString("error");
+            } catch (JSONException e1) {
+                try {
+                    proj = new RProject();
+                    proj.projectExist = false;
+                    proj.serverErrorMessage = j.getString("msg");
+                } catch (JSONException e2) {
+                    proj = new RProject();
+                    proj.projectExist = false;
+                    proj.serverErrorMessage = "Failed to Get Project";
+                }
+            }
 		}
+        proj.projectExist = true;
 		return proj;
 	}
 

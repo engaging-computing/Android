@@ -1,7 +1,5 @@
 package edu.uml.cs.isense.proj;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,15 +7,20 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.Connection;
 import edu.uml.cs.isense.credentials.CredentialManager;
+import edu.uml.cs.isense.objects.RProject;
 import edu.uml.cs.isense.objects.RProjectField;
 import edu.uml.cs.isense.supplements.ObscuredSharedPreferences;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -169,8 +172,14 @@ public class ProjectManager extends Activity implements OnClickListener {
 				projInput.setError("Enter a project ID");
 				pass = false;
 			}
+            //TODO figure out why api call doesnt work here
+            String proj = projInput.getText().toString();
+            int x = Integer.parseInt(proj);
+            RProject project = api.getProject(x);
+            Log.e("here", "" + project.name);
+
 			if (pass) {
-				setProject(mContext, projInput.getText().toString());
+				setProject(mContext, proj);
 				setResult(RESULT_OK);
 				finish();
 			}

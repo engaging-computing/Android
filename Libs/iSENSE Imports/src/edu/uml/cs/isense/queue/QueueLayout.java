@@ -33,9 +33,9 @@ import edu.uml.cs.isense.waffle.Waffle;
  * Activity that displays the list of data sets stored in the data saving queue.
  * From here, the user can check and uncheck data sets to upload, rename them,
  * change their data, delete them, or attempt to upload them to iSENSE.
- * 
+ *
  * @author Mike Stowell and Jeremy Poulin of the iSENSE team.
- * 
+ *
  */
 public class QueueLayout extends Activity implements OnClickListener {
 
@@ -80,8 +80,8 @@ public class QueueLayout extends Activity implements OnClickListener {
 	private Waffle w;
 	private API api;
 	private DataFieldManager dfm;
-	
-	
+
+
 	private LinkedList<String> dataSetUploadStatus;
 
 	/**
@@ -94,8 +94,8 @@ public class QueueLayout extends Activity implements OnClickListener {
 	private class CachedFieldDatabase {
 
 		private class QLProject {
-			private LinkedList<String> projects;
-			private LinkedList<LinkedList<String>> fields;
+			private final LinkedList<String> projects;
+			private final LinkedList<LinkedList<String>> fields;
 
 			public QLProject() {
 				this.projects = new LinkedList<String>();
@@ -121,7 +121,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 		}
 
-		private QLProject p;
+		private final QLProject p;
 
 		public CachedFieldDatabase() {
 			this.p = new QLProject();
@@ -226,6 +226,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 		desc.setText(ds.getDesc());
 	}
 
+	@Override
 	public void onClick(View v) {
 		int id = v.getId();
 		if (id == R.id.upload) {
@@ -234,11 +235,6 @@ public class QueueLayout extends Activity implements OnClickListener {
                 if (api.getCurrentUser() == null) {
                     Intent ask_key_or_login_intent = new Intent().setClass(mContext, LoginOrKeyDialog.class);
                     startActivityForResult(ask_key_or_login_intent, ASK_KEY_OR_LOGIN);
-
-                    //TODO
-                    //Not logged in so get a Contributor key
-                    Intent key_intent = new Intent().setClass(mContext, CredentialManagerKey.class);
-                    startActivityForResult(key_intent, CREDENTIAL_KEY_REQUESTED);
                 } else {
                     prepareForUpload();
                 }
@@ -273,7 +269,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 			startActivityForResult(iDelSel, QUEUE_DELETE_SELECTED_REQUESTED);
 		}
 	}
-	
+
 	private boolean runUploadSanityChecks() {
 		if (allSelectedDataSetsHaveProjects()) {
 			if (!Connection.hasConnectivity(mContext)) {
@@ -288,7 +284,7 @@ public class QueueLayout extends Activity implements OnClickListener {
             return false;
 		}
 	}
-	
+
 	private void prepareForUpload() {
 		lastSID = -1;
 		if (uq.mirrorQueue.isEmpty()) {
@@ -402,12 +398,12 @@ public class QueueLayout extends Activity implements OnClickListener {
                         ": <font COLOR=\"#07B50A\">upload successful</font>");
 
             } else if (uploadSet.getProjID().equals("-1")) { //invalid project id
-				
-				dataSetUploadStatus.add(uploadSet.getName() + 
+
+				dataSetUploadStatus.add(uploadSet.getName() +
 						": <font COLOR=\"#D9A414\">requires a project first</font>");
 				uq.queue.add(uploadSet);
 				uq.storeAndReRetrieveQueue(false);
-			
+
 			} else if (uploadSet.getType() == QDataSet.Type.DATA && info.dataSetId == -1) { //invalid data set id
 				//upload failed
 				// try to see if the data was formatted incorrectly (i.e. was a JSONArray, not JSONObject)
@@ -443,23 +439,23 @@ public class QueueLayout extends Activity implements OnClickListener {
             //if finished uploading show summary
 			if (uq.mirrorQueue.isEmpty()) {
 				uq.storeAndReRetrieveQueue(true);
-				
+
 				String[] sa = new String[dataSetUploadStatus.size()];
 				int i = 0;
-				
+
 				for (String s : dataSetUploadStatus)
 					sa[i++] = s;
-				
+
 				Intent iSum = new Intent(mContext, QueueSummary.class);
 				iSum.putExtra(QueueSummary.SUMMARY_ARRAY, sa);
 				startActivity(iSum);
-				
+
 				setResultAndFinish(RESULT_OK);
 				return;
 			} else {
 				continueUploading();
 			}
-			
+
 			OrientationManager.enableRotation(QueueLayout.this);
 		}
 	}
@@ -467,6 +463,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 	private void createRunnable(final QDataSet ds) {
 		sdUploader = new Runnable() {
 
+			@Override
 			public void run() {
 				if (ds.isUploadable()) {
                     info = ds.upload(api, mContext);
@@ -514,7 +511,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 					if (Connection.hasConnectivity(mContext)) {
 						Intent iProj = new Intent(mContext, ProjectManager.class);
-						iProj.putExtra("from_where", "queue");
+						iProj.putExtra("showSelectLater", false);
 						startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 					} else
 						w.make("You need internet connectivity to select a project",
@@ -567,7 +564,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 				String projectInput = ProjectManager.getProject(mContext);
 
 				Log.e("DataSet -- QLayout -- Pre Change", lastDataSetLongClicked.getData().toString());
-				
+
 				LinkedList<String> fields = cfd
 						.getFieldsForProject(projectInput);
 				if (fields != null) {
@@ -580,7 +577,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 					uq.addDataSetToQueue(alter);
 					addViewToScrollQueue(alter);
-					
+
 					Log.e("DataSet -- QLayout -- Post Change", alter.getData().toString());
 
 				} else {
@@ -608,23 +605,23 @@ public class QueueLayout extends Activity implements OnClickListener {
 			if (resultCode == RESULT_OK) {
 				if (FieldMatching.acceptedFields.isEmpty()) {
 					Intent iProj = new Intent(mContext, ProjectManager.class);
-					iProj.putExtra("from_where", "queue");
+					iProj.putExtra("showSelectLater", false);
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else if (!FieldMatching.compatible) {
 					Intent iProj = new Intent(mContext, ProjectManager.class);
-					iProj.putExtra("from_where", "queue");
+					iProj.putExtra("showSelectLater", false);
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else {
-                    String proj = ProjectManager.getProject(mContext);
-					QDataSet alter = lastDataSetLongClicked;
+					String projectInput = ProjectManager.getProject(mContext);
+                    QDataSet alter = lastDataSetLongClicked;
 
-                    if (proj == "-1") {
+                    if (projectInput == "-1") {
                         alter.setProj("No Proj.");
                     } else {
-                        alter.setProj(proj);
+                        alter.setProj(projectInput);
                     }
 					alter.setFields(FieldMatching.acceptedFields);
-					
+
 					Log.e("in QueueLayout?", alter.getData().toString());
 
 					uq.removeItemWithKey(lastDataSetLongClicked.key);
@@ -639,33 +636,37 @@ public class QueueLayout extends Activity implements OnClickListener {
 				iProj.putExtra("from_where", "queue");
 				startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 			}
-		} else if (requestCode == CREDENTIAL_KEY_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-				prepareForUpload();
-			} else if (resultCode == RESULT_CANCELED) {
-				finish();
-			}
-		} else if (resultCode == ASK_KEY_OR_LOGIN) {
-            if (resultCode == RESULT_OK) {
-                Intent intent = getIntent();
-                String uploadMethod = intent.getStringExtra(LoginOrKeyDialog.uploadMethod);
-                if (uploadMethod == LoginOrKeyDialog.keyRBSelected) {
-                    //Not logged in so get a Contributor key
-                    Intent key_intent = new Intent().setClass(mContext, CredentialManagerKey.class);
-                    startActivityForResult(key_intent, CREDENTIAL_KEY_REQUESTED);
-
-                } else if (uploadMethod == LoginOrKeyDialog.loginRBSelected) {
-                    //Login and then upload
-                    Intent login = new Intent(mContext, CredentialManager.class);
-                    startActivityForResult(login, LOGIN_THEN_UPLOAD);
+		} else {
+            if (requestCode == CREDENTIAL_KEY_REQUESTED) {
+                if (resultCode == RESULT_OK) {
+                    prepareForUpload();
+                } else if (resultCode == RESULT_CANCELED) {
+                    finish();
                 }
-
             } else {
-                finish();
-            }
-        } else if (resultCode == LOGIN_THEN_UPLOAD) {
-            if (resultCode == RESULT_OK) {
-                prepareForUpload();
+                if (requestCode == ASK_KEY_OR_LOGIN) {
+                    if (resultCode == RESULT_OK) {
+                        String uploadMethod = data.getExtras().getString(LoginOrKeyDialog.uploadMethod);
+
+                        if (uploadMethod.equals(LoginOrKeyDialog.keyRBSelected)) {
+                            //Not logged in so get a Contributor key
+                            Intent key_intent = new Intent().setClass(mContext, CredentialManagerKey.class);
+                            startActivityForResult(key_intent, CREDENTIAL_KEY_REQUESTED);
+                            
+                        } else if (uploadMethod.equals(LoginOrKeyDialog.loginRBSelected)) {
+                            //Login and then upload
+                            Intent login = new Intent(mContext, CredentialManager.class);
+                            startActivityForResult(login, LOGIN_THEN_UPLOAD);
+                        }
+
+                    } else {
+                        finish();
+                    }
+                } else if (requestCode == LOGIN_THEN_UPLOAD) {
+                    if (resultCode == RESULT_OK) {
+                        prepareForUpload();
+                    }
+                }
             }
         }
 	}
@@ -689,10 +690,10 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			String projectInput = ProjectManager.getProject(mContext);
+			String projectString = ProjectManager.getProject(mContext);
+			int projectInt = Integer.valueOf(projectString);
 
-			dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-					mContext);
+			dfm = new DataFieldManager(projectInt, api, mContext);
 			dfm.getOrderWithExternalAsyncTask();
 			dfm.writeProjectFields();
 
@@ -757,6 +758,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 			data.setOnClickListener(new OnClickListener() {
 
+				@Override
 				public void onClick(View v) {
 					if (ds.isUploadable()) {
 						data.setBackgroundResource(R.drawable.listelement_bkgd_changer);
@@ -774,6 +776,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 			data.setOnLongClickListener(new OnLongClickListener() {
 
+				@Override
 				public boolean onLongClick(View v) {
 					lastDataSetLongClicked = ds;
 					lastViewLongClicked = data;
@@ -820,6 +823,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 			pic.setOnClickListener(new OnClickListener() {
 
+				@Override
 				public void onClick(View v) {
 					if (ds.isUploadable()) {
 						pic.setBackgroundResource(R.drawable.listelement_bkgd_changer);
@@ -837,6 +841,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 			pic.setOnLongClickListener(new OnLongClickListener() {
 
+				@Override
 				public boolean onLongClick(View v) {
 					lastDataSetLongClicked = ds;
 					lastViewLongClicked = pic;
@@ -878,6 +883,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 			both.setOnClickListener(new OnClickListener() {
 
+				@Override
 				public void onClick(View v) {
 					if (ds.isUploadable()) {
 						both.setBackgroundResource(R.drawable.listelement_bkgd_changer);
@@ -895,6 +901,7 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 			both.setOnLongClickListener(new OnLongClickListener() {
 
+				@Override
 				public boolean onLongClick(View v) {
 					lastDataSetLongClicked = ds;
 					lastViewLongClicked = both;

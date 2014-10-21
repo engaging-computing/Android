@@ -1,5 +1,14 @@
 package edu.uml.cs.isense.queue;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Environment;
+
+import org.json.JSONArray;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,14 +24,6 @@ import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
 
-import org.json.JSONArray;
-
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Environment;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
@@ -310,17 +311,17 @@ public class UploadQueue implements Serializable {
 	/**
 	 * @param name
 	 *            - The name of the of the data set
-	 * @param desc
+	 * @param description
 	 *            - A description for the data set
 	 * @param type
 	 *            - QDataSet.DATA QDataSet.PIC, or QDataSet.BOTH
 	 * @param projID
 	 *            - The associated project ID for the data set
-	 * @param data
+	 * @param dataSet
 	 *            - If type is QDataSet.DATA, we look here.
 	 * @param picture
 	 *            - If type is QDataSet.PIC, we look here.
-	 * @param requestDataLabelInOrder
+	 * @param dataAlreadyInOrder
 	 * 			  - If data is already in the correct order and just needs to be given field IDs
 	 */
 	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields, Boolean dataAlreadyInOrder) {

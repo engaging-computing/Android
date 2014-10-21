@@ -9,14 +9,14 @@ import android.widget.Button;
 import edu.uml.cs.isense.riverwalk.R;
 
 public class NoQR extends Activity {
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.no_qr);
-		
+
 		getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		
+
 		final Button visit = (Button) findViewById(R.id.no_qr_visit);
 		visit.setOnClickListener(new OnClickListener() {
 			@Override
@@ -25,7 +25,7 @@ public class NoQR extends Activity {
 				finish();
 			}
 		});
-		
+
 		final Button cancel = (Button) findViewById(R.id.no_qr_cancel);
 		cancel.setOnClickListener(new OnClickListener() {
 			@Override
@@ -34,13 +34,13 @@ public class NoQR extends Activity {
 				finish();
 			}
 		});
-		
+
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		setResult(RESULT_CANCELED);
 		finish();
 	}
-	
+
 }

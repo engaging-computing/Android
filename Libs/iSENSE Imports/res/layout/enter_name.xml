@@ -37,7 +37,7 @@
         android:enabled="false"
         android:imeOptions="actionNext"
         android:inputType="textCapSentences"
-        android:maxLength="12"
+        android:maxLength="45"
         android:text="@string/def_username" />
 
     <TextView

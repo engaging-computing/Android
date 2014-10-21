@@ -17,9 +17,9 @@ public class LoginOrKeyDialog extends Activity {
     private RadioButton login;
 
     //strings for intent
-    public static final String uploadMethod = "WhichMethod?";
+    public static final String uploadMethod = "WhichMethodForUpload";
     public static final String loginRBSelected = "LoginMethod";
-    public static final String keyRBSelected = "keyMethod";
+    public static final String keyRBSelected = "KeyMethod";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +38,12 @@ public class LoginOrKeyDialog extends Activity {
                 if (key.isChecked()) {
                     Intent result = new Intent();
                     result.putExtra(uploadMethod, keyRBSelected);
-                    setResult(Activity.RESULT_OK);
+                    setResult(Activity.RESULT_OK, result);
                     finish();
                 } else {
                     Intent result = new Intent();
                     result.putExtra(uploadMethod, loginRBSelected);
-                    setResult(Activity.RESULT_OK);
+                    setResult(Activity.RESULT_OK, result);
                     finish();
                 }
             }

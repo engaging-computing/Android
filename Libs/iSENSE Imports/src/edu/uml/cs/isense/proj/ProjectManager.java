@@ -172,16 +172,14 @@ public class ProjectManager extends Activity implements OnClickListener {
 				projInput.setError("Enter a project ID");
 				pass = false;
 			}
-            //TODO figure out why api call doesnt work here
-            String proj = projInput.getText().toString();
-            int x = Integer.parseInt(proj);
-            RProject project = api.getProject(x);
-            Log.e("here", "" + project.name);
+            if (pass) {
+                new DoesProjectExistTask().execute();
+            }
+
+
 
 			if (pass) {
-				setProject(mContext, proj);
-				setResult(RESULT_OK);
-				finish();
+
 			}
 		} else if (id == R.id.project_cancel) {
 			setResult(RESULT_CANCELED);
@@ -335,7 +333,41 @@ public class ProjectManager extends Activity implements OnClickListener {
 	}
 
 
-	@Override
+    public class DoesProjectExistTask extends AsyncTask<String, Void, RProject> {
+        private int projectId;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            String proj = projInput.getText().toString();
+            projectId = Integer.parseInt(proj);
+        }
+
+        @Override
+        protected RProject doInBackground(String... params) {
+            RProject project = api.getProject(projectId);
+            return project;
+
+        }
+
+        @Override
+        protected void onPostExecute(RProject rProject) {
+            super.onPostExecute(rProject);
+            Log.e("here in Project Manager", "" + rProject.projectExist);
+
+            if (!rProject.projectExist) {
+                projInput.setError("Project Does Not Exist");
+            } else {
+                setProject(mContext, Integer.toString(rProject.projectId));
+                setResult(RESULT_OK);
+                finish();
+            }
+        }
+    }
+
+
+
+    @Override
 	public void onBackPressed() {
 		setResult(RESULT_CANCELED);
 		finish();

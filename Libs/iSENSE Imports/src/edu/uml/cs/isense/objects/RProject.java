@@ -11,15 +11,15 @@ public class RProject {
     public String serverErrorMessage = "";
 
     //values associated with project
-    public int project_id;
+    public int projectId;
     public int featured_media_id;
     public int default_read;
-    public int like_count;
+    public int likeCount;
     public boolean hidden;
     public boolean featured;
     public String name;
     public String url;
     public String timecreated;
-    public String owner_name;
-    public String owner_url;
+    public String ownerName;
+    public String ownerUrl;
 }

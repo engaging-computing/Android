@@ -356,7 +356,7 @@ public class ProjectManager extends Activity implements OnClickListener {
             Log.e("here in Project Manager", "" + rProject.projectExist);
 
             if (!rProject.projectExist) {
-                projInput.setError("Project Does Not Exist");
+                projInput.setError("Project Not Found");
             } else {
                 setProject(mContext, Integer.toString(rProject.projectId));
                 setResult(RESULT_OK);

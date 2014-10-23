@@ -149,7 +149,7 @@ public class RecordingService extends Service {
 		SharedPreferences prefs2 = getSharedPreferences(Motion.MY_SAVED_PREFERENCES, 0);
 		rate = prefs2.getInt(Motion.RATE_PREFS_KEY, 50);
 
-		dfm.setProjID(Integer.parseInt(Motion.projectNumber));
+		dfm.setProjID(Integer.parseInt(ProjectManager.getProject(this)));
 
         //record data
         dfm.recordData(rate);
@@ -199,7 +199,7 @@ public class RecordingService extends Service {
 
 			//add new dataset to queue
 			Motion.uq.buildQueueFromFile();
-			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, Motion.projectNumber, null, false);
+			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, ProjectManager.getProject(this), null, false);
         }
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

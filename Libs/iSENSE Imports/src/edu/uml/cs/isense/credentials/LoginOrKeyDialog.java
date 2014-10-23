@@ -35,17 +35,14 @@ public class LoginOrKeyDialog extends Activity {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent result = new Intent();
                 if (key.isChecked()) {
-                    Intent result = new Intent();
                     result.putExtra(uploadMethod, keyRBSelected);
-                    setResult(Activity.RESULT_OK, result);
-                    finish();
                 } else {
-                    Intent result = new Intent();
                     result.putExtra(uploadMethod, loginRBSelected);
-                    setResult(Activity.RESULT_OK, result);
-                    finish();
                 }
+                setResult(Activity.RESULT_OK, result);
+                finish();
             }
         });
 

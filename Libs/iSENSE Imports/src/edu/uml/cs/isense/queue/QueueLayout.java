@@ -233,8 +233,8 @@ public class QueueLayout extends Activity implements OnClickListener {
 			if(runUploadSanityChecks()) {
                 // TODO remove login task and replace with credential managers
                 if (api.getCurrentUser() == null) {
-                    Intent ask_key_or_login_intent = new Intent().setClass(mContext, LoginOrKeyDialog.class);
-                    startActivityForResult(ask_key_or_login_intent, ASK_KEY_OR_LOGIN);
+                    Intent askLogin = new Intent().setClass(mContext, LoginOrKeyDialog.class);
+                    startActivityForResult(askLogin, ASK_KEY_OR_LOGIN);
                 } else {
                     prepareForUpload();
                 }
@@ -650,8 +650,8 @@ public class QueueLayout extends Activity implements OnClickListener {
 
                         if (uploadMethod.equals(LoginOrKeyDialog.keyRBSelected)) {
                             //Not logged in so get a Contributor key
-                            Intent key_intent = new Intent().setClass(mContext, CredentialManagerKey.class);
-                            startActivityForResult(key_intent, CREDENTIAL_KEY_REQUESTED);
+                            Intent keyIntent = new Intent().setClass(mContext, CredentialManagerKey.class);
+                            startActivityForResult(keyIntent, CREDENTIAL_KEY_REQUESTED);
                             
                         } else if (uploadMethod.equals(LoginOrKeyDialog.loginRBSelected)) {
                             //Login and then upload

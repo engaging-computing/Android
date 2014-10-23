@@ -350,10 +350,12 @@ public class ManualEntry extends Activity implements LocationListener {
 					TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 					Spinner mSpinner = (Spinner) singlefield.findViewById(R.id.field_spinner);
 
-					field.restrictions = (String) field.restrictions.subSequence(2, field.restrictions.length() - 2);
+                    String restricts = field.restrictions;
+
+                    restricts = (String) restricts.subSequence(2, restricts.length() - 2);
 
 					String delims = "\",\" *";
-					String[] splitFields = field.restrictions.split(delims);
+					String[] splitFields = restricts.split(delims);
 
 					ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, splitFields); //selected item will look like a spinner set from XML
 					mSpinner.setAdapter(spinnerArrayAdapter);

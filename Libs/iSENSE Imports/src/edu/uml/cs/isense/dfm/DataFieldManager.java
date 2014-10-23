@@ -1422,6 +1422,8 @@ public class DataFieldManager extends Application {
 	 */
 	public JSONArray stopRecording() {
 		recordingTimer.cancel();
+        unRegisterSensors();
+
 		return dataSet;
 	}
 
@@ -1659,8 +1661,6 @@ public class DataFieldManager extends Application {
 
 		/**
 		 * Called from an app to enable sensors based upon what the fields are of the project.
-		 * @param mSensorManager
-		 * @param appContext
 		 */
 		@SuppressLint("InlinedApi")
 		public void registerSensors() {
@@ -1754,7 +1754,7 @@ public class DataFieldManager extends Application {
 
 	        if (mSensorManager != null)
 	            mSensorManager.unregisterListener(sensorListener);
-		}
+        }
 
 		// Assists with differentiating between displays for dialogues
 		private int getApiLevel() {

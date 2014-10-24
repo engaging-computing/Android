@@ -1,7 +1,5 @@
 package edu.uml.cs.isense.proj;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +12,14 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.Connection;
 import edu.uml.cs.isense.credentials.CredentialManager;
+import edu.uml.cs.isense.objects.RProject;
 import edu.uml.cs.isense.objects.RProjectField;
 import edu.uml.cs.isense.supplements.ObscuredSharedPreferences;
 import edu.uml.cs.isense.waffle.Waffle;
@@ -169,11 +171,11 @@ public class ProjectManager extends Activity implements OnClickListener {
 				projInput.setError("Enter a project ID");
 				pass = false;
 			}
-			if (pass) {
-				setProject(mContext, projInput.getText().toString());
-				setResult(RESULT_OK);
-				finish();
-			}
+
+            if (pass) {
+                new DoesProjectExistTask().execute();
+            }
+
 		} else if (id == R.id.project_cancel) {
 			setResult(RESULT_CANCELED);
 			finish();
@@ -326,7 +328,50 @@ public class ProjectManager extends Activity implements OnClickListener {
 	}
 
 
-	@Override
+    public class DoesProjectExistTask extends AsyncTask<String, Void, RProject> {
+        private int projectId;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            try {
+                String proj = projInput.getText().toString();
+                projectId = Integer.parseInt(proj);
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.cancel(true);
+            }
+        }
+
+        @Override
+        protected RProject doInBackground(String... params) {
+            RProject project = api.getProject(projectId);
+            return project;
+        }
+
+        @Override
+        protected void onPostExecute(RProject rProject) {
+            super.onPostExecute(rProject);
+
+            if (!rProject.projectExist) {
+                projInput.setError("Project Not Found");
+            } else {
+                setProject(mContext, Integer.toString(rProject.projectId));
+                setResult(RESULT_OK);
+                finish();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            projInput.setError("Project entered must be a number");
+        }
+    }
+
+
+
+    @Override
 	public void onBackPressed() {
 		setResult(RESULT_CANCELED);
 		finish();

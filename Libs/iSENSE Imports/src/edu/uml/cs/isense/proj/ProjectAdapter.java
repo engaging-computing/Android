@@ -109,10 +109,10 @@ class ProjectAdapter extends ArrayAdapter<RProject> {
 					tt.setText(p.name);
 				}
 				if (bt != null) {
-					if (p.owner_name.equals("")) {
+					if (p.ownerName.equals("")) {
 						bt.setVisibility(View.GONE);
 					} else {
-						bt.setText("Created By: " + p.owner_name);
+						bt.setText("Created By: " + p.ownerName);
 					}
 				}
 			}

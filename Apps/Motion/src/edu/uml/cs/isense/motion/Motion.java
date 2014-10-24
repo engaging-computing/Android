@@ -66,7 +66,6 @@ import edu.uml.cs.isense.waffle.Waffle;
 
 public class Motion extends Activity implements SensorEventListener {
 
-	public static String projectNumber = "-1";
 	public static final String DEFAULT_PROJ = "-1";
 	public static final int DEFAULT_RATE = 50;
 	public static final int DEFAULT_LENGTH = 10;
@@ -175,8 +174,6 @@ public class Motion extends Activity implements SensorEventListener {
 		setContentView(R.layout.main);
 		saved = savedInstanceState;
 		mContext = this;
-
-
 
 		api = API.getInstance();
 		setUseDev(useDev);
@@ -570,7 +567,7 @@ public class Motion extends Activity implements SensorEventListener {
 
 		if (reqCode == PROJECT_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				projectNumber = ProjectManager.getProject(mContext);
+				String projectNumber = ProjectManager.getProject(mContext);
 
 				if (projectNumber.equals("-1")) {
 					w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
@@ -604,7 +601,7 @@ public class Motion extends Activity implements SensorEventListener {
 			if (resultCode == RESULT_OK) {
 
 				/*set project*/
-				projectNumber = data.getExtras().getString(Presets.PROJECT);
+				String projectNumber = data.getExtras().getString(Presets.PROJECT);
 				ProjectManager.setProject(mContext, projectNumber);
 				projNumB.setText("Project: " + projectNumber);
 				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);

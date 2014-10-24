@@ -176,12 +176,12 @@
             android:name="edu.uml.cs.isense.motion.dialogs.Presets"
             android:label="Preset Recording Modes"
             android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.LoginOrKeyDialog"
+            android:label="Upload Method"
+            android:theme="@style/AppThemeDialog" />
         
     </application>
-    
-      <instrumentation
-			android:targetPackage="edu.uml.cs.isense.motion"
-			android:name="android.test.InstrumentationTestRunner" />
         
 
 </manifest>

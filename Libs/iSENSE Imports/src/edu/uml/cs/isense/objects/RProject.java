@@ -6,15 +6,20 @@ package edu.uml.cs.isense.objects;
  * @author iSENSE Android Development Team
  */
 public class RProject {
-    public int project_id;
+    //so we can check if project actually exists
+    public boolean projectExist = false;
+    public String serverErrorMessage = "";
+
+    //values associated with project
+    public int projectId;
     public int featured_media_id;
     public int default_read;
-    public int like_count;
+    public int likeCount;
     public boolean hidden;
     public boolean featured;
-    public String name = "";
-    public String url = "";
-    public String timecreated = "";
-    public String owner_name = "";
-    public String owner_url = "";
+    public String name;
+    public String url;
+    public String timecreated;
+    public String ownerName;
+    public String ownerUrl;
 }

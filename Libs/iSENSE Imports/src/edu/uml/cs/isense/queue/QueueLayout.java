@@ -1,7 +1,5 @@
 package edu.uml.cs.isense.queue;
 
-import java.util.LinkedList;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,11 +13,16 @@ import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.LinkedList;
+
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.Connection;
 import edu.uml.cs.isense.comm.UploadInfo;
+import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.credentials.CredentialManagerKey;
+import edu.uml.cs.isense.credentials.LoginOrKeyDialog;
 import edu.uml.cs.isense.dfm.DataFieldManager;
 import edu.uml.cs.isense.dfm.FieldMatching;
 import edu.uml.cs.isense.proj.ProjectManager;
@@ -53,9 +56,10 @@ public class QueueLayout extends Activity implements OnClickListener {
 	private static final int QUEUE_DELETE_SELECTED_REQUESTED = 9005;
 	private static final int FIELD_MATCHING_REQUESTED = 9006;
 	private static final int CREDENTIAL_KEY_REQUESTED = 9007;
+    private static final int ASK_KEY_OR_LOGIN = 9008;
+    private static final int LOGIN_THEN_UPLOAD = 9009;
 
-
-	private static final int QUEUE_BOX_DESELECTED = 0;
+    private static final int QUEUE_BOX_DESELECTED = 0;
 	private static final int QUEUE_BOX_SELECTED = 1;
 
 	public static final String LAST_UPLOADED_DATA_SET_ID = "lastuploadeddatasetid";
@@ -229,9 +233,8 @@ public class QueueLayout extends Activity implements OnClickListener {
 			if(runUploadSanityChecks()) {
                 // TODO remove login task and replace with credential managers
                 if (api.getCurrentUser() == null) {
-                    //Not logged in so get a Contributor key
-                    Intent key_intent = new Intent().setClass(mContext, CredentialManagerKey.class);
-                    startActivityForResult(key_intent, CREDENTIAL_KEY_REQUESTED);
+                    Intent askLogin = new Intent().setClass(mContext, LoginOrKeyDialog.class);
+                    startActivityForResult(askLogin, ASK_KEY_OR_LOGIN);
                 } else {
                     prepareForUpload();
                 }
@@ -610,11 +613,13 @@ public class QueueLayout extends Activity implements OnClickListener {
 					startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 				} else {
 					String projectInput = ProjectManager.getProject(mContext);
+                    QDataSet alter = lastDataSetLongClicked;
 
-					cfd.addProject(projectInput, FieldMatching.acceptedFields);
-
-					QDataSet alter = lastDataSetLongClicked;
-					alter.setProj(projectInput);
+                    if (projectInput == "-1") {
+                        alter.setProj("No Proj.");
+                    } else {
+                        alter.setProj(projectInput);
+                    }
 					alter.setFields(FieldMatching.acceptedFields);
 
 					Log.e("in QueueLayout?", alter.getData().toString());
@@ -631,14 +636,39 @@ public class QueueLayout extends Activity implements OnClickListener {
 				iProj.putExtra("from_where", "queue");
 				startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
 			}
-		} else if (requestCode == CREDENTIAL_KEY_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-				prepareForUpload();
-			} else if (resultCode == RESULT_CANCELED) {
-				//TODO cancel upload
-			}
-		}
+		} else {
+            if (requestCode == CREDENTIAL_KEY_REQUESTED) {
+                if (resultCode == RESULT_OK) {
+                    prepareForUpload();
+                } else if (resultCode == RESULT_CANCELED) {
+                    finish();
+                }
+            } else {
+                if (requestCode == ASK_KEY_OR_LOGIN) {
+                    if (resultCode == RESULT_OK) {
+                        String uploadMethod = data.getExtras().getString(LoginOrKeyDialog.uploadMethod);
 
+                        if (uploadMethod.equals(LoginOrKeyDialog.keyRBSelected)) {
+                            //Not logged in so get a Contributor key
+                            Intent keyIntent = new Intent().setClass(mContext, CredentialManagerKey.class);
+                            startActivityForResult(keyIntent, CREDENTIAL_KEY_REQUESTED);
+                            
+                        } else if (uploadMethod.equals(LoginOrKeyDialog.loginRBSelected)) {
+                            //Login and then upload
+                            Intent login = new Intent(mContext, CredentialManager.class);
+                            startActivityForResult(login, LOGIN_THEN_UPLOAD);
+                        }
+
+                    } else {
+                        finish();
+                    }
+                } else if (requestCode == LOGIN_THEN_UPLOAD) {
+                    if (resultCode == RESULT_OK) {
+                        prepareForUpload();
+                    }
+                }
+            }
+        }
 	}
 
 	// Task for getting dfm's order array before calling the FieldMatching

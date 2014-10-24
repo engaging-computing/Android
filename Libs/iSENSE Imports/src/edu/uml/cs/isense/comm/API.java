@@ -1,5 +1,14 @@
 package edu.uml.cs.isense.comm;
 
+import android.util.Log;
+
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,13 +24,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import android.util.Log;
 import edu.uml.cs.isense.objects.RDataSet;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.objects.RProject;
@@ -171,15 +173,16 @@ public class API {
 				JSONObject inner = j.getJSONObject(i);
 				RProject proj = new RProject();
 
-				proj.project_id = inner.getInt("id");
+				proj.projectId = inner.getInt("id");
 				proj.name = inner.getString("name");
 				proj.url = inner.getString("url");
 				proj.hidden = inner.getBoolean("hidden");
 				proj.featured = inner.getBoolean("featured");
-				proj.like_count = inner.getInt("likeCount");
+				proj.likeCount = inner.getInt("likeCount");
 				proj.timecreated = inner.getString("createdAt");
-				proj.owner_name = inner.getString("ownerName");
-				proj.owner_url = inner.getString("ownerUrl");
+				proj.ownerName = inner.getString("ownerName");
+				proj.ownerUrl = inner.getString("ownerUrl");
+                proj.projectExist = true;
 
 				result.add(proj);
 			}
@@ -198,23 +201,46 @@ public class API {
 	 */
 	public RProject getProject(int projectId) {
 		RProject proj = new RProject();
+        String reqResult = makeRequest(baseURL, "projects/" + projectId,
+                "", "GET", null);
 		try {
-			String reqResult = makeRequest(baseURL, "projects/" + projectId,
-					"", "GET", null);
-			JSONObject j = new JSONObject(reqResult);
+            JSONObject j = new JSONObject(reqResult);
 
-			proj.project_id = j.getInt("id");
+			proj.projectId = j.getInt("id");
 			proj.name = j.getString("name");
 			proj.url = j.getString("url");
 			proj.hidden = j.getBoolean("hidden");
 			proj.featured = j.getBoolean("featured");
-			proj.like_count = j.getInt("likeCount");
+			proj.likeCount = j.getInt("likeCount");
 			proj.timecreated = j.getString("createdAt");
-			proj.owner_name = j.getString("ownerName");
-			proj.owner_url = j.getString("ownerUrl");
+			proj.ownerName = j.getString("ownerName");
+			proj.ownerUrl = j.getString("ownerUrl");
+            proj.projectExist = true;
+            Log.e("api", "" + proj.projectId);
+            if(proj.projectId == 0) {
+                proj = new RProject();
+                proj.projectExist = false;
+                proj.serverErrorMessage = "Project Not Found";
+            }
 
 		} catch (Exception e) {
-			e.printStackTrace();
+            try {
+                JSONObject j = new JSONObject(reqResult);
+                proj = new RProject();
+                proj.projectExist = false;
+                proj.serverErrorMessage = j.getString("error");
+            } catch (Exception e1) {
+                try {
+                    JSONObject j = new JSONObject(reqResult);
+                    proj = new RProject();
+                    proj.projectExist = false;
+                    proj.serverErrorMessage = j.getString("msg");
+                } catch (Exception e2) {
+                    proj = new RProject();
+                    proj.projectExist = false;
+                    proj.serverErrorMessage = "Failed to Get Project";
+                }
+            }
 		}
 		return proj;
 	}

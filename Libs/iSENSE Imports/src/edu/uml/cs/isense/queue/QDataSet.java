@@ -243,7 +243,6 @@ public class QDataSet implements Serializable {
 				info = uploadData();
 				break;
 
-
 			case PIC:
 				if (CredentialManager.isLoggedIn()) {
                     info = UploadQueue.getAPI().uploadMedia(

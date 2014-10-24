@@ -80,7 +80,7 @@ public class BrowseProjects extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		RProject p = m_projects.get(position);
-		ProjectManager.setProject(this, String.valueOf(p.project_id));
+		ProjectManager.setProject(this, String.valueOf(p.projectId));
 		setResult(Activity.RESULT_OK);
 		finish();
 	}

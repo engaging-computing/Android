@@ -1,12 +1,5 @@
 package edu.uml.cs.isense.writer;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -37,6 +30,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.objects.RProjectField;
@@ -349,11 +350,9 @@ public class ManualEntry extends Activity implements LocationListener {
 
 					TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 					Spinner mSpinner = (Spinner) singlefield.findViewById(R.id.field_spinner);
-
+                    
                     String restricts = field.restrictions;
-
                     restricts = (String) restricts.subSequence(2, restricts.length() - 2);
-
 					String delims = "\",\" *";
 					String[] splitFields = restricts.split(delims);
 

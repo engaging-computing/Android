@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -172,11 +171,15 @@ public class ProjectManager extends Activity implements OnClickListener {
 				projInput.setError("Enter a project ID");
 				pass = false;
 			}
-            //TODO figure out why api call doesnt work here
+
             String proj = projInput.getText().toString();
-            int x = Integer.parseInt(proj);
-            RProject project = api.getProject(x);
-            Log.e("here", "" + project.name);
+            try {
+                int x = Integer.parseInt(proj);
+                RProject project = api.getProject(x);
+            } catch (Exception e) {
+                e.printStackTrace();
+                pass = false;
+            }
 
 			if (pass) {
 				setProject(mContext, proj);

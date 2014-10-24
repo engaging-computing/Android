@@ -168,7 +168,19 @@
 	<string name="x">Ax:</string>
 	<string name="y">Ay:</string>
 	<string name="z">Az:</string>
-		
-	
-    
+
+    <string name="timestamp">Timestamp</string>
+    <string name="accel">Acceleration</string>
+    <string name="loc">Location</string>
+    <string name="vel">Velocity (Calculated from GPS)</string>
+    <string name="dis">Distance (Calculated from GPS)</string>
+    <string name="mag">Magnitude</string>
+    <string name="temp">Temperature</string>
+    <string name="alt">Altitude</string>
+    <string name="light">Luminous Flux (Light)</string>
+    <string name="heading">Heading</string>
+
+
+
+
 </resources>

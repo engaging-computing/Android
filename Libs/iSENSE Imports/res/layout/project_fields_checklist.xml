@@ -18,15 +18,12 @@
         android:layout_height="wrap_content"
         android:id="@+id/topButtons"
         android:layout_below="@id/new_proj_name" >
-
-        
-        
         <Button
             android:id="@+id/select_deselect_all"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Select All" />
+            android:text="@string/select_all" />
     </LinearLayout>
     
    <ScrollView
@@ -46,89 +43,84 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Timestamp"/>
+        android:text="@string/timestamp"/>
 
     <CheckBox
         android:id="@+id/cbAcceleration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Acceleration" />
+        android:text="@string/accel" />
 
     <CheckBox
         android:id="@+id/cbMagnetic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Magnetic" />
+        android:text="@string/mag" />
     
      <CheckBox
         android:id="@+id/cbLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Location" />
+        android:text="@string/loc" />
      
      <CheckBox
         android:id="@+id/cbVelocity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Velocity (Calculated from gps)" />
+        android:text="@string/vel" />
 
     <CheckBox
         android:id="@+id/cbDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Distance (Calculated from gps)" />
+        android:text="@string/dis" />
 
      <CheckBox
         android:id="@+id/cbAltitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Altitude" />
+        android:text="@string/altitude" />
      
     <CheckBox
         android:id="@+id/cbPressure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Pressure" />
+        android:text="@string/pressure" />
     
         <CheckBox
         android:id="@+id/cbHumidity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Pressure" />
+        android:text="@string/humidity" />
      
     <CheckBox
         android:id="@+id/cbHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Heading" />
+        android:text="@string/heading" />
 
     <CheckBox
         android:id="@+id/cbTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Temperature" />
+        android:text="@string/temp" />
 
     <CheckBox
         android:id="@+id/cbLuminuous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Luminous Flux (Light)" />
-
-    
-
-   
-    
+        android:text="@string/light" />
     </LinearLayout>
     
     </ScrollView>

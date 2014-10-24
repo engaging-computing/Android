@@ -176,7 +176,6 @@
     <string name="dis">Distance (Calculated from GPS)</string>
     <string name="mag">Magnitude</string>
     <string name="temp">Temperature</string>
-    <string name="pressure">Pressure</string>
     <string name="alt">Altitude</string>
     <string name="light">Luminous Flux (Light)</string>
     <string name="heading">Heading</string>

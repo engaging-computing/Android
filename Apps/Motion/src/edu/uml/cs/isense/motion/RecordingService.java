@@ -50,13 +50,8 @@ public class RecordingService extends Service {
     CountDownTimer mTimer;
 
     LocalBroadcastManager broadcaster;
-    static final public String RESULT = "edu.uml.cs.isense.carphysicsv2.Recording_Service.REQUEST_PROCESSED";
+    static final public String RESULT = "edu.uml.cs.isense.motion.RecordingService.REQUEST_PROCESSED";
 
-    /**
-     * This is called when service is first created. The location manager is initiated but no data is
-     * being recorded at this point
-     */
-    @SuppressLint("NewApi")
     @Override
 	public void onCreate() {
 		super.onCreate();

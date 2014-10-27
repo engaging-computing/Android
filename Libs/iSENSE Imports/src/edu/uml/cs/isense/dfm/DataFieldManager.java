@@ -118,9 +118,6 @@ public class DataFieldManager extends Application {
 	 * @param mContext
 	 *            - The context of the class containing the DataFieldManager
 	 *            object instance.
-	 * @param f
-	 *            - An instance of the {@link edu.uml.cs.isense.dfm.Fields}
-	 *            class.
 	 * @return An instance of DataFieldManager.
 	 */
 	public DataFieldManager(int projID, API api, Context mContext) {
@@ -844,7 +841,6 @@ public class DataFieldManager extends Application {
 	 *
 	 */
 	public void writeProjectFields() {
-		//TODO ARE PREFS NEEDED HERE?
 		SharedPreferences mPrefs = this.mContext.getSharedPreferences(
 				"CSV_ORDER", 0);
 		SharedPreferences.Editor mEdit = mPrefs.edit();
@@ -1321,9 +1317,14 @@ public class DataFieldManager extends Application {
 	 * @param location
 	 */
 	public void updateLoc(Location location) {
-		if (loc != null) {
+        Log.e("update loc", "update loc");
+
+        if (loc != null) {
+            Log.e("update loc2", "update loc2");
 			loc = location;
-		}
+		} else {
+            Log.e("Location null", "location null");
+        }
 	}
 
 
@@ -1506,8 +1507,6 @@ public class DataFieldManager extends Application {
 	        	velocity = distance/dataSetRate;
 	        	f.velocity = velocity;
 	        }
-	        //TODO create some kind of event listener for velocity and distance so that apps can display the values
-
         }
         if (enabledFields[Fields.HUMIDITY] || enabledFields[Fields.HUMIDITY]) {
         	f.humidity = humidity;
@@ -1667,13 +1666,12 @@ public class DataFieldManager extends Application {
 			//just to be sure
 			unRegisterSensors();
 
-			//Initialize sensor managers
+            //Initialize sensor managers
 			sensorListener = new MySensorListener();
 	        locationListener = new MyLocationListener();
 
 			mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 		    mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-
 
 			if (enabledFields[Fields.ACCEL_X]
 					|| enabledFields[Fields.ACCEL_Y]
@@ -1733,7 +1731,7 @@ public class DataFieldManager extends Application {
 			if (enabledFields[Fields.LATITUDE] || enabledFields[Fields.LONGITUDE] || enabledFields[Fields.ALTITUDE]) {
 				 Criteria criteria = new Criteria();
 			     criteria.setAccuracy(Criteria.ACCURACY_FINE);
-
+                Log.e("in DFM", "initialize location manager");
 				 mLocationManager.requestLocationUpdates(
 			                mLocationManager.getBestProvider(criteria, true), 0, 0,
 			                locationListener);
@@ -1765,12 +1763,13 @@ public class DataFieldManager extends Application {
 		 * You can not implement a LocationListener to a service so that is why
 		 * There is a separate class here that implements a LocationListener
 		 */
-		public class MyLocationListener implements LocationListener
-		{
+		public class MyLocationListener implements LocationListener {
 
 		    @Override
 			public void onLocationChanged(final Location location) {
-				updateLoc(location);
+                Log.e("update loc", "update loc");
+
+                updateLoc(location);
 		    }
 
 		    @Override

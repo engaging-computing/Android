@@ -24,7 +24,6 @@ import org.json.JSONArray;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,7 +39,13 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,7 +69,8 @@ import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class Motion extends Activity implements SensorEventListener {
+
+public class Motion  extends FragmentActivity implements SensorEventListener {
 
 	public static final String DEFAULT_PROJ = "-1";
 	public static final int DEFAULT_RATE = 50;
@@ -113,6 +119,8 @@ public class Motion extends Activity implements SensorEventListener {
 	public static final int SAVE_MODE_REQUESTED = 1008;
 	public static final int PRESETS_REQUESTED = 1009;
 
+	 ViewPager fields;
+     PagerAdapter fieldAdapter;
 
 	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
 
@@ -231,6 +239,9 @@ public class Motion extends Activity implements SensorEventListener {
 		nameB = (Button) findViewById(R.id.b_name);
 		rateB = (Button) findViewById(R.id.b_rate);
 		lengthB = (Button) findViewById(R.id.b_length);
+        fields = (ViewPager) findViewById(R.id.viewpager_fields);
+        fieldAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        fields.setAdapter(fieldAdapter);
 
 		if (RecordingService.running) {
 			startStop.setBackgroundResource(R.drawable.button_rsense_green);
@@ -539,20 +550,20 @@ public class Motion extends Activity implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
-
-		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-		String xPrepend = event.values[0] > 0 ? "+" : "";
-		String yPrepend = event.values[1] > 0 ? "+" : "";
-		String zPrepend = event.values[2] > 0 ? "+" : "";
-
-		x.setText("X: " + xPrepend
-				+ oneDigit.format(event.values[0]));
-		y.setText("Y: " + yPrepend
-				+ oneDigit.format(event.values[1]));
-		z.setText("Z: " + zPrepend
-				+ oneDigit.format(event.values[2]));
-		}
+//		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+//
+//		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
+//		String xPrepend = event.values[0] > 0 ? "+" : "";
+//		String yPrepend = event.values[1] > 0 ? "+" : "";
+//		String zPrepend = event.values[2] > 0 ? "+" : "";
+//
+//		x.setText("X: " + xPrepend
+//				+ oneDigit.format(event.values[0]));
+//		y.setText("Y: " + yPrepend
+//				+ oneDigit.format(event.values[1]));
+//		z.setText("Z: " + zPrepend
+//				+ oneDigit.format(event.values[2]));
+//		}
 
 	}
 
@@ -774,4 +785,28 @@ private void setLengthText() {
 	}
 }
 
+
+    /**
+     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
+     * sequence.
+     */
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+        	if (position == 0) {
+        		return new AccelFragment();
+        	} else {
+                return new MagFragment();
+        	}
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+    }
 }

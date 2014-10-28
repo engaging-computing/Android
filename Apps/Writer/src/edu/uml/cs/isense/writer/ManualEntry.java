@@ -394,7 +394,7 @@ public class ManualEntry extends Activity implements LocationListener {
 
                     et.setEnabled(false);
                     if (this.getLocation() != null) {
-                        et.setText("" + this.getLocation().getLatitude());//mLocationManager.getLastKnownLocation(LOCATION_SERVICE).getLatitude());
+                        et.setText("" + this.getLocation().getLatitude());
                     } else {
                         et.setHint("No GPS Signal");
                     }
@@ -544,10 +544,8 @@ public class ManualEntry extends Activity implements LocationListener {
         mLocationManager.requestLocationUpdates(
                 mLocationManager.getBestProvider(c, true), 0, 0, ManualEntry.this);
 
-        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             //best provider is not gps (must be network or passive) inform the user
-            mLocationManager.requestLocationUpdates(
-                mLocationManager.getBestProvider(c, true), 0, 0, ManualEntry.this);
             w.make("GPS is turned off using "+ mLocationManager.getBestProvider(c, true) + " provider" , Waffle.IMAGE_WARN);
         }
 

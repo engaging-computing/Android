@@ -1,19 +1,5 @@
 package edu.uml.cs.isense.dfm;
 
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
@@ -34,6 +20,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.objects.RProjectField;
@@ -333,14 +334,12 @@ public class DataFieldManager extends Application {
 				dataJSON.put("");
 
 			if (enabledFields[Fields.HEADING_DEG] && f.angle_deg != null) {
-				Log.e("","deg" + f.angle_deg);
 				dataJSON.put(f.angle_deg);
 			} else {
 				dataJSON.put("");
 			}
 
 			if (enabledFields[Fields.HEADING_RAD] && f.angle_rad != null) {
-				Log.e("","rad" + f.angle_rad);
 				dataJSON.put(f.angle_rad);
 			} else {
 				dataJSON.put("");
@@ -1317,14 +1316,8 @@ public class DataFieldManager extends Application {
 	 * @param location
 	 */
 	public void updateLoc(Location location) {
-        Log.e("update loc", "update loc");
-
-        if (loc != null) {
-            Log.e("update loc2", "update loc2");
+        if (location != null)
 			loc = location;
-		} else {
-            Log.e("Location null", "location null");
-        }
 	}
 
 
@@ -1661,16 +1654,13 @@ public class DataFieldManager extends Application {
 		/**
 		 * Called from an app to enable sensors based upon what the fields are of the project.
 		 */
-		@SuppressLint("InlinedApi")
 		public void registerSensors() {
 			//just to be sure
 			unRegisterSensors();
 
             //Initialize sensor managers
 			sensorListener = new MySensorListener();
-	        locationListener = new MyLocationListener();
 
-			mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 		    mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 
 			if (enabledFields[Fields.ACCEL_X]
@@ -1728,14 +1718,19 @@ public class DataFieldManager extends Application {
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
 
-			if (enabledFields[Fields.LATITUDE] || enabledFields[Fields.LONGITUDE] || enabledFields[Fields.ALTITUDE]) {
-				 Criteria criteria = new Criteria();
-			     criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                Log.e("in DFM", "initialize location manager");
-				 mLocationManager.requestLocationUpdates(
+            //if locationmanager is null and field is Lat, Long, or Altitude
+			if ((mLocationManager == null) && (enabledFields[Fields.LATITUDE] || enabledFields[Fields.LONGITUDE] || enabledFields[Fields.ALTITUDE])) {
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+
+                locationListener = new MyLocationListener();
+
+                mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+
+				mLocationManager.requestLocationUpdates(
 			                mLocationManager.getBestProvider(criteria, true), 0, 0,
 			                locationListener);
-				 }
+		    }
 			if (enabledFields[Fields.HUMIDITY]) {
 				mSensorManager.registerListener(sensorListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
@@ -1759,50 +1754,53 @@ public class DataFieldManager extends Application {
 			return android.os.Build.VERSION.SDK_INT;
 		}
 
-		/**
-		 * You can not implement a LocationListener to a service so that is why
-		 * There is a separate class here that implements a LocationListener
-		 */
-		public class MyLocationListener implements LocationListener {
 
-		    @Override
-			public void onLocationChanged(final Location location) {
-                Log.e("update loc", "update loc");
+    /**
+     * You can not implement a LocationListener to a service so that is why
+     * There is a separate class here that implements a LocationListener
+     */
+    public class MyLocationListener implements LocationListener {
 
+        @Override
+        public void onLocationChanged(final Location location) {
+            if (location != null)
                 updateLoc(location);
-		    }
+        }
 
-		    @Override
-			public void onProviderDisabled(String provider) {
-		    }
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
 
-		    @Override
-			public void onProviderEnabled(String provider) {
-		    }
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
 
-		    @Override
-			public void onStatusChanged(String provider, int status, Bundle extras) {
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
 
-		    }
+        }
 
-		}
+    }
 
-		/**
-		 * You can not implement a SensorEventListener to a service so that is why
-		 * There is a separate class here that implements a SensorEventListener
-		 */
-		public class MySensorListener implements SensorEventListener {
+    /**
+     * You can not implement a SensorEventListener to a service so that is why
+     * There is a separate class here that implements a SensorEventListener
+     */
+    public class MySensorListener implements SensorEventListener {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            updateValues(event);
+        }
 
-		    @Override
-		    public void onSensorChanged(SensorEvent event) {
-		    	updateValues(event);
-		    }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-		    @Override
-		    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
 
-		    }
-		}
+
+    }
+
+
 }
 
 

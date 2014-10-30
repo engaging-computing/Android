@@ -1,20 +1,3 @@
-/***************************************************************************************************/
-/***************************************************************************************************/
-/**                                                                                               **/
-/**      IIIIIIIIIIIII               iSENSE Car Ramp Physics App                 SSSSSSSSS        **/
-/**           III                                                               SSS               **/
-/**           III                    By: Michael Stowell                       SSS                **/
-/**           III                    and Virinchi Balabhadrapatruni           SSS                 **/
-/**           III                    Some Code From: iSENSE Amusement Park      SSS               **/
-/**           III                                    App (John Fertita)          SSSSSSSSS        **/
-/**           III                    Faculty Advisor:  Fred Martin                      SSS       **/
-/**           III                    Group:            ECG,                              SSS      **/
-/**           III                                      iSENSE                           SSS       **/
-/**      IIIIIIIIIIIII               Property:         UMass Lowell              SSSSSSSSS        **/
-/**                                                                                               **/
-/***************************************************************************************************/
-/***************************************************************************************************/
-
 package edu.uml.cs.isense.motion;
 
 import java.text.DecimalFormat;
@@ -28,13 +11,8 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -63,6 +41,14 @@ import edu.uml.cs.isense.motion.dialogs.MessageDialogTemplate;
 import edu.uml.cs.isense.motion.dialogs.Presets;
 import edu.uml.cs.isense.motion.dialogs.RateDialog;
 import edu.uml.cs.isense.motion.dialogs.ResetToDefaults;
+import edu.uml.cs.isense.motion.fields.AccelFragment;
+import edu.uml.cs.isense.motion.fields.AltFragment;
+import edu.uml.cs.isense.motion.fields.HumidityFragment;
+import edu.uml.cs.isense.motion.fields.LightFragment;
+import edu.uml.cs.isense.motion.fields.LocFragment;
+import edu.uml.cs.isense.motion.fields.MagFragment;
+import edu.uml.cs.isense.motion.fields.PressureFragment;
+import edu.uml.cs.isense.motion.fields.TempFragment;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QueueLayout;
@@ -70,7 +56,7 @@ import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class Motion  extends FragmentActivity implements SensorEventListener {
+public class Motion  extends FragmentActivity {
 
 	public static final String DEFAULT_PROJ = "-1";
 	public static final int DEFAULT_RATE = 50;
@@ -91,15 +77,12 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 	private Button nameB;
 	private Button rateB;
 	private Button lengthB;
-	private TextView x, y, z;
 	public static Boolean running = false;
 
 	//saved pref keys
 	public static final String MY_SAVED_PREFERENCES = "MyPrefs" ;
 	public static final String LENGTH_PREFS_KEY = "length";
 	public static final String RATE_PREFS_KEY = "rate";
-
-	private SensorManager mSensorManager;
 
 	private Timer timeTimer;
 
@@ -270,9 +253,9 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 			nameB.setText(firstName + " " + lastInitial);
 		}
 
-		x = (TextView) findViewById(R.id.x);
-		y = (TextView) findViewById(R.id.y);
-		z = (TextView) findViewById(R.id.z);
+//		x = (TextView) findViewById(R.id.x);
+//		y = (TextView) findViewById(R.id.y);
+//		z = (TextView) findViewById(R.id.z);
 
 		String projId = ProjectManager.getProject(mContext);
 
@@ -284,9 +267,6 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 
 		setRateText();
 		setLengthText();
-
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
 
 		 /* update UI with data passed back from service */
         receiver = new BroadcastReceiver() {
@@ -441,12 +421,6 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 	public void onStart() {
 		super.onStart();
 		inPausedState = false;
-
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver), new IntentFilter(RecordingService.RESULT));
-
-		mSensorManager.registerListener(Motion.this,
-				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-				SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
 	@SuppressLint("NewApi")
@@ -548,24 +522,7 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 		return false;
 	}
 
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-//		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
-//
-//		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-//		String xPrepend = event.values[0] > 0 ? "+" : "";
-//		String yPrepend = event.values[1] > 0 ? "+" : "";
-//		String zPrepend = event.values[2] > 0 ? "+" : "";
-//
-//		x.setText("X: " + xPrepend
-//				+ oneDigit.format(event.values[0]));
-//		y.setText("Y: " + yPrepend
-//				+ oneDigit.format(event.values[1]));
-//		z.setText("Z: " + zPrepend
-//				+ oneDigit.format(event.values[2]));
-//		}
 
-	}
 
 	public static int getApiLevel() {
 		return android.os.Build.VERSION.SDK_INT;
@@ -610,7 +567,7 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 
 		} else if (reqCode == PRESETS_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-
+				//TODO presets set default field (loc for location) (accel sets field to accel)
 				/*set project*/
 				String projectNumber = data.getExtras().getString(Presets.PROJECT);
 				ProjectManager.setProject(mContext, projectNumber);
@@ -722,11 +679,6 @@ public class Motion  extends FragmentActivity implements SensorEventListener {
 		startActivityForResult(i, reqCode);
 	}
 
-@Override
-public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-}
-
 private void setRateText() {
 	SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 	int rate = ratePrefs.getInt(RATE_PREFS_KEY, DEFAULT_RATE);
@@ -787,8 +739,7 @@ private void setLengthText() {
 
 
     /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
+     * A simple pager adapter that is used to look at sensor values in real time
      */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         public ScreenSlidePagerAdapter(FragmentManager fm) {
@@ -797,16 +748,32 @@ private void setLengthText() {
 
         @Override
         public Fragment getItem(int position) {
-        	if (position == 0) {
-        		return new AccelFragment();
-        	} else {
-                return new MagFragment();
+        	switch(position) {
+        		case 0:
+            		return new AccelFragment();
+        		case 1:
+        			return new LocFragment();
+        		case 2:
+        			return new AltFragment();
+        		case 3:
+        			return new MagFragment();
+        		case 4:
+        			return new PressureFragment();
+        		case 5:
+        			return new TempFragment();
+        		case 6:
+        			return new HumidityFragment();
+        		case 7:
+        			return new LightFragment();
+        		default:
+        			return null;
         	}
         }
 
         @Override
         public int getCount() {
-            return 2;
+        	//num of fragments (0-7)
+            return 8;
         }
     }
 }

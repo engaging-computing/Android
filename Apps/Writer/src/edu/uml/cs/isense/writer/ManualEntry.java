@@ -1,3 +1,20 @@
+/***************************************************************************************************/
+/***************************************************************************************************/
+/**                                                                                               **/
+/**      IIIIIIIIIIIII               iSENSE Writer App                           SSSSSSSSS        **/
+/**           III                                                               SSS               **/
+/**           III                    By: Bobby Donald                          SSS                **/
+/**           III                                                             SSS                 **/
+/**           III                   									        SSS               **/
+/**           III                                    				             SSSSSSSSS        **/
+/**           III                    Faculty Advisor:  Fred Martin                      SSS       **/
+/**           III                    Group:            ECG,                              SSS      **/
+/**           III                                      iSENSE                           SSS       **/
+/**      IIIIIIIIIIIII               Property:         UMass Lowell              SSSSSSSSS        **/
+/**                                                                                               **/
+/***************************************************************************************************/
+/***************************************************************************************************/
+
 package edu.uml.cs.isense.writer;
 
 import java.text.SimpleDateFormat;

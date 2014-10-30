@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:background="#444">
 
     <TextView
@@ -12,7 +12,7 @@
     android:gravity="center"
     android:background="#444"
     android:textColor="@android:color/white"
-    android:text="@string/force"
+    android:text="@string/mag"
     android:textSize="18sp"
     android:textStyle="bold"/>
 
@@ -24,7 +24,7 @@
     android:weightSum="3">
 
         <TextView
-            android:id="@+id/x"
+            android:id="@+id/magx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -34,7 +34,7 @@
             android:layout_weight="1"/>
 
         <TextView
-            android:id="@+id/y"
+            android:id="@+id/magy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -44,7 +44,7 @@
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/z"
+            android:id="@+id/magz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"

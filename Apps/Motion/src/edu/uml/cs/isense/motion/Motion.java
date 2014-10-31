@@ -1,3 +1,19 @@
+/***************************************************************************************************/
+/***************************************************************************************************/
+/**                                                                                               **/
+/**      IIIIIIIIIIIII               iSENSE Car Ramp Physics App                 SSSSSSSSS        **/
+/**           III                                                               SSS               **/
+/**           III                    By: Bobby Donald, Michael Stowell         SSS                **/
+/**           III                    and Virinchi Balabhadrapatruni           SSS                 **/
+/**           III                    Some Code From: iSENSE Amusement Park      SSS               **/
+/**           III                                    App (John Fertita)          SSSSSSSSS        **/
+/**           III                    Faculty Advisor:  Fred Martin                      SSS       **/
+/**           III                    Group:            ECG,                              SSS      **/
+/**           III                                      iSENSE                           SSS       **/
+/**      IIIIIIIIIIIII               Property:         UMass Lowell              SSSSSSSSS        **/
+/**                                                                                               **/
+/***************************************************************************************************/
+/***************************************************************************************************/
 package edu.uml.cs.isense.motion;
 
 import java.text.DecimalFormat;

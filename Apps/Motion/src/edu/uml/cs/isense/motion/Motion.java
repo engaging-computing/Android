@@ -269,10 +269,6 @@ public class Motion  extends FragmentActivity {
 			nameB.setText(firstName + " " + lastInitial);
 		}
 
-//		x = (TextView) findViewById(R.id.x);
-//		y = (TextView) findViewById(R.id.y);
-//		z = (TextView) findViewById(R.id.z);
-
 		String projId = ProjectManager.getProject(mContext);
 
 		if (projId.equals("-1")) {

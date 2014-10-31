@@ -174,7 +174,7 @@
     <string name="loc">Location</string>
     <string name="vel">Velocity (Calculated from GPS)</string>
     <string name="dis">Distance (Calculated from GPS)</string>
-    <string name="mag">Magnitude</string>
+    <string name="mag">Magnetic</string>
     <string name="temp">Temperature</string>
     <string name="alt">Altitude</string>
     <string name="light">Luminous Flux (Light)</string>

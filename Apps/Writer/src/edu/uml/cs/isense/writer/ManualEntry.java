@@ -1,5 +1,30 @@
+/***************************************************************************************************/
+/***************************************************************************************************/
+/**                                                                                               **/
+/**      IIIIIIIIIIIII               iSENSE Writer App                           SSSSSSSSS        **/
+/**           III                                                               SSS               **/
+/**           III                    By: Bobby Donald                          SSS                **/
+/**           III                                                             SSS                 **/
+/**           III                   									        SSS               **/
+/**           III                                    				             SSSSSSSSS        **/
+/**           III                    Faculty Advisor:  Fred Martin                      SSS       **/
+/**           III                    Group:            ECG,                              SSS      **/
+/**           III                                      iSENSE                           SSS       **/
+/**      IIIIIIIIIIIII               Property:         UMass Lowell              SSSSSSSSS        **/
+/**                                                                                               **/
+/***************************************************************************************************/
+/***************************************************************************************************/
+
 package edu.uml.cs.isense.writer;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -28,14 +53,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.CredentialManager;
 import edu.uml.cs.isense.objects.RProjectField;
@@ -67,7 +84,8 @@ public class ManualEntry extends Activity implements LocationListener {
 
     private static final String DEFAULT_PROJ = "514";
 
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manual_entry);

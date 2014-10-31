@@ -4,58 +4,13 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true"
     android:orientation="vertical" >
-    
-     <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:background="#444"
-            android:textColor="@android:color/white"
-            android:text="@string/force"
-            android:textSize="18sp"
-            android:textStyle="bold" />
 
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height= "60dp"
+        android:id="@+id/viewpager_fields"/>
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#444"
-        android:orientation="horizontal" 
-    	android:weightSum="3">
-
-        <TextView
-            android:id="@+id/x"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" 
-            android:layout_weight="1"/>
-        
-        <TextView
-            android:id="@+id/y"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_weight="1" />
-        
-        <TextView
-            android:id="@+id/z"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-    
-    	<LinearLayout
         android:id="@+id/ll_rateanddurationbuttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -112,9 +67,6 @@
         android:textColor="#0066FF"
         android:textSize="30sp" />
     
-    	
-        
-    
      <RelativeLayout
         android:id="@+id/rl_nameandlogin"
         android:layout_width="match_parent"
@@ -142,9 +94,7 @@
 
     </RelativeLayout>
     
-     
-    
-        <LinearLayout
+    <LinearLayout
         android:id="@+id/ll_project"
         android:layout_width="match_parent"
         android:layout_height="40dp"

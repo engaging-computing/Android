@@ -92,13 +92,13 @@ public class ManualEntry extends Activity implements LocationListener {
 
         mContext = this;
         api = API.getInstance();
+        w = new Waffle(mContext);
 
         uq = new UploadQueue("ManualEntry", mContext, api);
         uq.buildQueueFromFile();
 
         initializeLocationManager();
 
-        w = new Waffle(mContext);
 
         CredentialManager.login(mContext, api);
         addField = (Button) findViewById(R.id.adddatapoint);
@@ -394,8 +394,8 @@ public class ManualEntry extends Activity implements LocationListener {
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
-                    if (mLocationManager.getLastKnownLocation(LOCATION_SERVICE) != null) {
-                        et.setText("" + mLocationManager.getLastKnownLocation(LOCATION_SERVICE).getLongitude());
+                    if (this.getLocation() != null) {
+                        et.setText("" + this.getLocation().getLongitude());
                     } else {
                         et.setHint("No GPS Signal");
                     }
@@ -411,8 +411,8 @@ public class ManualEntry extends Activity implements LocationListener {
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
-                    if (mLocationManager.getLastKnownLocation(LOCATION_SERVICE) != null) {
-                        et.setText("" + mLocationManager.getLastKnownLocation(LOCATION_SERVICE).getLatitude());
+                    if (this.getLocation() != null) {
+                        et.setText("" + this.getLocation().getLatitude());
                     } else {
                         et.setHint("No GPS Signal");
                     }
@@ -535,15 +535,36 @@ public class ManualEntry extends Activity implements LocationListener {
         }
     }
 
+    public Location getLocation() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        if (locationManager != null) {
+            //includes locations from GPS, AGPS
+            Location lastKnownGPSLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (lastKnownGPSLocation != null) {
+                return lastKnownGPSLocation;
+            } else {
+                //includes locations from AGPS, CellID, WiFi MACID
+                Location lastKnownNetworkLocation =  locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                return lastKnownNetworkLocation;
+            }
+        } else {
+            return null;
+        }
+    }
+
     void initializeLocationManager() {
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
-
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mLocationManager.requestLocationUpdates(
-                    mLocationManager.getBestProvider(c, true), 0, 0, ManualEntry.this);
+        //location will come from best provider available. (could be gps, network, or passive)
+        mLocationManager.requestLocationUpdates(
+                mLocationManager.getBestProvider(c, true), 0, 0, ManualEntry.this);
+
+        if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //best provider is not gps (must be network or passive) inform the user
+            w.make("GPS is turned off using "+ mLocationManager.getBestProvider(c, true) + " provider" , Waffle.IMAGE_WARN);
         }
 
     }
@@ -580,4 +601,5 @@ public class ManualEntry extends Activity implements LocationListener {
         if (mLocationManager != null)
             mLocationManager.removeUpdates(ManualEntry.this);
     }
+
 }

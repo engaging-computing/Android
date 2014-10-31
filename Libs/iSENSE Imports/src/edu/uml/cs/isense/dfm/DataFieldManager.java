@@ -1,5 +1,19 @@
 package edu.uml.cs.isense.dfm;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
@@ -20,21 +34,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.objects.RProjectField;
@@ -49,8 +48,7 @@ import edu.uml.cs.isense.objects.RProjectField;
  */
 @SuppressLint("UseValueOf")
 public class DataFieldManager extends Application {
-    private MySensorListener sensorListener;
-    private MyLocationListener locationListener;
+    private MyListener mListener;
 
 	private float rawAccel[] = new float[4];
 	private float rawMag[] = new float[3];
@@ -1659,7 +1657,7 @@ public class DataFieldManager extends Application {
 			unRegisterSensors();
 
             //Initialize sensor managers
-			sensorListener = new MySensorListener();
+			mListener = new MyListener();
 
 		    mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 
@@ -1667,7 +1665,7 @@ public class DataFieldManager extends Application {
 					|| enabledFields[Fields.ACCEL_Y]
 					|| enabledFields[Fields.ACCEL_Z]
 					|| enabledFields[Fields.ACCEL_TOTAL]) {
-				mSensorManager.registerListener(sensorListener,
+				mSensorManager.registerListener(mListener,
 						mSensorManager
 								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 						SensorManager.SENSOR_DELAY_FASTEST);
@@ -1679,7 +1677,7 @@ public class DataFieldManager extends Application {
 					|| enabledFields[Fields.MAG_TOTAL]
 					|| enabledFields[Fields.HEADING_DEG]
 					|| enabledFields[Fields.HEADING_RAD]) {
-				mSensorManager.registerListener(sensorListener,
+				mSensorManager.registerListener(mListener,
 						mSensorManager
 								.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
 						SensorManager.SENSOR_DELAY_FASTEST);
@@ -1690,7 +1688,7 @@ public class DataFieldManager extends Application {
 					|| enabledFields[Fields.TEMPERATURE_K]) {
 				if (getApiLevel() >= 14) {
 					mSensorManager.registerListener(
-							sensorListener,
+							mListener,
 							        mSensorManager
 											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
 									SensorManager.SENSOR_DELAY_FASTEST);
@@ -1699,7 +1697,7 @@ public class DataFieldManager extends Application {
 
 			if (enabledFields[Fields.HUMIDITY]) {
 				mSensorManager.registerListener(
-						sensorListener,
+						mListener,
 						        mSensorManager
 										.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
 								SensorManager.SENSOR_DELAY_FASTEST);
@@ -1707,13 +1705,13 @@ public class DataFieldManager extends Application {
 
 			if (enabledFields[Fields.PRESSURE]
 					|| enabledFields[Fields.ALTITUDE]) {
-				mSensorManager.registerListener(sensorListener,
+				mSensorManager.registerListener(mListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
 
 			if (enabledFields[Fields.LIGHT]) {
-				mSensorManager.registerListener(sensorListener,
+				mSensorManager.registerListener(mListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
@@ -1723,16 +1721,16 @@ public class DataFieldManager extends Application {
                 Criteria criteria = new Criteria();
                 criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
-                locationListener = new MyLocationListener();
+                mListener = new MyListener();
 
                 mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
 				mLocationManager.requestLocationUpdates(
 			                mLocationManager.getBestProvider(criteria, true), 0, 0,
-			                locationListener);
+			                mListener);
 		    }
 			if (enabledFields[Fields.HUMIDITY]) {
-				mSensorManager.registerListener(sensorListener,
+				mSensorManager.registerListener(mListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
 						SensorManager.SENSOR_DELAY_FASTEST);
 			}
@@ -1743,10 +1741,10 @@ public class DataFieldManager extends Application {
 		 */
 		public void unRegisterSensors() {
 			if (mLocationManager != null)
-	            mLocationManager.removeUpdates(locationListener);
+	            mLocationManager.removeUpdates(mListener);
 
 	        if (mSensorManager != null)
-	            mSensorManager.unregisterListener(sensorListener);
+	            mSensorManager.unregisterListener(mListener);
         }
 
 		// Assists with differentiating between displays for dialogues
@@ -1755,12 +1753,21 @@ public class DataFieldManager extends Application {
 		}
 
 
-    /**
-     * You can not implement a LocationListener to a service so that is why
-     * There is a separate class here that implements a LocationListener
-     */
-    public class MyLocationListener implements LocationListener {
 
+    /**
+     * You can not implement a SensorEventListener or a LocationListener in a service so that is why
+     * There is a separate class here that implements a SensorEventListener
+     */
+    public class MyListener implements SensorEventListener, LocationListener {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            updateValues(event);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
         @Override
         public void onLocationChanged(final Location location) {
             if (location != null)
@@ -1779,24 +1786,6 @@ public class DataFieldManager extends Application {
         public void onStatusChanged(String provider, int status, Bundle extras) {
 
         }
-
-    }
-
-    /**
-     * You can not implement a SensorEventListener to a service so that is why
-     * There is a separate class here that implements a SensorEventListener
-     */
-    public class MySensorListener implements SensorEventListener {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            updateValues(event);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-
 
     }
 

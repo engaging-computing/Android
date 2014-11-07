@@ -29,18 +29,17 @@
     </LinearLayout>
     
    <ScrollView
+       android:id="@+id/datapoints_sv"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_above="@+id/buttons"
        android:layout_below="@+id/dataset_name_layout"
        tools:context="edu.uml.cs.isense.writer.ManualEntry" >
-
-   <LinearLayout
-    	android:id="@+id/datapoints_sv"
-    	android:orientation="vertical"
-		android:layout_width="match_parent"
-   		android:layout_height="wrap_content"/>
-      
+	   <LinearLayout
+	    	android:id="@+id/datapoints_ll"
+	    	android:orientation="vertical"
+			android:layout_width="match_parent"
+	   		android:layout_height="wrap_content"/>
     </ScrollView>
     
    

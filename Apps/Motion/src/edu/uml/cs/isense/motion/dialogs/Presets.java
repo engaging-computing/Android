@@ -12,6 +12,8 @@ public class Presets extends Activity{
 	public static final String PROJECT = "project";
 	public static final String LENGTH = "length";
 	public static final String RATE = "rate";
+	public static final String FIELD = "field";
+
 
 
 	@Override
@@ -32,6 +34,7 @@ public class Presets extends Activity{
 				resultIntent.putExtra(LENGTH, 10);
 				resultIntent.putExtra(PROJECT, "570");
 				setResult(Activity.RESULT_OK, resultIntent);
+				resultIntent.putExtra(FIELD, 0);
 				finish();
 			}
 
@@ -45,6 +48,7 @@ public class Presets extends Activity{
 				resultIntent.putExtra(RATE, 1000);
 				resultIntent.putExtra(LENGTH, -1);
 				resultIntent.putExtra(PROJECT, "13");
+				resultIntent.putExtra(FIELD, 1);
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			}

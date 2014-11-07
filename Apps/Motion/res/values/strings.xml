@@ -36,7 +36,7 @@ Light\n\n
 8. Remember to change the project number in the app to match your project number!\n\nYou may also use the Create a Project feature in this app by clicking on the data recorded in the upload menu then pressing “Select Project” and then selecting “Create New Project” from the new menu that pops up. This will allow you to create a new project with the proper fields set up for you.</string>
         
     <string name="about_title">About</string>
-    <string name="login_title">Credential Manager</string>
+    <string name="login_title">Credentials</string>
     <string name="logged_in_as">Logged in as: </string>
     <string name="recordSettings">Recording Fields</string>
     <string name="X">X:</string>

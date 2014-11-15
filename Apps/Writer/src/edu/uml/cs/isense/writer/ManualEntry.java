@@ -18,7 +18,6 @@
 package edu.uml.cs.isense.writer;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -28,9 +27,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -62,7 +61,7 @@ import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class ManualEntry extends Activity implements LocationListener {
+public class ManualEntry extends ActionBarActivity implements LocationListener {
     public static Context mContext;
     private API api;
     private Boolean useDev = false;
@@ -113,13 +112,18 @@ public class ManualEntry extends Activity implements LocationListener {
 
         });
 
-//        // Initialize action bar customization for API >= 11
-//        if (android.os.Build.VERSION.SDK_INT >= 11) {
-//            ActionBar bar = getSupportActionBar();
-//
-//            // make the actionbar clickable
-//            bar.setDisplayHomeAsUpEnabled(true);
-//        }
+
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar.setOnMenuItemClickListener(
+//                new Toolbar.OnMenuItemClickListener() {
+//                    @Override
+//                    public boolean onMenuItemClick(MenuItem item) {
+//                        // Handle the menu item
+//                        return true;
+//                    }
+//                });
+//        toolbar.inflateMenu(R.menu.main);
+
 
         datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_sv);
         if (fields == null) {
@@ -169,12 +173,12 @@ public class ManualEntry extends Activity implements LocationListener {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        toolbar.inflate(R.menu.main, menu);
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

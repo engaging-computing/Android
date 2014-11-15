@@ -32,8 +32,12 @@ public class Fields {
 	public String angle_deg, angle_rad;
 	public double latitude, longitude;
 	public String mag_x, mag_y, mag_z, mag_total;
-	public String altitude;
+	public double altitude;
 	public String pressure;
+	public float velocity, distance;
+	public double humidity;
+	
+
 	
 	/**
 	 * Default constructor for the Fields object.
@@ -42,7 +46,7 @@ public class Fields {
 	}
 	
 	// Constants
-	public static final int NUM_FIELDS = 19;
+	public static final int NUM_FIELDS = 22;
 	
 	public static final int TIME = 0;
 	public static final int ACCEL_X = 1;
@@ -63,4 +67,11 @@ public class Fields {
 	public static final int LIGHT = 16;
 	public static final int TEMPERATURE_F = 17;
 	public static final int TEMPERATURE_K = 18;
+	public static final int VELOCITY = 19;
+	public static final int DISTANCE = 20;
+	public static final int HUMIDITY = 21;
+
+
+	
+	
 }

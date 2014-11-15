@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="edu.uml.cs.isense.motion"
+    android:versionCode="4"
+    android:versionName="1.0">
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="21" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/isense_graph"
+        android:label="@string/display_name" >
+        
+        <service android:enabled="true" android:name="edu.uml.cs.isense.motion.RecordingService" />
+        <uses-library android:name="android.test.runner" />
+        
+        <activity
+            android:name="edu.uml.cs.isense.motion.Motion"
+            android:label="@string/display_name"
+            android:theme="@style/AppTheme" 
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.RecordSettings"
+            android:label="@string/recordSettings"
+            android:theme="@style/AppThemeDialog" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.About"
+            android:label="@string/about_title"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.Help"
+            android:label="@string/help_title"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.DataActivity"
+            android:label="@string/upload_or_trash"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.proj.ProjectManager"
+            android:label="@string/choose_project_title"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.proj.BrowseProjects"
+            android:label="@string/select_proj"
+            android:windowSoftInputMode="stateHidden"
+            tools:ignore="MissingRegistered" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.proj.NoQR"
+            android:label="@string/no_qr"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" >
+        </activity>
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueLayout"
+            android:label="Upload Data"
+            android:theme="@style/AppTheme"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueAlter"
+            android:label="Alter Data Set"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueEditData"
+            android:label="Edit Data"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueEditRename"
+            android:label="Rename Data Set"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.NoInitialProject"
+            android:label="No Associated Projects"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueSummary"
+            android:label="Summary"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.dfm.FieldMatching"
+            android:label="Select Fields"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.EnterName"
+            android:label="@string/enter_name_prompt"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.MessageDialogTemplate"
+            android:label="Output a message"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.DurationDialog"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+         <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.RateDialog"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.ViewData"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.ResetToDefaults"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.SaveModeDialog"
+            android:label="Save Mode?"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.queue.QueueDeleteSelected"
+            android:label="Delete Selected Data Sets"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.proj.ProjectFieldDialog"
+            android:label="@string/new_proj_name_title"
+            android:configChanges="keyboard|keyboardHidden"
+            android:windowSoftInputMode="stateHidden"
+            tools:ignore="MissingRegistered"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.ClassroomMode"
+            android:label="@string/classroom_mode"
+            android:theme="@style/AppThemeDialog"
+            tools:ignore="MissingRegistered" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.CredentialManager"
+            android:label="Credential Manager"
+            android:configChanges="screenSize|orientation"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.proj.ProjectCreate"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Create New Project"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.CredentialManagerKey"
+            android:label="Add Contributor Key"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.ContributorKeyDialog"
+            android:label="Add Contributor Key"
+            android:theme="@style/AppThemeDialog" />
+         <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.Presets"
+            android:label="Preset Recording Modes"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.LoginOrKeyDialog"
+            android:label="Upload Method"
+            android:theme="@style/AppThemeDialog" />
+        
+    </application>
+        
+
+</manifest>

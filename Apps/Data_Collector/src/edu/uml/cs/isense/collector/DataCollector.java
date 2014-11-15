@@ -922,7 +922,7 @@ public class DataCollector extends Activity implements SensorEventListener,
 		mEdit.putString("project_id", "-1").commit();
 
 		dfm = new DataFieldManager(Integer.parseInt(mPrefs.getString(
-				"project_id", "-1")), api, mContext, f);
+				"project_id", "-1")), api, mContext);
 		dfm.getOrder();
 
 		for (int i = 0; i < Fields.NUM_FIELDS; i++)
@@ -960,7 +960,7 @@ public class DataCollector extends Activity implements SensorEventListener,
 			setUpDFMWithAllFields();
 		} else {
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-					mContext, f);
+					mContext);
 			dfm.getOrder();
 
 			String fields = mPrefs.getString("accepted_fields", "");
@@ -1648,7 +1648,7 @@ public class DataCollector extends Activity implements SensorEventListener,
 				setUpDFMWithAllFields();
 			} else {
 				dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-						mContext, f);
+						mContext);
 
 				dfm.getOrderWithExternalAsyncTask();
 				

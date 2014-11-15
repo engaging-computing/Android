@@ -11,7 +11,7 @@ import android.widget.Button;
 /**
  * This dialog themed activity displays when the user attempts
  * to scan a QR code in the
- * {@link edu.uml.cs.isense.proj.Setup Setup} class but has not
+ * {@link edu.uml.cs.isense.proj.ProjectManager Setup} class but has not
  * yet installed the ZXing Barcode Scanner Android application.
  * 
  * No public implementation of this class is necessary.

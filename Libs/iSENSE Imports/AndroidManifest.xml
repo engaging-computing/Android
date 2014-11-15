@@ -4,8 +4,8 @@
     android:versionName="4.1">
 
     <uses-sdk
-        android:minSdkVersion="L"
-        android:targetSdkVersion="L" />
+        android:minSdkVersion="9"
+        android:targetSdkVersion="21" />
 
     <activity
         android:name=".queue.QueueLayout"
@@ -81,8 +81,8 @@
         android:label="Create New Project"
         android:theme="@style/AppTheme" />
     <activity
-        android:name=".proj.ProjectNameDialog"
+        android:name=".proj.ProjectFieldDialog"
         android:label="Enter Projet Name"
-        android:theme="@style/AppThemeDialog" />
+        android:theme="@style/AppTheme" />
 
 </manifest>

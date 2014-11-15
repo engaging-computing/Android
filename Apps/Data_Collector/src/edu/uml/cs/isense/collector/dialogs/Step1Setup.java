@@ -212,7 +212,7 @@ public class Step1Setup extends Activity {
 		String proj = globalProjPrefs.getString("project_id_dc", "");
 		if (!(proj.equals(""))) {
 			projLabel.setText("Project (currently " + proj + ")");
-			dfm = new DataFieldManager(Integer.parseInt(proj), api, mContext, f);
+			dfm = new DataFieldManager(Integer.parseInt(proj), api, mContext);
 
 			// reset the global project id so we don't pull it again
 			gppEdit.putString("project_id_dc", "").commit();
@@ -224,9 +224,9 @@ public class Step1Setup extends Activity {
 			if (!(proj.equals("") || proj.equals("-1"))) {
 				projLabel.setText("Project (currently " + proj + ")");
 				dfm = new DataFieldManager(Integer.parseInt(proj), api,
-						mContext, f);
+						mContext);
 			} else {
-				dfm = new DataFieldManager(-1, api, mContext, f);
+				dfm = new DataFieldManager(-1, api, mContext);
 				projCheck.toggle();
 			}
 		}
@@ -389,7 +389,7 @@ public class Step1Setup extends Activity {
 			Log.d("SensorCheck", "ProjectId = " + projectInput);
 
 			dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
-					mContext, f);
+					mContext);
 			dfm.getOrderWithExternalAsyncTask();
 			dfm.writeProjectFields();
 

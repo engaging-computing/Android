@@ -95,7 +95,7 @@
             android:label="@string/project_prompt"
             android:theme="@style/AppThemeDialog" />
           <activity
-            android:name="edu.uml.cs.isense.proj.ProjectNameDialog"
+            android:name="edu.uml.cs.isense.proj.ProjectFieldDialog"
             android:label="@string/project_name_dialog"
             android:theme="@style/AppThemeDialog" />
           <activity

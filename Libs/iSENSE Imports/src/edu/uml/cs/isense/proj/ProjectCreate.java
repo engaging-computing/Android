@@ -34,7 +34,7 @@ import edu.uml.cs.isense.waffle.Waffle;
 /**
  * This Activity is designed to allow users to create a project on the iSENSE
  * website.
- * 
+ *
  * @author iSENSE Android Development Team
  */
 public class ProjectCreate extends Activity {
@@ -117,6 +117,7 @@ public class ProjectCreate extends Activity {
 		// Set listeners for the buttons
 		final Button cancel = (Button) findViewById(R.id.project_create_cancel);
 		cancel.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				finish();
 			}
@@ -124,6 +125,7 @@ public class ProjectCreate extends Activity {
 
 		final Button ok = (Button) findViewById(R.id.project_create_ok);
 		ok.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				// check to see if the project has a name
 				if (projectName.getText().toString().length() == 0) {
@@ -170,6 +172,7 @@ public class ProjectCreate extends Activity {
 		final Button addField = (Button) findViewById(R.id.project_create_add_field_button);
 		addField.setOnClickListener(new OnClickListener() {
 
+			@Override
 			public void onClick(View v) {
 				int position = fieldSpin.getSelectedItemPosition();
 
@@ -246,6 +249,7 @@ public class ProjectCreate extends Activity {
 
 		ImageView x = (ImageView) v.findViewById(R.id.project_field_x);
 		x.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				fieldScroll.removeView(v);
 				if ((Integer) v.getTag() == FIELD_TYPE_LOCATION) {
@@ -268,10 +272,12 @@ public class ProjectCreate extends Activity {
 
 	private void scrollDown() {
 		Thread scrollThread = new Thread() {
+			@Override
 			public void run() {
 				try {
 					sleep(200);
 					ProjectCreate.this.runOnUiThread(new Runnable() {
+						@Override
 						public void run() {
 							fieldScrollHolder.fullScroll(View.FOCUS_DOWN);
 						}
@@ -433,9 +439,8 @@ public class ProjectCreate extends Activity {
 
 			if (newProjID != 0) {
 
-				Intent iRet = new Intent();
-				iRet.putExtra(NEW_PROJECT_ID, "" + newProjID);
-				setResult(RESULT_OK, iRet);
+				ProjectManager.setProject(mContext, String.valueOf(newProjID));
+				setResult(RESULT_OK);
 				finish();
 
 			} else

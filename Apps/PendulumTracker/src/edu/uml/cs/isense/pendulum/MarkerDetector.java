@@ -10,14 +10,11 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-
-import android.util.Log;
 
 public class MarkerDetector {
 	
-	private static final String  TAG = "PendulumTracker::MarkerDetector";
+//	private static final String  TAG = "PendulumTracker::MarkerDetector";
 	
     // Lower and Upper bounds for range checking in HSV color space
     private Scalar mLowerBound = new Scalar(0);
@@ -78,13 +75,13 @@ public class MarkerDetector {
     // this processes one frame and return the location of the detected marker (e.g. pendulum) 
     public Point processGrey(Mat mGrey)
     {
-		double downScale = 1.0;
-		final Size imgSize = new Size(mGrey.cols()*downScale, mGrey.rows()*downScale);
+//		double downScale = 1.0;
+//		final Size imgSize = new Size(mGrey.cols()*downScale, mGrey.rows()*downScale);
 	
 		/*Mat */ ///result = new Mat();
 		mResult = mGrey.clone(); // use when doing image processing on original grabbed image
 		///Imgproc.resize(mResult, mResult, imgSize);
-		Mat mask = new Mat(mResult.size(), CvType.CV_8U);
+//		Mat mask = new Mat(mResult.size(), CvType.CV_8U);
 
 		Core.inRange(mResult, new Scalar(0), new Scalar(64), mResult);
 		
@@ -107,8 +104,8 @@ public class MarkerDetector {
         // Find max contour area
         List<MatOfPoint> mContours = new ArrayList<MatOfPoint>();
         double maxArea = 0;
-        double mMinContourArea = 0.2;
-        double mMaxContourArea = 0.9;
+//        double mMinContourArea = 0.2;
+//        double mMaxContourArea = 0.9;
         Iterator<MatOfPoint> each = contours.iterator();
         // look for contour with maximum area
         while (each.hasNext())
@@ -138,7 +135,7 @@ public class MarkerDetector {
 		//final double upScale = 3.125;
 		final double upScale = 1;
 		//final double upScale = 6;
-		final Size greyImgSize = new Size(mGrey.cols()*upScale*downScale, mGrey.rows()*upScale*downScale); // downscale upscale 
+//		final Size greyImgSize = new Size(mGrey.cols()*upScale*downScale, mGrey.rows()*upScale*downScale); // downscale upscale 
 
 		Point center = new Point(0,0);
 		center = getBlobCentroid(mResult);
@@ -209,7 +206,7 @@ public class MarkerDetector {
 	{
 		// Assume binary blob mask
 		//Point center = new Point(0,0);
-		Mat centers = new Mat();
+//		Mat centers = new Mat();
 		int cx = 0, cy = 0;
 		int numPts = 0;
 		int numRows = mask.rows();

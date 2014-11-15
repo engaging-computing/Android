@@ -32,7 +32,6 @@
 *gradle*
 *.gradle
 *local.properties
-*out
 *build
 *production
 *.iml
@@ -54,3 +53,6 @@
 *.idea/tasks.xml
 *.idea/datasources.xml
 *.idea/dataSources.ids
+
+#Robotium
+

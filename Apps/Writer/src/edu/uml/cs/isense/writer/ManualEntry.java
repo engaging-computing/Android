@@ -115,13 +115,10 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
         });
 
-        // Initialize action bar customization for API >= 14
-        if (android.os.Build.VERSION.SDK_INT >= 14) {
+        // Initialize action bar customization for API >= 11
+        if (android.os.Build.VERSION.SDK_INT >= 11) {
             ActionBar bar = getSupportActionBar();
-            bar.setLogo(R.drawable.rsense_logo_right);
 
-//            // make the actionbar clickable
-//            bar.setDisplayHomeAsUpEnabled(true);
         }
 
         datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_sv);

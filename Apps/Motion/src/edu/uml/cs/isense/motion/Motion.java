@@ -16,13 +16,7 @@
 /***************************************************************************************************/
 package edu.uml.cs.isense.motion;
 
-import java.text.DecimalFormat;
-import java.util.Timer;
-
-import org.json.JSONArray;
-
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,12 +28,12 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +41,12 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+
+import java.text.DecimalFormat;
+import java.util.Timer;
+
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
@@ -72,7 +72,7 @@ import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class Motion  extends FragmentActivity {
+public class Motion  extends ActionBarActivity {
 
 	public static final String DEFAULT_PROJ = "-1";
 	public static final int DEFAULT_RATE = 50;
@@ -206,12 +206,13 @@ public class Motion  extends FragmentActivity {
 		}
 
 		// Initialize action bar customization for API >= 11
-		if (android.os.Build.VERSION.SDK_INT >= 11) {
-			ActionBar bar = getActionBar();
-
-			// make the actionbar clickable
-			bar.setDisplayHomeAsUpEnabled(true);
-		}
+        //having issues with material design and logo, commenting out until I figure out why
+//		if (android.os.Build.VERSION.SDK_INT >= 11) {
+//			ActionBar bar = getSupportActionBar();
+//
+//			// make the actionbar clickable
+//			bar.setDisplayHomeAsUpEnabled(true);
+//		}
 
 		if (RecordingService.running)
 			useMenu = false;

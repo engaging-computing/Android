@@ -1,0 +1,46 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Main theme colors new for material design-->
+        <!--   your app branding color for the app bar -->
+        <item name="colorPrimary">@color/primary</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@color/accent</item>
+
+    </style>
+
+    <style name="AppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+
+    <!--<style name="PDTheme" parent="Theme.AppCompat.Light.Dialog">-->
+        <!--<item name="android:alertDialogStyle">@style/CustomProgressDialogStyle</item>-->
+        <!--<item name="android:textColorPrimary">#000000</item>-->
+    <!--</style>-->
+
+    <!--<style name="CustomProgressDialogStyle">-->
+        <!--<item name="android:bottomBright">#FF0000</item>-->
+        <!--<item name="android:bottomDark">#FF0000</item>-->
+        <!--<item name="android:bottomMedium">#FF0000</item>-->
+        <!--<item name="android:centerBright">#FF0000</item>-->
+        <!--<item name="android:centerDark">#FF0000</item>-->
+        <!--<item name="android:centerMedium">#FF0000</item>-->
+        <!--<item name="android:fullBright">#FF0000</item>-->
+        <!--<item name="android:fullDark">#FF0000</item>-->
+        <!--<item name="android:topBright">#FF0000</item>-->
+        <!--<item name="android:topDark">#FF0000</item>-->
+    <!--</style>-->
+
+    <!--<style name="AppTheme.Widget" parent="Theme.AppCompat.Light">-->
+        <!--<item name="android:popupMenuStyle">@style/AppTheme.PopupMenu</item>-->
+        <!--<item name="android:dropDownListViewStyle">@style/AppTheme.DropDownListView</item>-->
+    <!--</style>-->
+
+    <!--<style name="AppTheme.PopupMenu" parent="Base.V11.Theme.AppCompat.Light.Dialog" />-->
+
+    <!--<style name="AppTheme.DropDownListView" parent="@android:style/Widget.Holo.Light.ListView.DropDown" />-->
+
+</resources>

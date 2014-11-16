@@ -18,6 +18,7 @@
 package edu.uml.cs.isense.writer;
 
 import android.annotation.SuppressLint;
+import android.support.v7.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -29,9 +30,9 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -114,82 +115,14 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.inflateMenu(R.menu.main);
+        // Initialize action bar customization for API >= 14
+        if (android.os.Build.VERSION.SDK_INT >= 14) {
+            ActionBar bar = getSupportActionBar();
+            bar.setLogo(R.drawable.rsense_logo_right);
 
-
-        toolbar.setOnMenuItemClickListener(
-                new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        int id = item.getItemId();
-                        if (id == R.id.MENU_ITEM_LOGIN) {
-                            startActivityForResult(new Intent(mContext, CredentialManager.class),
-                                    LOGIN_STATUS_REQUESTED);
-                            return true;
-                        }
-                        if (id == R.id.MENU_ITEM_PROJECT) {
-//                            Intent setup = new Intent(mContext, ProjectManager.class);
-//                            setup.putExtra("showSelectLater", false);
-//                            mContext.startActivityForResult(setup, PROJECT_REQUESTED);
-                            return true;
-                        }
-
-                        if (id == android.R.id.home) {
-                            CountDownTimer cdt = null;
-
-                            // Give user 10 seconds to switch dev/prod mode
-                            if (actionBarTapCount == 0) {
-                                cdt = new CountDownTimer(5000, 5000) {
-                                    @Override
-                                    public void onTick(long millisUntilFinished) {
-                                    }
-
-                                    @Override
-                                    public void onFinish() {
-                                        actionBarTapCount = 0;
-                                    }
-                                }.start();
-                            }
-
-                            String other = (useDev) ? "production" : "dev";
-
-                            switch (++actionBarTapCount) {
-                                case 5:
-                                    w.make(getResources().getString(R.string.two_more_taps) + other
-                                            + getResources().getString(R.string.mode_type));
-                                    break;
-                                case 6:
-                                    w.make(getResources().getString(R.string.one_more_tap) + other
-                                            + getResources().getString(R.string.mode_type));
-                                    break;
-                                case 7:
-                                    w.make(getResources().getString(R.string.now_in_mode) + other
-                                            + getResources().getString(R.string.mode_type));
-                                    useDev = !useDev;
-
-                                    if (cdt != null)
-                                        cdt.cancel();
-
-                                    api.useDev(useDev);
-
-                                    clearFields();
-                                    new getNewFieldsTask().execute();
-
-                                    actionBarTapCount = 0;
-                                    break;
-                            }
-
-                        }
-
-                        if (id == R.id.MENU_ITEM_UPLOAD) {
-                            manageUploadQueue();
-                        }
-                        return true;
-                    }
-                });
-
+//            // make the actionbar clickable
+//            bar.setDisplayHomeAsUpEnabled(true);
+        }
 
         datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_sv);
         if (fields == null) {
@@ -237,6 +170,81 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
             }
 
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.MENU_ITEM_LOGIN) {
+            startActivityForResult(new Intent(this, CredentialManager.class),
+                    LOGIN_STATUS_REQUESTED);
+            return true;
+        }
+        if (id == R.id.MENU_ITEM_PROJECT) {
+            Intent setup = new Intent(mContext, ProjectManager.class);
+            setup.putExtra("showSelectLater", false);
+            this.startActivityForResult(setup, PROJECT_REQUESTED);
+            return true;
+        }
+
+        if (id == android.R.id.home) {
+            CountDownTimer cdt = null;
+
+            // Give user 10 seconds to switch dev/prod mode
+            if (actionBarTapCount == 0) {
+                cdt = new CountDownTimer(5000, 5000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        actionBarTapCount = 0;
+                    }
+                }.start();
+            }
+
+            String other = (useDev) ? "production" : "dev";
+
+            switch (++actionBarTapCount) {
+                case 5:
+                    w.make(getResources().getString(R.string.two_more_taps) + other
+                            + getResources().getString(R.string.mode_type));
+                    break;
+                case 6:
+                    w.make(getResources().getString(R.string.one_more_tap) + other
+                            + getResources().getString(R.string.mode_type));
+                    break;
+                case 7:
+                    w.make(getResources().getString(R.string.now_in_mode) + other
+                            + getResources().getString(R.string.mode_type));
+                    useDev = !useDev;
+
+                    if (cdt != null)
+                        cdt.cancel();
+
+                    api.useDev(useDev);
+
+                    clearFields();
+                    new getNewFieldsTask().execute();
+
+                    actionBarTapCount = 0;
+                    break;
+            }
+
+        }
+
+        if (id == R.id.MENU_ITEM_UPLOAD) {
+            manageUploadQueue();
+        }
+        return true;
     }
 
 

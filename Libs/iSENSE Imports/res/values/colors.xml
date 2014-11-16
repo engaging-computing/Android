@@ -8,12 +8,8 @@
 
     <!--Material design colors, these are default colors, each app should overide these by having
         its own colors with the same name in values/colors.xml-->
-    <color name="colorPrimaryDark">#608CBF</color>
-    <color name="colorPrimary">#A1D3FF</color>
-    <color name="colorAccent">#C7E5FF</color>
-    <color name="actionMenuTextColor">@android:color/black</color>
-    <color name="textColorPrimary">@android:color/white</color>
-    <color name="textColorSecondary">@android:color/white</color>
-    <color name="colorBackground">#113</color>
+    <color name="primary">#608CBF</color>
+    <color name="primary_dark">#A1D3FF</color>
+    <color name="accent">#000000</color>
 
 </resources>

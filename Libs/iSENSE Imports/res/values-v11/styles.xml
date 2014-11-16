@@ -2,8 +2,6 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
-        <!--<item name="android:actionBarWidgetTheme">@style/AppTheme.Widget</item>-->
-        <!--<item name="android:popupMenuStyle">@style/AppTheme.PopupMenu</item>-->
         <item name="android:dropDownListViewStyle">@style/AppTheme.DropDownListView</item>
         <item name="android:homeAsUpIndicator">@null</item>
     </style>
@@ -37,13 +35,13 @@
         <item name="android:color">@color/actionbar_text</item>
     </style>
 
-    <!--<style name="AppTheme.Widget" parent="Theme.AppCompat.Light">-->
-        <!--<item name="android:popupMenuStyle">@style/AppTheme.PopupMenu</item>-->
-        <!--<item name="android:dropDownListViewStyle">@style/AppTheme.DropDownListView</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppTheme.PopupMenu" parent="@android:style/Widget.AppCompat.Light.ListPopupWindow" />-->
-
     <style name="AppTheme.DropDownListView" parent="Widget.AppCompat.Light.ListView.DropDown" />
+
+    <style name="ToolBarTheme" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorPrimary</item>
+        <item name="android:background">@color/colorBackground</item>
+        <item name="actionMenuTextColor">@color/actionMenuTextColor</item>
+    </style>
 
 </resources>

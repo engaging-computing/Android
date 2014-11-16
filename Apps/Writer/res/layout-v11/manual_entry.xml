@@ -5,13 +5,12 @@
     tools:context="edu.uml.cs.isense.writer.ManualEntry" >
 
     <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/toolbar"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:theme="@style/AppTheme.ActionBar" />
+        android:layout_height="wrap_content"
+        app:theme="@style/ToolBarTheme"/>
 
     <LinearLayout
     	android:id="@+id/dataset_name_layout"
@@ -33,9 +32,8 @@
 	        android:singleLine="true"
 	        android:layout_weight="1"
 	        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
+        <requestFocus/>
+        </EditText>
 
     </LinearLayout>
     
@@ -57,7 +55,8 @@
     	android:id="@+id/datapoints_sv"
     	android:orientation="vertical"
 		android:layout_width="match_parent"
-   		android:layout_height="wrap_content"/>
+   		android:layout_height="wrap_content"
+       android:padding="10dp"/>
       
     </ScrollView>
     

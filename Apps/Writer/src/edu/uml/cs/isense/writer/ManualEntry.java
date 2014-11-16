@@ -28,6 +28,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -112,17 +114,81 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
         });
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.main);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        toolbar.setOnMenuItemClickListener(
-//                new Toolbar.OnMenuItemClickListener() {
-//                    @Override
-//                    public boolean onMenuItemClick(MenuItem item) {
-//                        // Handle the menu item
-//                        return true;
-//                    }
-//                });
-//        toolbar.inflateMenu(R.menu.main);
+
+        toolbar.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        int id = item.getItemId();
+                        if (id == R.id.MENU_ITEM_LOGIN) {
+                            startActivityForResult(new Intent(mContext, CredentialManager.class),
+                                    LOGIN_STATUS_REQUESTED);
+                            return true;
+                        }
+                        if (id == R.id.MENU_ITEM_PROJECT) {
+//                            Intent setup = new Intent(mContext, ProjectManager.class);
+//                            setup.putExtra("showSelectLater", false);
+//                            mContext.startActivityForResult(setup, PROJECT_REQUESTED);
+                            return true;
+                        }
+
+                        if (id == android.R.id.home) {
+                            CountDownTimer cdt = null;
+
+                            // Give user 10 seconds to switch dev/prod mode
+                            if (actionBarTapCount == 0) {
+                                cdt = new CountDownTimer(5000, 5000) {
+                                    @Override
+                                    public void onTick(long millisUntilFinished) {
+                                    }
+
+                                    @Override
+                                    public void onFinish() {
+                                        actionBarTapCount = 0;
+                                    }
+                                }.start();
+                            }
+
+                            String other = (useDev) ? "production" : "dev";
+
+                            switch (++actionBarTapCount) {
+                                case 5:
+                                    w.make(getResources().getString(R.string.two_more_taps) + other
+                                            + getResources().getString(R.string.mode_type));
+                                    break;
+                                case 6:
+                                    w.make(getResources().getString(R.string.one_more_tap) + other
+                                            + getResources().getString(R.string.mode_type));
+                                    break;
+                                case 7:
+                                    w.make(getResources().getString(R.string.now_in_mode) + other
+                                            + getResources().getString(R.string.mode_type));
+                                    useDev = !useDev;
+
+                                    if (cdt != null)
+                                        cdt.cancel();
+
+                                    api.useDev(useDev);
+
+                                    clearFields();
+                                    new getNewFieldsTask().execute();
+
+                                    actionBarTapCount = 0;
+                                    break;
+                            }
+
+                        }
+
+                        if (id == R.id.MENU_ITEM_UPLOAD) {
+                            manageUploadQueue();
+                        }
+                        return true;
+                    }
+                });
 
 
         datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_sv);
@@ -173,81 +239,6 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         });
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        toolbar.inflate(R.menu.main, menu);
-//        return true;
-//    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.MENU_ITEM_LOGIN) {
-            startActivityForResult(new Intent(this, CredentialManager.class),
-                    LOGIN_STATUS_REQUESTED);
-            return true;
-        }
-        if (id == R.id.MENU_ITEM_PROJECT) {
-            Intent setup = new Intent(mContext, ProjectManager.class);
-            setup.putExtra("showSelectLater", false);
-            this.startActivityForResult(setup, PROJECT_REQUESTED);
-            return true;
-        }
-
-        if (id == android.R.id.home) {
-            CountDownTimer cdt = null;
-
-            // Give user 10 seconds to switch dev/prod mode
-            if (actionBarTapCount == 0) {
-                cdt = new CountDownTimer(5000, 5000) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        actionBarTapCount = 0;
-                    }
-                }.start();
-            }
-
-            String other = (useDev) ? "production" : "dev";
-
-            switch (++actionBarTapCount) {
-                case 5:
-                    w.make(getResources().getString(R.string.two_more_taps) + other
-                            + getResources().getString(R.string.mode_type));
-                    break;
-                case 6:
-                    w.make(getResources().getString(R.string.one_more_tap) + other
-                            + getResources().getString(R.string.mode_type));
-                    break;
-                case 7:
-                    w.make(getResources().getString(R.string.now_in_mode) + other
-                            + getResources().getString(R.string.mode_type));
-                    useDev = !useDev;
-
-                    if (cdt != null)
-                        cdt.cancel();
-
-                    api.useDev(useDev);
-
-                    clearFields();
-                    new getNewFieldsTask().execute();
-
-                    actionBarTapCount = 0;
-                    break;
-            }
-
-        }
-
-        if (id == R.id.MENU_ITEM_UPLOAD) {
-            manageUploadQueue();
-        }
-        return true;
-    }
-
 
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
@@ -284,9 +275,10 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
         LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LinearLayout datapoint = new LinearLayout(mContext);
+
         FrameLayout dataPointFrame = new FrameLayout(mContext);
 
-        dataPointFrame = (FrameLayout) getLayoutInflater().inflate(R.layout.data_point, null);
+        dataPointFrame = (CardView) getLayoutInflater().inflate(R.layout.data_point, null);
         datapoint = (LinearLayout) dataPointFrame.findViewById(R.id.ll_data_point);
 
         //Set Datapoint number

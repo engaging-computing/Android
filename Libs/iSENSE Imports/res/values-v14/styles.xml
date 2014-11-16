@@ -49,4 +49,11 @@
 
     <style name="AppTheme.DropDownListView" parent="Widget.AppCompat.Light.ListView.DropDown" />
 
+    <style name="ToolBarTheme" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorPrimary</item>
+        <item name="android:background">@color/colorBackground</item>
+        <item name="actionMenuTextColor">@color/actionMenuTextColor</item>
+    </style>
+
 </resources>

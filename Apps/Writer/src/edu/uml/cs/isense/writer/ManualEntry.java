@@ -18,7 +18,6 @@
 package edu.uml.cs.isense.writer;
 
 import android.annotation.SuppressLint;
-import android.support.v7.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -28,6 +27,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
@@ -77,6 +77,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
     private Waffle w;
     public static UploadQueue uq;
     private LocationManager mLocationManager;
+    CardView cardToBeDeleted;
 
     /* Action Bar */
     private static int actionBarTapCount = 0;
@@ -118,7 +119,6 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         // Initialize action bar customization for API >= 11
         if (android.os.Build.VERSION.SDK_INT >= 11) {
             ActionBar bar = getSupportActionBar();
-
         }
 
         datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_sv);
@@ -281,10 +281,10 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LinearLayout datapoint = new LinearLayout(mContext);
 
-        FrameLayout dataPointFrame = new FrameLayout(mContext);
+        CardView dataPointCard = new CardView(mContext);
 
-        dataPointFrame = (CardView) getLayoutInflater().inflate(R.layout.data_point, null);
-        datapoint = (LinearLayout) dataPointFrame.findViewById(R.id.ll_data_point);
+        dataPointCard = (CardView) getLayoutInflater().inflate(R.layout.data_point, datapointsLayout, false);
+        datapoint = (LinearLayout) dataPointCard.findViewById(R.id.ll_data_point);
 
         //Set Datapoint number
         TextView datapointnumber = new TextView(mContext);
@@ -300,15 +300,32 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                 if (datapoints == 1) {
                     w.make("Must have one data point", Waffle.LENGTH_LONG, Waffle.IMAGE_X);
                 } else {
-                    final FrameLayout dataPointFrame = (FrameLayout) v.getParent().getParent().getParent();
+                    cardToBeDeleted = (CardView) v.getParent().getParent().getParent();
 
                     Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
-                    animation.setDuration(200);
+                    animation.setDuration(400);
 
-                    dataPointFrame.startAnimation(animation);
-                    datapointsLayout.removeView(dataPointFrame);
-                    renumberDataPoints();
+                    animation.setAnimationListener(new Animation.AnimationListener(){
+                        @Override
+                        public void onAnimationStart(Animation arg0) {
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation arg0) {
+                        }
+                        @Override
+                        public void onAnimationEnd(Animation arg0) {
+                            //without this runnable it crashes
+                            datapointsLayout.post(new Runnable() {
+                                public void run() {
+                                    datapointsLayout.removeView(cardToBeDeleted);
+                                    renumberDataPoints();
+                                }
+                        });
 
+                        }
+                    });
+
+                    cardToBeDeleted.startAnimation(animation);
                 }
             }
 
@@ -322,7 +339,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
             inflater.inflate(R.layout.no_fields, noFieldError);
             datapoint.addView(noFieldError, 1);
 
-            datapointsLayout.addView(dataPointFrame, datapoints - 1);
+            datapointsLayout.addView(dataPointCard, datapoints - 1);
         } else {
 
             for (int i = 0; i < fields.size(); i++) {
@@ -334,7 +351,6 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
                     EditText et = (EditText) singlefield.findViewById(R.id.field_et);
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
-
 
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm MM/dd/yyyy");
                     String currentDateandTime = sdf.format(new Date());
@@ -422,7 +438,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                 }
             }
 
-            datapointsLayout.addView(dataPointFrame, datapoints - 1);
+            datapointsLayout.addView(dataPointCard, datapoints - 1);
         }
     }
 
@@ -433,6 +449,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         datapoints--;
 
         for (int i = 0; i < datapoints; i++) {
+            CardView card = (CardView) datapointsLayout.getChildAt(i);
             TextView pointNumber = (TextView) datapointsLayout.getChildAt(i).findViewById(R.id.pointNumber);
             pointNumber.setText("Data Point: " + (i + 1));
         }

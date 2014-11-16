@@ -61,7 +61,18 @@
   	android:layout_height="wrap_content"
   	android:layout_alignParentBottom="true"
   	android:weightSum="2">
-   
+
+      <Button
+          android:id="@+id/save"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:background="@drawable/button_bar_green"
+          android:text="Save"
+          android:textColor="#FFF"
+          android:textSize="14sp"
+          android:textStyle="bold"/>
+
 	   <Button
 	       android:id="@+id/adddatapoint"
 	       android:layout_width="match_parent"
@@ -69,15 +80,7 @@
 	       android:background="@drawable/button_bar_rsense"
 	       android:layout_weight="1"
 	       android:text="Add Data Point" />
-	   
-	    <Button
-	       android:id="@+id/save"
-	       android:layout_width="match_parent"
-	       android:layout_height="wrap_content"
-	       android:background="@drawable/button_bar_rsense"
-	       android:layout_weight="1"
-	       android:text="Save" />
-    
+
     </LinearLayout>
 
 </RelativeLayout>

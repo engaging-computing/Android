@@ -72,7 +72,7 @@ import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class Motion  extends ActionBarActivity {
+public class Motion extends ActionBarActivity {
 
 	public static final String DEFAULT_PROJ = "-1";
 	public static final int DEFAULT_RATE = 50;
@@ -387,8 +387,7 @@ public class Motion  extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				Intent rate = new Intent(mContext, RateDialog.class);
-				rate.putExtra("title", "Change Recording Rate");
-				startActivityForResult(rate, RECORDING_RATE_REQUESTED);
+                startActivityForResult(rate, RECORDING_RATE_REQUESTED);
 			}
 
 		});
@@ -398,9 +397,9 @@ public class Motion  extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mContext, DurationDialog.class);
-				i.putExtra("title", "Change Recording Length");
 				startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
-			}
+
+            }
 
 		});
 

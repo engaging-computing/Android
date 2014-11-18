@@ -3,15 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-   
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Presets"/>
+
     <LinearLayout
         android:id="@+id/presetButtons"
         android:layout_width="match_parent"
-        android:layout_height="300dp" 
+        android:layout_height="300dp"
         android:layout_margin="20dp"
         android:orientation="vertical"
         android:weightSum="2">
-        
+
 	    <Button
 	        android:id="@+id/buttonAccelerometer"
 	        android:layout_width="match_parent"
@@ -23,7 +29,7 @@
 	        android:textColor="#0066FF"
 	        android:textSize="14sp"
 	        android:textStyle="bold" />
-	
+
 	    <Button
 	        android:id="@+id/buttonGPS"
 	        android:layout_width="match_parent"
@@ -32,10 +38,10 @@
 	        android:text="@string/gps"
 	        android:textColor="#0066FF"
 	        android:textSize="14sp"
-	        android:textStyle="bold" 
+	        android:textStyle="bold"
 	        android:layout_weight="1"/>
     </LinearLayout>
-    
+
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
@@ -53,6 +59,7 @@
             android:id="@+id/cancelButton"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_height="wrap_content"
+            android:layout_width="match_parent"
             android:layout_weight="1"
             android:text="@android:string/cancel" />
         

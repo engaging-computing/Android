@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
+
+    <!--This view forces the dialog to match_parent without it the dialog is really small, bug with Android L?-->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Length"/>
+
 
     <RadioGroup
         android:id="@+id/radioGroup1"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <RadioButton
             android:id="@+id/radio0"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
             android:onClick="onRadioButtonClicked"
@@ -51,8 +65,8 @@
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="1 minute" />
-        
-        <RadioButton
+
+          <RadioButton
             android:id="@+id/radio6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,38 +74,26 @@
             android:text="Push to Stop" />
     </RadioGroup>
 
-    <TextView
-        android:id="@+id/messageBox2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <View
-        android:id="@+id/view1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/dividerVertical" />
 
     <LinearLayout
         android:id="@+id/buttonView"
-        style="?android:buttonBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/negative2"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@android:string/cancel" />
+        android:layout_height="wrap_content"
+        android:gravity="right">
 
         <Button
             android:id="@+id/positive2"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
             android:text="@android:string/ok" />
+
+        <Button
+            android:id="@+id/negative2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@android:string/cancel" />
     </LinearLayout>
 
 </LinearLayout>

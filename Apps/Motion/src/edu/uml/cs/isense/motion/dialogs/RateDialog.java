@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.TextView;
+
 import edu.uml.cs.isense.motion.Motion;
 import edu.uml.cs.isense.motion.R;
 
@@ -19,48 +19,10 @@ public class RateDialog extends Activity {
 	Spinner spinner;
 	int rate;
 
-	public void onRadioButtonClicked(View view) {
-	    switch (view.getId()) {
-	    case R.id.radio0:
-	    	rate = 50;
-	    	break;
-
-	    case R.id.radio1:
-	    	rate = 100;
-	    	break;
-
-	    case R.id.radio2:
-	    	rate = 500;
-	    	break;
-
-	    case R.id.radio3:
-	    	rate = 1000;
-	    	break;
-
-	    case R.id.radio4:
-	    	rate = 5000;
-	    	break;
-
-	    case R.id.radio5:
-	    	rate = 30000;
-	    	break;
-
-	    default:
-	    	rate = 60000;
-	    	break;
-	    }
-
-	}
-
-
 	@Override
 	public void onCreate(Bundle b) {
 		super.onCreate(b);
 		setContentView(R.layout.rate_dialog);
-
-		setTitle(getIntent().getExtras().getString("title"));
-		TextView messageBox = (TextView) findViewById(R.id.messageBox2);
-		messageBox.setText(getIntent().getExtras().getString("message"));
 
 		ok = (Button) findViewById(R.id.positive2);
 		cancel = (Button) findViewById(R.id.negative2);
@@ -122,5 +84,38 @@ public class RateDialog extends Activity {
 			}
 		});
 	}
+
+    public void onRadioButtonClicked(View view) {
+        switch (view.getId()) {
+            case R.id.radio0:
+                rate = 50;
+                break;
+
+            case R.id.radio1:
+                rate = 100;
+                break;
+
+            case R.id.radio2:
+                rate = 500;
+                break;
+
+            case R.id.radio3:
+                rate = 1000;
+                break;
+
+            case R.id.radio4:
+                rate = 5000;
+                break;
+
+            case R.id.radio5:
+                rate = 30000;
+                break;
+
+            default:
+                rate = 60000;
+                break;
+        }
+
+    }
 
 }

@@ -5,17 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="10dp"
-    android:layout_margin="5dp">
+    android:layout_margin="5dp"
+    card_view:cardElevation = "5dp">
 
     <LinearLayout
         android:id="@+id/ll_data_point"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp"
-        card_view:cardElevation = "14.5sp">
-        <!--android:background="@drawable/listelement_border"-->
-
+        android:padding="10dp">
 
         <RelativeLayout 
 	        android:id="@+id/dataPointHeader"

@@ -37,6 +37,7 @@
 *.ipr
 *~
 *.swp
+.gradle
 
 */build
 */production
@@ -51,6 +52,7 @@
 *.idea/tasks.xml
 *.idea/datasources.xml
 *.idea/dataSources.ids
+
 
 #Robotium
 

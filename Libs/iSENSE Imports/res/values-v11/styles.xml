@@ -11,36 +11,51 @@
 
     </style>
 
-    <style name="AppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
-        <!--<item name="android:layout_height">wrap_content</item>-->
-        <!--<item name="android:layout_width">wrap_content</item>-->
+    <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Main theme colors new for material design-->
+        <!--   your app branding color for the app bar -->
+        <item name="colorPrimary">@color/primary</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@color/accent</item>
     </style>
 
-    <!--<style name="PDTheme" parent="Theme.AppCompat.Light.Dialog">-->
-        <!--<item name="android:alertDialogStyle">@style/CustomProgressDialogStyle</item>-->
-        <!--<item name="android:textColorPrimary">#000000</item>-->
-    <!--</style>-->
+    <style name="AppThemeNoActionBarDark" parent="Theme.AppCompat.NoActionBar">
 
-    <!--<style name="CustomProgressDialogStyle">-->
-        <!--<item name="android:bottomBright">#FF0000</item>-->
-        <!--<item name="android:bottomDark">#FF0000</item>-->
-        <!--<item name="android:bottomMedium">#FF0000</item>-->
-        <!--<item name="android:centerBright">#FF0000</item>-->
-        <!--<item name="android:centerDark">#FF0000</item>-->
-        <!--<item name="android:centerMedium">#FF0000</item>-->
-        <!--<item name="android:fullBright">#FF0000</item>-->
-        <!--<item name="android:fullDark">#FF0000</item>-->
-        <!--<item name="android:topBright">#FF0000</item>-->
-        <!--<item name="android:topDark">#FF0000</item>-->
-    <!--</style>-->
+        <!-- Main theme colors new for material design-->
+        <!--   your app branding color for the app bar -->
+        <item name="colorPrimary">@color/primary</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@android:color/white</item>
+    </style>
 
-    <!--<style name="AppTheme.Widget" parent="Theme.AppCompat.Light">-->
-        <!--<item name="android:popupMenuStyle">@style/AppTheme.PopupMenu</item>-->
-        <!--<item name="android:dropDownListViewStyle">@style/AppTheme.DropDownListView</item>-->
-    <!--</style>-->
+    <style name="AppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
 
-    <!--<style name="AppTheme.PopupMenu" parent="Base.V11.Theme.AppCompat.Light.Dialog" />-->
+    <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <!--&lt;!&ndash; Background for the search query section (e.g. EditText) &ndash;&gt;-->
+        <!--<item name="queryBackground"></item>-->
+        <!--&lt;!&ndash; Background for the actions section (e.g. voice, submit) &ndash;&gt;-->
+        <!--<item name="submitBackground"></item>-->
+        <!--&lt;!&ndash; Close button icon &ndash;&gt;-->
+        <!--<item name="closeIcon"></item>-->
+        <!--&lt;!&ndash; Search button icon &ndash;&gt;-->
+        <!--<item name="searchIcon"></item>-->
+        <!--&lt;!&ndash; Go/commit button icon &ndash;&gt;-->
+        <!--<item name="goIcon"></item>-->
+        <!--&lt;!&ndash; Voice search button icon &ndash;&gt;-->
+        <!--<item name="voiceIcon"></item>-->
+        <!--&lt;!&ndash; Commit icon shown in the query suggestion row &ndash;&gt;-->
+        <!--<item name="commitIcon"></item>-->
+        <!--&lt;!&ndash; Layout for query suggestion rows &ndash;&gt;-->
+        <!--<item name="suggestionRowLayout"></item>-->
+    </style>
 
-    <!--<style name="AppTheme.DropDownListView" parent="@android:style/Widget.Holo.Light.ListView.DropDown" />-->
+
 
 </resources>

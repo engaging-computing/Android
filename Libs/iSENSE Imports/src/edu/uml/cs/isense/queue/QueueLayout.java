@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,7 +38,7 @@ import edu.uml.cs.isense.waffle.Waffle;
  * @author Mike Stowell and Jeremy Poulin of the iSENSE team.
  *
  */
-public class QueueLayout extends Activity implements OnClickListener {
+public class QueueLayout extends ActionBarActivity implements OnClickListener {
 
 	/**
 	 * Global string constant that the user should use to pass in the parent
@@ -47,7 +48,6 @@ public class QueueLayout extends Activity implements OnClickListener {
 	 * the string passed to it.
 	 */
 	public static final String PARENT_NAME = "parentName";
-	public static final String LOGIN_CONTEXT = "logincontext";
 
 	private static final int ALTER_DATASET_REQUESTED = 9001;
 	private static final int ALTER_DATA_NAME_REQUESTED = 9002;

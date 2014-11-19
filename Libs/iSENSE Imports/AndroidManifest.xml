@@ -34,7 +34,7 @@
     <activity
         android:name=".proj.BrowseProjects"
         android:windowSoftInputMode="stateHidden"
-        android:label="Projects" />
+        android:theme="@style/AppThemeNoActionBar" />
     <activity
         android:name=".proj.NoQR"
         android:label="No QR Code Scanner Found"

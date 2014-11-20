@@ -10,16 +10,17 @@
     </item>
     <item
         android:id="@+id/reset"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:title="@string/reset">
     </item>
-    <item android:id="@+id/presets" 
-        app:showAsAction="ifRoom"
+    <item
+        android:id="@+id/presets"
+        app:showAsAction="never"
         android:title="Presets">
     </item>
     <item
         android:id="@+id/helpMenuItem"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:title="Help">
     </item>
   

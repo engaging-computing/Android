@@ -81,6 +81,9 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
     private LocationManager mLocationManager;
     CardView cardToBeDeleted;
 
+    LinearLayout bottomButtons;
+    ScrollView scrollView;
+
     /* Action Bar */
     private static int actionBarTapCount = 0;
     public static final int LOGIN_STATUS_REQUESTED = 6005;
@@ -185,12 +188,12 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
             	if (scrollView.getScrollY() > 0 && scrollView.getScrollY() < (datapointsLayout.getHeight() -scrollView.getHeight())) {
 	            	if (scrollY > scrollView.getScrollY()) { //scrolling up
 	            		//HIDE Buttons
-	            		addField.setVisibility(View.GONE);
-	            		save.setVisibility(View.GONE);
-	            	} else if (!addField.isShown() || !save.isShown()) { //scrolling down and buttons are not already visible
-	            		//Show Buttons
 	            		addField.setVisibility(View.VISIBLE);
-                		save.setVisibility(View.VISIBLE);
+	            		save.setVisibility(View.VISIBLE);
+	            	} else if (addField.isShown() || save.isShown()) { //scrolling down and buttons are not already visible
+	            		//Show Buttons
+                        addField.setVisibility(View.GONE);
+                		save.setVisibility(View.GONE);
 	            	}
 					scrollY = scrollView.getScrollY();
 	            }
@@ -334,13 +337,15 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
                     animation.setDuration(400);
 
-                    animation.setAnimationListener(new Animation.AnimationListener(){
+                    animation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation arg0) {
                         }
+
                         @Override
                         public void onAnimationRepeat(Animation arg0) {
                         }
+
                         @Override
                         public void onAnimationEnd(Animation arg0) {
                             //without this runnable it crashes
@@ -349,17 +354,19 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                                     datapointsLayout.removeView(cardToBeDeleted);
                                     renumberDataPoints();
                                 }
-                        });
+                            });
+                        }
+                    });
+                    cardToBeDeleted.startAnimation(animation);
 
                     //if buttons are hidden user can delete data points then if they could no longer scroll they would never see the buttons again
                     //to prevent this the buttons are shown when a data point is deleted
                     if (!addField.isShown() || !save.isShown()) {
-                    addField.setVisibility(View.VISIBLE);
-            		save.setVisibility(View.VISIBLE);
+                        addField.setVisibility(View.VISIBLE);
+                        save.setVisibility(View.VISIBLE);
                     }
                 }
             }
-
         });
 
 

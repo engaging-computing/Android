@@ -546,6 +546,10 @@ public class Motion extends ActionBarActivity {
 				projNumB.setText("Project: " + projectNumber);
 				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
 
+				/*change sensor field*/
+				int field = data.getExtras().getInt(Presets.FIELD);
+				fields.setCurrentItem(field);
+
 				/*set rate*/
 				SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor2 = ratePrefs.edit();

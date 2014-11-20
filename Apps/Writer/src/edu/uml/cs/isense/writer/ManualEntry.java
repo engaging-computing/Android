@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
@@ -45,6 +46,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -87,6 +89,8 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
     private static final String DEFAULT_PROJ = "514";
 
+    private int scrollY = 0;
+
     @SuppressLint("NewApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +111,8 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         addField = (Button) findViewById(R.id.adddatapoint);
         save = (Button) findViewById(R.id.upload);
         datasetName = (EditText) findViewById(R.id.dataset_name);
+        bottomButtons = (LinearLayout) findViewById(R.id.buttons);
+
         datasetName.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -121,7 +127,9 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
             ActionBar bar = getSupportActionBar();
         }
 
-        datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_sv);
+        datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_ll);
+        scrollView = (ScrollView) findViewById(R.id.datapoints_sv);
+
         if (fields == null) {
             new getNewFieldsTask().execute();
         } else {
@@ -166,6 +174,27 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                 }
             }
 
+        });
+
+        datapointsLayout.getViewTreeObserver().addOnScrollChangedListener(new OnScrollChangedListener() {
+
+            @Override
+            public void onScrollChanged() {
+            	//if you scoll fast the values would jump below 0 when it got to the top and above the max height when you got scroll to the bottom
+            	//this was causing the buttons to flicker, the check below prevents this behavior
+            	if (scrollView.getScrollY() > 0 && scrollView.getScrollY() < (datapointsLayout.getHeight() -scrollView.getHeight())) {
+	            	if (scrollY > scrollView.getScrollY()) { //scrolling up
+	            		//HIDE Buttons
+	            		addField.setVisibility(View.GONE);
+	            		save.setVisibility(View.GONE);
+	            	} else if (!addField.isShown() || !save.isShown()) { //scrolling down and buttons are not already visible
+	            		//Show Buttons
+	            		addField.setVisibility(View.VISIBLE);
+                		save.setVisibility(View.VISIBLE);
+	            	}
+					scrollY = scrollView.getScrollY();
+	            }
+            }
         });
     }
 
@@ -322,10 +351,12 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                                 }
                         });
 
-                        }
-                    });
-
-                    cardToBeDeleted.startAnimation(animation);
+                    //if buttons are hidden user can delete data points then if they could no longer scroll they would never see the buttons again
+                    //to prevent this the buttons are shown when a data point is deleted
+                    if (!addField.isShown() || !save.isShown()) {
+                    addField.setVisibility(View.VISIBLE);
+            		save.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 

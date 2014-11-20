@@ -52,8 +52,8 @@
             android:theme="@style/AppThemeDialog"/>
         <activity
             android:name="edu.uml.cs.isense.proj.BrowseProjects"
-            android:label="@string/select_proj"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden"
+            android:theme="@style/AppThemeNoActionBarDark" />
         <activity
             android:name="edu.uml.cs.isense.queue.NoInitialProject"
             android:label="No Associated Projects"

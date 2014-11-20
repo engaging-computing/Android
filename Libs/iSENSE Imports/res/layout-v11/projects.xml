@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/ExperimentSearchInput"
+        android:digits="@string/digits_restriction"
+        android:imeOptions="actionDone"
+        android:hint="@string/search"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="@dimen/abc_action_bar_default_height_material"
+        android:background="@color/primary"
+        android:textColor="@android:color/white"
+        android:queryBackground="@android:color/white"
+        android:submitBackground="@android:color/white"/>
+
+    <ListView
+        android:id="@+id/android:list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/white"
+        android:cacheColorHint="@android:color/white"
+        android:focusable="true" />
+
+    <TextView
+        android:id="@+id/android:empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/project_no_items" />
+
+</LinearLayout>

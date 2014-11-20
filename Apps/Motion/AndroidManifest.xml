@@ -58,10 +58,8 @@
         </activity>
         <activity
             android:name="edu.uml.cs.isense.proj.BrowseProjects"
-            android:label="@string/select_proj"
             android:windowSoftInputMode="stateHidden"
-            tools:ignore="MissingRegistered" >
-        </activity>
+            android:theme="@style/AppThemeNoActionBarDark" />
         <activity
             android:name="edu.uml.cs.isense.proj.NoQR"
             android:label="@string/no_qr"

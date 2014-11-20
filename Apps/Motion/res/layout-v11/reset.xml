@@ -14,14 +14,11 @@
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/dividerVertical" />
+        android:layout_height="1dp"/>
 
     <LinearLayout
-        style="?android:buttonBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent" >
+        android:layout_height="wrap_content" >
 
         <Button
             android:id="@+id/noreset"

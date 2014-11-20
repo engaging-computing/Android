@@ -3,55 +3,56 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-   
-    <LinearLayout
-        android:id="@+id/presetButtons"
-        android:layout_width="match_parent"
-        android:layout_height="300dp" 
-        android:layout_margin="20dp"
-        android:orientation="vertical"
-        android:weightSum="2">
-        
-        <Button
-            android:id="@+id/buttonAccelerometer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/button_rsense"
-            android:text="@string/acceleration"
-            android:textColor="#0066FF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    
-        <Button
-            android:id="@+id/buttonGPS"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_rsense"
-            android:text="@string/gps"
-            android:textColor="#0066FF"
-            android:textSize="14sp"
-            android:textStyle="bold" 
-            android:layout_weight="1"/>
-    </LinearLayout>
-    
-    
-     <LinearLayout
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent" 
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:gravity="center"
+        android:text="Presets"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <RadioButton
+            android:id="@+id/accel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Acceleration" />
+
+        <RadioButton
+            android:id="@+id/gps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPS" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:id="@+id/bottomButtons">
 
         <Button
             android:id="@+id/cancelButton"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_width="match_parent"
             android:layout_weight="1"
             android:text="@android:string/cancel" />
-        
+
+        <Button
+            android:id="@+id/okButton"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:text="@android:string/ok"/>
+
     </LinearLayout>
 
-     
+
 
 </LinearLayout>

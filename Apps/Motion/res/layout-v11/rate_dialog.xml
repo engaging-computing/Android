@@ -13,8 +13,10 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Length"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Rate"
+        android:id="@+id/textView"
+        android:gravity="center_horizontal" />
 
     <RadioGroup
         android:id="@+id/radioGroup1"
@@ -76,22 +78,24 @@
     <LinearLayout
         android:id="@+id/buttonView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right">
-
-        <Button
-            android:id="@+id/positive2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?android:attr/buttonBarButtonStyle"
-            android:text="@android:string/ok" />
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/negative2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?android:attr/buttonBarButtonStyle"
-            android:text="@android:string/cancel" />
+            android:text="@android:string/cancel"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/positive2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@android:string/ok"
+            android:layout_weight="1"/>
+
     </LinearLayout>
 
 </LinearLayout>

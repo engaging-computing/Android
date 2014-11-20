@@ -38,6 +38,7 @@
 *~
 *.swp
 .gradle
+.gradle/
 
 */build
 */production

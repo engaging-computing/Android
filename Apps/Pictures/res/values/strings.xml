@@ -57,7 +57,7 @@
 	
 	<string name="other">Other</string>
 	<string name="project">Project</string>
-	<string name="login">Login</string>
+	<string name="login">Credentials</string>
 	<string name="continuous">Continuously Take Photos</string>
 	<string name="interval">Time Interval (seconds):</string>
 	<string name="takePicContinuous">Press Here to Continuously Take Pictures</string>

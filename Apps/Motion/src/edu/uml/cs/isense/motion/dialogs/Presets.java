@@ -12,6 +12,17 @@ public class Presets extends Activity{
 	public static final String PROJECT = "project";
 	public static final String LENGTH = "length";
 	public static final String RATE = "rate";
+	public static final String FIELD = "field";
+
+    public static final String ACCEL_PROJECT= "570";
+    public static final int ACCEL_PROJECT_RATE= 50;
+    public static final int ACCEL_PROJECT_LENGTH= 10;
+    public static final int ACCEL_CAROUSEL_POSITION = 1;
+
+    public static final String GPS_PROJECT= "13";
+    public static final int GPS_PROJECT_RATE = 1000;
+    public static final int GPS_PROJECT_LENGTH = -1; //-1 is push to stop
+    public static final int GPS_CAROUSEL_POSITION = 1;
 
 
 	@Override
@@ -28,10 +39,11 @@ public class Presets extends Activity{
 			@Override
 			public void onClick(View v) {
 				Intent resultIntent = new Intent();
-				resultIntent.putExtra(RATE, 50);
-				resultIntent.putExtra(LENGTH, 10);
-				resultIntent.putExtra(PROJECT, "570");
+				resultIntent.putExtra(RATE, ACCEL_PROJECT_RATE);
+				resultIntent.putExtra(LENGTH, ACCEL_PROJECT_LENGTH);
+				resultIntent.putExtra(PROJECT, ACCEL_PROJECT);
 				setResult(Activity.RESULT_OK, resultIntent);
+				resultIntent.putExtra(FIELD, ACCEL_CAROUSEL_POSITION);
 				finish();
 			}
 
@@ -42,9 +54,10 @@ public class Presets extends Activity{
 			@Override
 			public void onClick(View v) {
 				Intent resultIntent = new Intent();
-				resultIntent.putExtra(RATE, 1000);
-				resultIntent.putExtra(LENGTH, -1);
-				resultIntent.putExtra(PROJECT, "13");
+				resultIntent.putExtra(RATE, GPS_PROJECT_RATE);
+				resultIntent.putExtra(LENGTH, GPS_PROJECT_LENGTH);
+				resultIntent.putExtra(PROJECT, GPS_PROJECT);
+				resultIntent.putExtra(FIELD, GPS_CAROUSEL_POSITION);
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			}

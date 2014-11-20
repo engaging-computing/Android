@@ -37,6 +37,7 @@
 	  android:background="?android:attr/dividerVertical" />
     
    <ScrollView
+       android:id="@+id/datapoints_sv"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_above="@+id/buttonDivider"
@@ -44,7 +45,7 @@
        tools:context="edu.uml.cs.isense.writer.ManualEntry" >
 
    <LinearLayout
-    	android:id="@+id/datapoints_sv"
+    	android:id="@+id/datapoints_ll"
     	android:orientation="vertical"
 		android:layout_width="match_parent"
    		android:layout_height="wrap_content"/>
@@ -58,31 +59,29 @@
 	  android:layout_height="1dp"
 	  android:background="?android:attr/dividerVertical" />
   
-  <LinearLayout
-   	android:id="@+id/buttons"
-   	style="?android:attr/buttonBarStyle"
-   	android:orientation="horizontal"
-	android:layout_width="match_parent"
-  	android:layout_height="wrap_content"
-  	android:layout_alignParentBottom="true"
-  	android:weightSum="2">
-   
-	   <Button
-	       android:id="@+id/adddatapoint"
-	       style="?android:attr/buttonBarButtonStyle"
-	       android:layout_width="match_parent"
-	       android:layout_height="wrap_content"
-	       android:layout_weight="1"
-	       android:text="Add Data Point" />
-	   
-	    <Button
-	       android:id="@+id/save"
-	       style="?android:attr/buttonBarButtonStyle"
-	       android:layout_width="match_parent"
-	       android:layout_height="wrap_content"
-	       android:layout_weight="1"
-	       android:text="Save" />
-    
-    </LinearLayout>
+	  <LinearLayout
+	   	android:id="@+id/buttons"
+	   	style="?android:attr/buttonBarStyle"
+	   	android:orientation="horizontal"
+		android:layout_width="match_parent"
+	  	android:layout_height="wrap_content"
+	  	android:layout_alignParentBottom="true"
+	  	android:weightSum="2">
+		   <Button
+		       android:id="@+id/adddatapoint"
+		       style="?android:attr/buttonBarButtonStyle"
+		       android:layout_width="match_parent"
+		       android:layout_height="wrap_content"
+		       android:layout_weight="1"
+		       android:text="Add Data Point" />
+		   
+		    <Button
+		       android:id="@+id/save"
+		       style="?android:attr/buttonBarButtonStyle"
+		       android:layout_width="match_parent"
+		       android:layout_height="wrap_content"
+		       android:layout_weight="1"
+		       android:text="Save" />
+	    </LinearLayout>
 
 </RelativeLayout>

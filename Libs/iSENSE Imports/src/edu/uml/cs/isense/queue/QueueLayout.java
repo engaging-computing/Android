@@ -1,13 +1,14 @@
 package edu.uml.cs.isense.queue;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -185,7 +186,26 @@ public class QueueLayout extends ActionBarActivity implements OnClickListener {
 
 		scrollQueue = (LinearLayout) findViewById(R.id.scrollqueue);
 		fillScrollQueue();
-	}
+
+        if (android.os.Build.VERSION.SDK_INT >= 11) {
+            ActionBar bar = getSupportActionBar();
+
+            // make the actionbar clickable
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 	// Works through list of data to be uploaded and creates the list of blocks
 	private void fillScrollQueue() {

@@ -36,7 +36,7 @@ Light\n\n
 8. Remember to change the project number in the app to match your project number!\n\nYou may also use the Create a Project feature in this app by clicking on the data recorded in the upload menu then pressing “Select Project” and then selecting “Create New Project” from the new menu that pops up. This will allow you to create a new project with the proper fields set up for you.</string>
         
     <string name="about_title">About</string>
-    <string name="login_title">Credentials</string>
+    <string name="login_title">Account</string>
     <string name="logged_in_as">Logged in as: </string>
     <string name="recordSettings">Recording Fields</string>
     <string name="X">X:</string>
@@ -53,7 +53,7 @@ Light\n\n
     <string name="changename">Change Name</string>
     <string name="reset">Reset Settings</string>
     <string name="genericproj">Generic Project</string>
-    
+    <string name="reset_prompt">Would you like to reset iS Motion to it\'s default settings?</string>
 
     <string-array name="lengths_array">
         <item>1 sec</item>

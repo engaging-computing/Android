@@ -16,7 +16,7 @@
             android:checked="true"
             android:onClick="onRadioButtonClicked"
             android:text="50 miliseconds" />
- 
+
         <RadioButton
             android:id="@+id/radio1"
             android:layout_width="wrap_content"
@@ -51,19 +51,14 @@
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="30 seconds" />
-        
-          <RadioButton
+
+        <RadioButton
             android:id="@+id/radio6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
             android:text="1 minute" />
     </RadioGroup>
-
-    <TextView
-        android:id="@+id/messageBox2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/buttonView"

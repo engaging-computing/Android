@@ -1,0 +1,4 @@
+include ':Apps:Motion'
+include ':Libs:iSENSE Imports'
+include ':Apps:Pictures'
+include ':Apps:Writer'

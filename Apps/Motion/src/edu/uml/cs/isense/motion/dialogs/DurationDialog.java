@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.TextView;
+
 import edu.uml.cs.isense.motion.Motion;
 import edu.uml.cs.isense.motion.R;
 
@@ -61,10 +61,6 @@ public class DurationDialog extends Activity {
 	public void onCreate(Bundle b) {
 		super.onCreate(b);
 		setContentView(R.layout.duration_dialog);
-
-		setTitle(getIntent().getExtras().getString("title"));
-		TextView messageBox = (TextView) findViewById(R.id.messageBox2);
-		messageBox.setText(getIntent().getExtras().getString("message"));
 
 		ok = (Button) findViewById(R.id.positive2);
 		cancel = (Button) findViewById(R.id.negative2);

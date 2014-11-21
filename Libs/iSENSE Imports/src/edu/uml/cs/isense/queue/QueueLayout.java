@@ -1,12 +1,14 @@
 package edu.uml.cs.isense.queue;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -37,7 +39,7 @@ import edu.uml.cs.isense.waffle.Waffle;
  * @author Mike Stowell and Jeremy Poulin of the iSENSE team.
  *
  */
-public class QueueLayout extends Activity implements OnClickListener {
+public class QueueLayout extends ActionBarActivity implements OnClickListener {
 
 	/**
 	 * Global string constant that the user should use to pass in the parent
@@ -47,7 +49,6 @@ public class QueueLayout extends Activity implements OnClickListener {
 	 * the string passed to it.
 	 */
 	public static final String PARENT_NAME = "parentName";
-	public static final String LOGIN_CONTEXT = "logincontext";
 
 	private static final int ALTER_DATASET_REQUESTED = 9001;
 	private static final int ALTER_DATA_NAME_REQUESTED = 9002;
@@ -185,7 +186,26 @@ public class QueueLayout extends Activity implements OnClickListener {
 
 		scrollQueue = (LinearLayout) findViewById(R.id.scrollqueue);
 		fillScrollQueue();
-	}
+
+        if (android.os.Build.VERSION.SDK_INT >= 11) {
+            ActionBar bar = getSupportActionBar();
+
+            // make the actionbar clickable
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 	// Works through list of data to be uploaded and creates the list of blocks
 	private void fillScrollQueue() {

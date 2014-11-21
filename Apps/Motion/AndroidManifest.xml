@@ -46,11 +46,6 @@
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="edu.uml.cs.isense.motion.dialogs.Help"
-            android:label="@string/help_title"
-            android:theme="@style/AppTheme" >
-        </activity>
-        <activity
             android:name="edu.uml.cs.isense.motion.dialogs.DataActivity"
             android:label="@string/upload_or_trash"
             android:theme="@style/AppTheme" >
@@ -63,10 +58,8 @@
         </activity>
         <activity
             android:name="edu.uml.cs.isense.proj.BrowseProjects"
-            android:label="@string/select_proj"
             android:windowSoftInputMode="stateHidden"
-            tools:ignore="MissingRegistered" >
-        </activity>
+            android:theme="@style/AppThemeNoActionBarDark" />
         <activity
             android:name="edu.uml.cs.isense.proj.NoQR"
             android:label="@string/no_qr"
@@ -116,14 +109,6 @@
         <activity
             android:name="edu.uml.cs.isense.motion.dialogs.MessageDialogTemplate"
             android:label="Output a message"
-            android:theme="@style/AppThemeDialog" />
-        <activity
-            android:name="edu.uml.cs.isense.motion.dialogs.DurationDialog"
-            android:label="Single input"
-            android:theme="@style/AppThemeDialog" />
-         <activity
-            android:name="edu.uml.cs.isense.motion.dialogs.RateDialog"
-            android:label="Single input"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.motion.dialogs.ViewData"
@@ -180,7 +165,19 @@
             android:name="edu.uml.cs.isense.credentials.LoginOrKeyDialog"
             android:label="Upload Method"
             android:theme="@style/AppThemeDialog" />
-        
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.DurationDialog"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name=".dialogs.RateDialog"
+            android:label="Single input"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.motion.dialogs.Help"
+            android:label="@string/help_title"
+            android:theme="@style/AppTheme" >
+        </activity>
     </application>
         
 

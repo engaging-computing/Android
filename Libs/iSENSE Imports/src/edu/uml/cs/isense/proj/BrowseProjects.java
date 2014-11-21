@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -30,51 +31,77 @@ public class BrowseProjects extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.projects);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.projects);
 
-		setResult(Activity.RESULT_CANCELED);
+        setResult(Activity.RESULT_CANCELED);
 
-		m_projects = new ArrayList<RProject>();
-		m_adapter = new ProjectAdapter(getBaseContext(),
-				R.layout.projectrow, R.layout.loadrow,
-				m_projects);
-		m_adapter.query = "";
-		setListAdapter(m_adapter);
+        m_projects = new ArrayList<RProject>();
+        m_adapter = new ProjectAdapter(getBaseContext(),
+                R.layout.projectrow, R.layout.loadrow,
+                m_projects);
+        m_adapter.query = "";
+        setListAdapter(m_adapter);
 
-		final EditText et = (EditText) findViewById(R.id.ExperimentSearchInput);
-		et.setSingleLine(true);
-		et.addTextChangedListener(new TextWatcher() {
+        //If api level is 11 or up layout will use SearchView, if not use textview
+        if (android.os.Build.VERSION.SDK_INT > 10) {
+            SearchView sv = (SearchView) findViewById(R.id.ExperimentSearchInput);
+            sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    return false;
+                }
 
-			@Override
-			public void afterTextChanged(Editable s) {}
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    search(s);
+                    return false;
+                }
+            });
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {}
+        } else {
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				if (s == null || s.length() == 0) {
-					m_projects = new ArrayList<RProject>();
-					m_adapter = new ProjectAdapter(getBaseContext(),
-							R.layout.projectrow, R.layout.loadrow,
-							m_projects);
-					setListAdapter(m_adapter);
-				} else {
-					m_projects = new ArrayList<RProject>();
-					m_adapter = new ProjectAdapter(getBaseContext(),
-							R.layout.projectrow, R.layout.loadrow,
-							m_projects);
-					m_adapter.query = s.toString();
-					setListAdapter(m_adapter);
-				}
-			}
+            final EditText et = (EditText) findViewById(R.id.ExperimentSearchInput);
 
-		});
+            et.addTextChangedListener(new TextWatcher() {
 
-	}
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count,
+                                              int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before,
+                                          int count) {
+                    search(s.toString());
+                }
+
+            });
+        }
+    }
+
+        public void search(String s) {
+            if (s == null || s.length() == 0) {
+                m_projects = new ArrayList<RProject>();
+                m_adapter = new ProjectAdapter(getBaseContext(),
+                        R.layout.projectrow, R.layout.loadrow,
+                        m_projects);
+                setListAdapter(m_adapter);
+            } else {
+                m_projects = new ArrayList<RProject>();
+                m_adapter = new ProjectAdapter(getBaseContext(),
+                        R.layout.projectrow, R.layout.loadrow,
+                        m_projects);
+                m_adapter.query = s.toString();
+                setListAdapter(m_adapter);
+            }
+
+
+        }
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {

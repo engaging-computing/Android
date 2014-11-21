@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="20" />
+        android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -119,7 +119,7 @@
         <activity
             android:name="edu.uml.cs.isense.proj.BrowseProjects"
             android:windowSoftInputMode="stateHidden"
-            android:label="Projects" />
+            android:theme="@style/AppThemeNoActionBarDark" />
         <activity
             android:name="edu.uml.cs.isense.proj.NoQR"
             android:label="No QR Code Scanner Found"

@@ -3,85 +3,93 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="edu.uml.cs.isense.writer.ManualEntry" >
-    
-    <LinearLayout
-    	android:id="@+id/dataset_name_layout"
-    	android:orientation="horizontal"
-		android:layout_width="match_parent"
-   		android:layout_height="wrap_content"
-   		android:padding="10dp">
-	    <TextView
-           android:id="@+id/textView1"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="Dataset Name:" />
-	
-	    <EditText
-	        android:id="@+id/dataset_name"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:singleLine="true"
-	        android:layout_weight="1"
-	        android:ems="10" >
 
-        <requestFocus />
-    </EditText>
+    <LinearLayout
+        android:id="@+id/dataset_name_layout"
+        android:orientation="horizontal"
+        android:layout_below="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/tv_dataset_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dataset Name:" />
+
+        <EditText
+            android:id="@+id/dataset_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:ems="10" >
+            <requestFocus/>
+        </EditText>
 
     </LinearLayout>
-    
-    <View
-      android:id="@+id/datasetDivider"
-      android:layout_below="@+id/dataset_name_layout"
-	  android:layout_width="fill_parent"
-	  android:layout_height="1dp"
-	  android:background="?android:attr/dividerVertical" />
-    
-   <ScrollView
-       android:id="@+id/datapoints_sv"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_above="@+id/buttonDivider"
-       android:layout_below="@+id/datasetDivider"
-       tools:context="edu.uml.cs.isense.writer.ManualEntry" >
 
-   <LinearLayout
-    	android:id="@+id/datapoints_ll"
-    	android:orientation="vertical"
-		android:layout_width="match_parent"
-   		android:layout_height="wrap_content"/>
-      
+    <View
+        android:id="@+id/datasetDivider"
+        android:layout_below="@+id/dataset_name_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/dividerVertical" />
+
+    <ScrollView
+        android:id="@+id/datapoints_sv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonDivider"
+        android:layout_below="@+id/datasetDivider"
+        tools:context="edu.uml.cs.isense.writer.ManualEntry" >
+
+        <LinearLayout
+            android:id="@+id/datapoints_ll"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"/>
+
     </ScrollView>
-    
-  <View
-      android:id="@+id/buttonDivider"
-      android:layout_above="@+id/buttons"
-	  android:layout_width="fill_parent"
-	  android:layout_height="1dp"
-	  android:background="?android:attr/dividerVertical" />
-  
-	  <LinearLayout
-	   	android:id="@+id/buttons"
-	   	style="?android:attr/buttonBarStyle"
-	   	android:orientation="horizontal"
-		android:layout_width="match_parent"
-	  	android:layout_height="wrap_content"
-	  	android:layout_alignParentBottom="true"
-	  	android:weightSum="2">
-		   <Button
-		       android:id="@+id/adddatapoint"
-		       style="?android:attr/buttonBarButtonStyle"
-		       android:layout_width="match_parent"
-		       android:layout_height="wrap_content"
-		       android:layout_weight="1"
-		       android:text="Add Data Point" />
-		   
-		    <Button
-		       android:id="@+id/save"
-		       style="?android:attr/buttonBarButtonStyle"
-		       android:layout_width="match_parent"
-		       android:layout_height="wrap_content"
-		       android:layout_weight="1"
-		       android:text="Save" />
-	    </LinearLayout>
+
+    <View
+        android:id="@+id/buttonDivider"
+        android:layout_above="@+id/buttons"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/dividerVertical" />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        style="?android:attr/buttonBarStyle"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/save"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_bar_green"
+            android:text="Save"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/adddatapoint"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Data Point" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>

@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--Overides Colors from isense imports for toolbar-->
+    <color name="colorPrimaryDark">#608CBF</color>
+    <color name="colorPrimary">#A1D3FF</color>
+    <color name="colorAccent">#C7E5FF</color>
+    <color name="actionMenuTextColor">@android:color/black</color>
+    <color name="textColorPrimary">@android:color/white</color>
+    <color name="textColorSecondary">@android:color/white</color>
+    <color name="colorBackground">#4CAF50</color>
+
+</resources>

@@ -16,14 +16,7 @@
 /***************************************************************************************************/
 package edu.uml.cs.isense.motion;
 
-import java.text.DecimalFormat;
-import java.util.Timer;
-
-import org.json.JSONArray;
-
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,19 +27,22 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
-import android.widget.TextView;
+
+import java.text.DecimalFormat;
+import java.util.Timer;
+
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
@@ -72,7 +68,7 @@ import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class Motion  extends FragmentActivity {
+public class Motion extends ActionBarActivity {
 
 	public static final String DEFAULT_PROJ = "-1";
 	public static final int DEFAULT_RATE = 50;
@@ -108,52 +104,27 @@ public class Motion  extends FragmentActivity {
 	static String lastInitial = "";
 
 	public static final int RESULT_GOT_NAME = 1000;
-	public static final int UPLOAD_OK_REQUESTED = 1001;
 	public static final int LOGIN_STATUS_REQUESTED = 1002;
 	public static final int RECORDING_LENGTH_REQUESTED = 1003;
 	public static final int RECORDING_RATE_REQUESTED = 1004;
 	public static final int PROJECT_REQUESTED = 1005;
 	public static final int QUEUE_UPLOAD_REQUESTED = 1006;
 	public static final int RESET_REQUESTED = 1007;
-	public static final int SAVE_MODE_REQUESTED = 1008;
 	public static final int PRESETS_REQUESTED = 1009;
 
 	 ViewPager fields;
      PagerAdapter fieldAdapter;
 
-	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
-
 	private MediaPlayer mMediaPlayer;
 	private Vibrator vibrator;
 
-	DecimalFormat toThou = new DecimalFormat("######0.000");
-
-	int i = 0;
-	int len = 0;
-	int len2 = 0;
-
-	ProgressDialog dia;
-	double partialProg = 1.0;
-
-	public static String nameOfDataSet = "";
 
 	static boolean inPausedState = false;
 	static boolean useMenu = true;
-	static boolean setupDone = false;
-	static boolean choiceViaMenu = false;
-	static boolean dontToastMeTwice = false;
-	static boolean exitAppViaBack = false;
 	static boolean dontPromptMeTwice = false;
 
-	public static JSONArray dataSet;
-
-	long currentTime;
-
 	public static Context mContext;
-
-	public static TextView loggedInAs;
 	private Waffle w;
-	public static boolean inApp = false;
 
 	public static UploadQueue uq;
 
@@ -203,14 +174,6 @@ public class Motion  extends FragmentActivity {
 				}
 			};
 			new Thread(r).start();
-		}
-
-		// Initialize action bar customization for API >= 11
-		if (android.os.Build.VERSION.SDK_INT >= 11) {
-			ActionBar bar = getActionBar();
-
-			// make the actionbar clickable
-			bar.setDisplayHomeAsUpEnabled(true);
 		}
 
 		if (RecordingService.running)
@@ -386,8 +349,7 @@ public class Motion  extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				Intent rate = new Intent(mContext, RateDialog.class);
-				rate.putExtra("title", "Change Recording Rate");
-				startActivityForResult(rate, RECORDING_RATE_REQUESTED);
+                startActivityForResult(rate, RECORDING_RATE_REQUESTED);
 			}
 
 		});
@@ -397,9 +359,9 @@ public class Motion  extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mContext, DurationDialog.class);
-				i.putExtra("title", "Change Recording Length");
 				startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
-			}
+
+            }
 
 		});
 
@@ -481,9 +443,6 @@ public class Motion  extends FragmentActivity {
 			startActivityForResult(new Intent(this, Presets.class),
 					PRESETS_REQUESTED);
 		return true;
-//		case R.id.about_app:
-//			startActivity(new Intent(this, About.class));
-//			return true;
 		case R.id.helpMenuItem:
 			startActivity(new Intent(this, Help.class));
 			return true;

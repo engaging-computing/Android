@@ -158,7 +158,7 @@
 	<string name="key_info">A contributor key allows you to contribute data to a specific project without an iSENSE account.</string>
 	<string name="selectProject">Select a Project</string>
 	<string name="contribute"><u>You Can Contribute To:</u></string>
-	<string name="credentials"><u>Credentials</u></string>
+	<string name="login_underline"><u>Login</u></string>
 	<string name="logged_in">Logged in as:</string>
 	<string name="user_img_desc">iSense Gravatar</string>
 	<string name="logout">Log out</string>

@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Would you like to reset iS Motion to it's default settings?"/>
+        android:text="@string/reset_prompt"/>
 
     <View
         android:id="@+id/view1"

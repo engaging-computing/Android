@@ -17,7 +17,6 @@
 package edu.uml.cs.isense.motion;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

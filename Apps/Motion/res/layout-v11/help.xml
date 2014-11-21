@@ -23,19 +23,18 @@
 	            android:text="@string/help_app"
 	            android:textSize="16sp"
 	            android:padding="10dp"/>
-
 	    </LinearLayout>
 	</ScrollView>
 
 
 
 	<LinearLayout
-    android:id="@+id/LinearLayoutButtons"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:background="@android:color/transparent"
-    android:orientation="vertical">
+        android:id="@+id/LinearLayoutButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"

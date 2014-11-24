@@ -115,6 +115,64 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         save = (Button) findViewById(R.id.upload);
         datasetName = (EditText) findViewById(R.id.dataset_name);
         bottomButtons = (LinearLayout) findViewById(R.id.buttons);
+        TextView devswitch = (TextView) findViewById(R.id.tv_dataset_name);
+        devswitch.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CountDownTimer cdt = null;
+
+                // Give user 10 seconds to switch dev/prod mode
+                if (actionBarTapCount == 0) {
+                    cdt = new CountDownTimer(5000, 5000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            actionBarTapCount = 0;
+                        }
+                    }.start();
+                }
+
+                String other = (useDev) ? "production" : "dev";
+
+                switch (++actionBarTapCount) {
+                    case 5:
+                        w.make(getResources().getString(R.string.two_more_taps) + other
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 6:
+                        w.make(getResources().getString(R.string.one_more_tap) + other
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 7:
+                        w.make(getResources().getString(R.string.now_in_mode) + other
+                                + getResources().getString(R.string.mode_type));
+                        useDev = !useDev;
+
+                        if (cdt != null)
+                            cdt.cancel();
+
+                        if (api.getCurrentUser() != null) {
+                            Runnable r = new Runnable() {
+                                @Override
+                                public void run() {
+                                    api.deleteSession();
+                                    api.useDev(useDev);
+                                }
+                            };
+                            new Thread(r).start();
+                        } else {
+                            api.useDev(useDev);
+                        }
+                        CredentialManager.login(mContext, api);
+                        actionBarTapCount = 0;
+
+                        break;
+                }
+            }
+        });
 
         datasetName.setOnClickListener(new OnClickListener() {
 

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,7 +32,7 @@ import edu.uml.cs.isense.supplements.OrientationManager;
  * @author Mike Stowell and Jeremy Poulin of the iSENSE team.
  *
  */
-public class QueueEditData extends Activity {
+public class QueueEditData extends ActionBarActivity {
 
 	private Button okay, cancel;
 	private LinearLayout editDataList;

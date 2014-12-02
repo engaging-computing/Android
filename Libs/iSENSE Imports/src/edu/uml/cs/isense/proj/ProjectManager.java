@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -46,7 +47,7 @@ import edu.uml.cs.isense.waffle.Waffle;
  *
  * @author iSENSE Android Development Team
  */
-public class ProjectManager extends Activity implements OnClickListener {
+public class ProjectManager extends ActionBarActivity implements OnClickListener {
 
 	private EditText projInput;
 

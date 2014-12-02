@@ -241,15 +241,21 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
             @Override
             public void onScrollChanged() {
+
+                //remove focus so that we don't have a twitching affect when adding buttons when bottom edit text is current view
+                //added here as apposed to before buttons are added so view is unfocused when scrolling up or down to make behavior more consistent
+//                View current = getCurrentFocus();
+//                if (current != null) current.clearFocus();
+
             	//if you scoll fast the values would jump below 0 when it got to the top and above the max height when you got scroll to the bottom
             	//this was causing the buttons to flicker, the check below prevents this behavior
             	if (scrollView.getScrollY() > 0 && scrollView.getScrollY() < (datapointsLayout.getHeight() - scrollView.getHeight())) {
 	            	if (scrollY > scrollView.getScrollY()) { //scrolling up
-	            		//HIDE Buttons
+	            		//show Buttons
 	            		addField.setVisibility(View.VISIBLE);
 	            		save.setVisibility(View.VISIBLE);
 	            	} else if ( datapointsLayout.getHeight() > (scrollView.getHeight() + bottomButtons.getHeight())) {
-	            		//Show Buttons
+	            		//hide Buttons
                         addField.setVisibility(View.GONE);
                 		save.setVisibility(View.GONE);
 	            	}

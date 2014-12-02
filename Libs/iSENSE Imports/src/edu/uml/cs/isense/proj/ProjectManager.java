@@ -275,11 +275,11 @@ public class ProjectManager extends Activity implements OnClickListener {
 			}
 		} else if (requestCode == NEW_PROJ_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				if (data.hasExtra(ProjectCreate.NEW_PROJECT_ID)) {
+//				if (data.hasExtra(ProjectCreate.NEW_PROJECT_ID)) {
 					//TODO remove s
-					String projID = getProject(mContext);
-					projInput.setText(projID);
-				}
+                String projID = getProject(mContext);
+                projInput.setText(projID);
+//				}
 			} else {
 				setResult(RESULT_CANCELED);
 				finish();

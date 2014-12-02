@@ -2,6 +2,7 @@ package edu.uml.cs.isense.queue;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -13,7 +14,7 @@ import edu.uml.cs.isense.R;
  * 
  * @author iSENSE Android Development Team
  */
-public class NoInitialProject extends Activity {
+public class NoInitialProject extends ActionBarActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

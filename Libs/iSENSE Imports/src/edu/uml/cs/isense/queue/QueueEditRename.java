@@ -4,6 +4,7 @@ import edu.uml.cs.isense.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,7 +16,7 @@ import android.widget.EditText;
  * @author Mike Stowell and Jeremy Poulin of the iSENSE team.
  *
  */
-public class QueueEditRename extends Activity {
+public class QueueEditRename extends ActionBarActivity {
 
 	private EditText rename;
 	private Button okay, cancel;

@@ -116,8 +116,6 @@ public class Motion extends ActionBarActivity {
 	 ViewPager fields;
      PagerAdapter fieldAdapter;
 
-	private MediaPlayer mMediaPlayer;
-	private Vibrator vibrator;
 
 
 	static boolean inPausedState = false;
@@ -192,12 +190,6 @@ public class Motion extends ActionBarActivity {
 		w = new Waffle(mContext);
 
 		CredentialManager.login(mContext, api);
-
-		// Beep sound
-		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
-
-		// Vibrator for Long Click
-		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
 		startStop = (Button) findViewById(R.id.startStop);
 		uploadButton = (Button) findViewById(R.id.b_upload);
@@ -342,14 +334,6 @@ public class Motion extends ActionBarActivity {
 
 			@Override
 			public boolean onLongClick(View arg0) {
-
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.start();
-
-				// Vibrate and beep
-				vibrator.vibrate(300);
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.start();
 
                 if (RecordingService.running) {
 					startStop.setBackgroundResource(R.drawable.button_rsense);

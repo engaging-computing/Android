@@ -390,8 +390,8 @@ public class Motion extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 int current = fields.getCurrentItem();
-                if (current-1 > 0)
-                    fields.setCurrentItem(current - 1);
+                if (current > 0)
+                    fields.setCurrentItem(current-1);
             }
         });
 

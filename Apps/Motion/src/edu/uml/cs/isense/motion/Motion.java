@@ -23,10 +23,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -43,7 +41,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
-import java.util.Timer;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
@@ -76,14 +73,8 @@ public class Motion extends ActionBarActivity {
 	public static final int DEFAULT_RATE = 50;
 	public static final int DEFAULT_LENGTH = 10;
 	public static boolean useDev = false;
-	public static boolean promptForName = true;
 
-	public static final String VIS_URL_PROD = "http://isenseproject.org/projects/";
-	public static final String VIS_URL_DEV = "http://rsense-dev.cs.uml.edu/projects/";
-	public static String baseDataSetUrl = "";
 	public static String dataSetUrl = "";
-
-	public static String RECORD_SETTINGS = "RECORD_SETTINGS";
 
 	private Button startStop;
 	private Button uploadButton;
@@ -99,8 +90,6 @@ public class Motion extends ActionBarActivity {
 	public static final String MY_SAVED_PREFERENCES = "MyPrefs" ;
 	public static final String LENGTH_PREFS_KEY = "length";
 	public static final String RATE_PREFS_KEY = "rate";
-
-	private Timer timeTimer;
 
 	public API api;
 
@@ -119,8 +108,6 @@ public class Motion extends ActionBarActivity {
 	 ViewPager fields;
      PagerAdapter fieldAdapter;
 
-
-
 	static boolean inPausedState = false;
 	static boolean useMenu = true;
 	static boolean dontPromptMeTwice = false;
@@ -133,8 +120,6 @@ public class Motion extends ActionBarActivity {
 	public static Bundle saved;
 
 	public static Menu menu;
-
-    private TextView tvName;
 
     Intent service;
 
@@ -150,7 +135,6 @@ public class Motion extends ActionBarActivity {
 		api.useDev(useDev);
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -160,6 +144,8 @@ public class Motion extends ActionBarActivity {
 
 		api = API.getInstance();
 		setUseDev(useDev);
+
+        TextView tvName;
 
 		//bool in resources is false in values-xlarge but true in values
 		//this only allows devices with xlarge displays to put this activity in landscape
@@ -301,13 +287,11 @@ public class Motion extends ActionBarActivity {
                         } else {
                             api.useDev(useDev);
                         }
+
                         CredentialManager.login(mContext, api);
                         actionBarTapCount = 0;
-
-
                         break;
                 }
-
             }
 
         });
@@ -350,7 +334,6 @@ public class Motion extends ActionBarActivity {
 
 			@Override
 			public boolean onLongClick(View arg0) {
-
                 if (RecordingService.running) {
                     if(getApiLevel() < 21) {
                         startStop.setBackgroundResource(R.drawable.button_rsense);
@@ -370,7 +353,6 @@ public class Motion extends ActionBarActivity {
 						invalidateOptionsMenu();
                     startService(service);
                 }
-
 				return running;
 		}
 	});
@@ -416,7 +398,6 @@ public class Motion extends ActionBarActivity {
 		});
 
 		rateB.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				Intent rate = new Intent(mContext, RateDialog.class);
@@ -426,14 +407,11 @@ public class Motion extends ActionBarActivity {
 		});
 
 		lengthB.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mContext, DurationDialog.class);
 				startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
-
-                  }
-
+            }
 		});
 
 
@@ -454,16 +432,12 @@ public class Motion extends ActionBarActivity {
                     fields.setCurrentItem(current + 1);
             }
         });
-
-
 	}
 
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (timeTimer != null)
-			timeTimer.cancel();
 		inPausedState = true;
 		if (running) {
 			startStop.performLongClick();
@@ -473,8 +447,6 @@ public class Motion extends ActionBarActivity {
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (timeTimer != null)
-			timeTimer.cancel();
 		inPausedState = true;
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
@@ -604,7 +576,7 @@ public class Motion extends ActionBarActivity {
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
 				int rate = data.getExtras().getInt(Presets.RATE);
 				editor2.putInt(RATE_PREFS_KEY, rate);
-				editor2.commit();
+				editor2.apply();
 				setRateText();
 
 				/*set recording length*/
@@ -612,7 +584,7 @@ public class Motion extends ActionBarActivity {
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
 				int length = data.getExtras().getInt(Presets.LENGTH);
 				editor3.putInt(LENGTH_PREFS_KEY, length);
-				editor3.commit();
+				editor3.apply();
 				setLengthText();
 			}
 		} else if (reqCode == RESULT_GOT_NAME) {
@@ -659,14 +631,14 @@ public class Motion extends ActionBarActivity {
 				SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
 				editor2.putInt(RATE_PREFS_KEY, DEFAULT_RATE);
-				editor2.commit();
+				editor2.apply();
 				setRateText();
 
 				/*reset recording length*/
 				SharedPreferences lengthPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
 				editor3.putInt(LENGTH_PREFS_KEY, DEFAULT_LENGTH);
-				editor3.commit();
+				editor3.apply();
 				setLengthText();
 
 				/*reset name*/

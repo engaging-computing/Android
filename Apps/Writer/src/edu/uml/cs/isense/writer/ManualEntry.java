@@ -135,19 +135,19 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     }.start();
                 }
 
-                String other = (useDev) ? "production" : "dev";
+                String mode = (useDev) ? "production" : "dev";
 
                 switch (++actionBarTapCount) {
                     case 5:
-                        w.make(getResources().getString(R.string.two_more_taps) + other
+                        w.make(getResources().getString(R.string.two_more_taps) + mode
                                 + getResources().getString(R.string.mode_type));
                         break;
                     case 6:
-                        w.make(getResources().getString(R.string.one_more_tap) + other
+                        w.make(getResources().getString(R.string.one_more_tap) + mode
                                 + getResources().getString(R.string.mode_type));
                         break;
                     case 7:
-                        w.make(getResources().getString(R.string.now_in_mode) + other
+                        w.make(getResources().getString(R.string.now_in_mode) + mode
                                 + getResources().getString(R.string.mode_type));
                         useDev = !useDev;
 
@@ -244,8 +244,8 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
                 //remove focus so that we don't have a twitching affect when adding buttons when bottom edit text is current view
                 //added here as apposed to before buttons are added so view is unfocused when scrolling up or down to make behavior more consistent
-//                View current = getCurrentFocus();
-//                if (current != null) current.clearFocus();
+                View current = getCurrentFocus();
+                if (current != null) current.clearFocus();
 
             	//if you scoll fast the values would jump below 0 when it got to the top and above the max height when you got scroll to the bottom
             	//this was causing the buttons to flicker, the check below prevents this behavior
@@ -254,6 +254,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 	            		//show Buttons
 	            		addField.setVisibility(View.VISIBLE);
 	            		save.setVisibility(View.VISIBLE);
+
 	            	} else if ( datapointsLayout.getHeight() > (scrollView.getHeight() + bottomButtons.getHeight())) {
 	            		//hide Buttons
                         addField.setVisibility(View.GONE);

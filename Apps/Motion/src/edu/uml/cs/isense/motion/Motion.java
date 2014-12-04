@@ -258,19 +258,19 @@ public class Motion extends ActionBarActivity {
                     }.start();
                 }
 
-                String other = (useDev) ? "production" : "dev";
+                String mode = (useDev) ? "production" : "dev";
 
                 switch (++actionBarTapCount) {
                     case 5:
-                        w.make(getResources().getString(R.string.two_more_taps) + other
+                        w.make(getResources().getString(R.string.two_more_taps) + mode
                                 + getResources().getString(R.string.mode_type));
                         break;
                     case 6:
-                        w.make(getResources().getString(R.string.one_more_tap) + other
+                        w.make(getResources().getString(R.string.one_more_tap) + mode
                                 + getResources().getString(R.string.mode_type));
                         break;
                     case 7:
-                        w.make(getResources().getString(R.string.now_in_mode) + other
+                        w.make(getResources().getString(R.string.now_in_mode) + mode
                                 + getResources().getString(R.string.mode_type));
                         useDev = !useDev;
 

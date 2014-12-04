@@ -5,10 +5,35 @@
     android:keepScreenOn="true"
     android:orientation="vertical" >
 
-    <android.support.v4.view.ViewPager
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height= "60dp"
-        android:id="@+id/viewpager_fields"/>
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/leftChevron"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:layout_toLeftOf="@+id/leftChevron"
+            android:layout_alignParentLeft="true"
+            android:text="@string/font_awesome_icon_left_chevron"
+            android:background="@drawable/chevron"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager_fields"
+            android:layout_width="match_parent"
+            android:layout_toRightOf="@+id/leftChevron"
+            android:layout_toLeftOf="@+id/rightChevron"
+            android:layout_height= "60dp"/>
+
+        <Button
+            android:id="@+id/rightChevron"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/chevron"
+            android:text="@string/font_awesome_icon_right_chevron" />
+    </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/ll_rateanddurationbuttons"

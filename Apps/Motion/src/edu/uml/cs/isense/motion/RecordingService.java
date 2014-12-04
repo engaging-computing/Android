@@ -8,8 +8,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
@@ -42,6 +46,10 @@ public class RecordingService extends Service {
     float totalDistance = 0;
     long startTime;
 
+    private MediaPlayer mMediaPlayer;
+    private Vibrator vibrator;
+
+
     Intent intent;
     Context serviceContext;
 
@@ -61,6 +69,12 @@ public class RecordingService extends Service {
 
         serviceContext = this;
 
+        // Beep sound
+        mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
+
+        // Vibrator for Long Click
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
         //enables all sensors and gps based on the fields
 		dfm.registerSensors();
 
@@ -78,7 +92,9 @@ public class RecordingService extends Service {
             builder.setContentTitle("iSENSE Motion");
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
-            builder.setSmallIcon(R.drawable.ic_launcher);
+            builder.setSmallIcon(R.drawable.ic_stat_name);
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+            builder.setLargeIcon(bm);
             builder.setContentIntent(pendingIntent);
             builder.setOngoing(true);
             builder.setPriority(0);
@@ -136,6 +152,11 @@ public class RecordingService extends Service {
     	int length; //length of dataset
     	int rate; //interval between datapoints
 
+        // Vibrate and beep
+        vibrator.vibrate(300);
+        mMediaPlayer.setLooping(false);
+        mMediaPlayer.start();
+
         running = true;
 
 		SharedPreferences prefs = getSharedPreferences(Motion.MY_SAVED_PREFERENCES,
@@ -177,6 +198,11 @@ public class RecordingService extends Service {
         super.onDestroy();
         if (running) {
         	running = false;
+
+            // Vibrate and beep
+            vibrator.vibrate(300);
+            mMediaPlayer.setLooping(false);
+            mMediaPlayer.start();
 
         	//Stops timer from still counting down after recording has stopped
         	if (mTimer != null) {

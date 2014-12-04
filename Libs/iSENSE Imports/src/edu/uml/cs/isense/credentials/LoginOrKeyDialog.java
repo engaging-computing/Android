@@ -5,13 +5,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
 import edu.uml.cs.isense.R;
 
-public class LoginOrKeyDialog extends Activity {
+public class LoginOrKeyDialog extends ActionBarActivity {
     private Context mContext = this;
     private RadioButton key;
     private RadioButton login;

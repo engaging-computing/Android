@@ -3,6 +3,7 @@ package edu.uml.cs.isense.motion.dialogs;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,7 +14,7 @@ import android.widget.Spinner;
 import edu.uml.cs.isense.motion.Motion;
 import edu.uml.cs.isense.motion.R;
 
-public class DurationDialog extends Activity {
+public class DurationDialog extends ActionBarActivity {
 
 	Button ok, cancel;
 	EditText input;

@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,7 +38,7 @@ import edu.uml.cs.isense.waffle.Waffle;
  *
  * @author iSENSE Android Development Team
  */
-public class ProjectCreate extends Activity {
+public class ProjectCreate extends ActionBarActivity {
 
 	/**
 	 * Constant for an intent extra that can be passed as a boolean value as

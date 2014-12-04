@@ -3,6 +3,7 @@ package edu.uml.cs.isense.queue;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,7 +16,7 @@ import edu.uml.cs.isense.R;
  * @author Mike Stowell and Jeremy Poulin of the iSENSE team.
  *
  */
-public class QueueAlter extends Activity {
+public class QueueAlter extends ActionBarActivity {
 
 	private Button rename, changeData, selectProj, delete, cancel;
 

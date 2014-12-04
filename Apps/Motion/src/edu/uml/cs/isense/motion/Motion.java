@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.Timer;
@@ -118,8 +119,6 @@ public class Motion extends ActionBarActivity {
 	 ViewPager fields;
      PagerAdapter fieldAdapter;
 
-	private MediaPlayer mMediaPlayer;
-	private Vibrator vibrator;
 
 
 	static boolean inPausedState = false;
@@ -135,6 +134,8 @@ public class Motion extends ActionBarActivity {
 
 	public static Menu menu;
 
+    private TextView tvName;
+
     Intent service;
 
     //Receives info from library to update ui
@@ -142,6 +143,7 @@ public class Motion extends ActionBarActivity {
 
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
+
 
 	/* Make sure url is updated when useDev is set. */
 	void setUseDev(boolean useDev) {
@@ -192,16 +194,11 @@ public class Motion extends ActionBarActivity {
 
 		CredentialManager.login(mContext, api);
 
-		// Beep sound
-		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
-
-		// Vibrator for Long Click
-		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
 		startStop = (Button) findViewById(R.id.startStop);
 		uploadButton = (Button) findViewById(R.id.b_upload);
 		projNumB = (Button) findViewById(R.id.b_project);
 		nameB = (Button) findViewById(R.id.b_name);
+        tvName = (TextView) findViewById(R.id.tv_name);
 		rateB = (Button) findViewById(R.id.b_rate);
 		lengthB = (Button) findViewById(R.id.b_length);
         leftChevronB = (Button) findViewById(R.id.leftChevron);
@@ -252,6 +249,68 @@ public class Motion extends ActionBarActivity {
 
 		setRateText();
 		setLengthText();
+        tvName.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CountDownTimer cdt = null;
+
+                // Give user 10 seconds to switch dev/prod mode
+                if (actionBarTapCount == 0) {
+                    cdt = new CountDownTimer(5000, 5000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            actionBarTapCount = 0;
+                        }
+                    }.start();
+                }
+
+                String mode = (useDev) ? "production" : "dev";
+
+                switch (++actionBarTapCount) {
+                    case 5:
+                        w.make(getResources().getString(R.string.two_more_taps) + mode
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 6:
+                        w.make(getResources().getString(R.string.one_more_tap) + mode
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 7:
+                        w.make(getResources().getString(R.string.now_in_mode) + mode
+                                + getResources().getString(R.string.mode_type));
+                        useDev = !useDev;
+
+                        if (cdt != null)
+                            cdt.cancel();
+
+                        if (api.getCurrentUser() != null) {
+                            Runnable r = new Runnable() {
+                                @Override
+                                public void run() {
+                                    api.deleteSession();
+                                    api.useDev(useDev);
+                                }
+                            };
+                            new Thread(r).start();
+                        } else {
+                            api.useDev(useDev);
+                        }
+                        CredentialManager.login(mContext, api);
+                        actionBarTapCount = 0;
+
+
+                        break;
+                }
+
+            }
+
+        });
+
+
 
 		 /* update UI with data passed back from service */
         receiver = new BroadcastReceiver() {
@@ -285,14 +344,6 @@ public class Motion extends ActionBarActivity {
 
 			@Override
 			public boolean onLongClick(View arg0) {
-
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.start();
-
-				// Vibrate and beep
-				vibrator.vibrate(300);
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.start();
 
                 if (RecordingService.running) {
 					startStop.setBackgroundResource(R.drawable.button_rsense);
@@ -456,73 +507,29 @@ public class Motion extends ActionBarActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.login:
-			startActivityForResult(new Intent(this, CredentialManager.class),
-					LOGIN_STATUS_REQUESTED);
-			return true;
-		case R.id.upload:
-			manageUploadQueue();
-			return true;
-		case R.id.reset:
-			startActivityForResult(new Intent(this, ResetToDefaults.class),
-					RESET_REQUESTED);
-			return true;
-		case R.id.presets:
-			startActivityForResult(new Intent(this, Presets.class),
-					PRESETS_REQUESTED);
-		return true;
-		case R.id.helpMenuItem:
-			startActivity(new Intent(this, Help.class));
-			return true;
-		case android.R.id.home:
-			CountDownTimer cdt = null;
-
-			// Give user 10 seconds to switch dev/prod mode
-			if (actionBarTapCount == 0) {
-				cdt = new CountDownTimer(5000, 5000) {
-					@Override
-					public void onTick(long millisUntilFinished) {
-					}
-					@Override
-					public void onFinish() {
-						actionBarTapCount = 0;
-					}
-				}.start();
-			}
-
-			String other = (useDev) ? "production" : "dev";
-
-			switch (++actionBarTapCount) {
-			case 5:
-				w.make(getResources().getString(R.string.two_more_taps) + other
-						+ getResources().getString(R.string.mode_type));
-				break;
-			case 6:
-				w.make(getResources().getString(R.string.one_more_tap) + other
-						+ getResources().getString(R.string.mode_type));
-				break;
-			case 7:
-				w.make(getResources().getString(R.string.now_in_mode) + other
-						+ getResources().getString(R.string.mode_type));
-				useDev = !useDev;
-
-				if (cdt != null)
-					cdt.cancel();
-
-				setUseDev(useDev);
-
-				actionBarTapCount = 0;
-				break;
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-
+        switch (item.getItemId()) {
+            case R.id.login:
+                startActivityForResult(new Intent(this, CredentialManager.class),
+                        LOGIN_STATUS_REQUESTED);
+                return true;
+            case R.id.upload:
+                manageUploadQueue();
+                return true;
+            case R.id.reset:
+                startActivityForResult(new Intent(this, ResetToDefaults.class),
+                        RESET_REQUESTED);
+                return true;
+            case R.id.presets:
+                startActivityForResult(new Intent(this, Presets.class),
+                        PRESETS_REQUESTED);
+                return true;
+            case R.id.helpMenuItem:
+                startActivity(new Intent(this, Help.class));
+                return true;
+            default:
+                return false;
+        }
+    }
 
 	public static int getApiLevel() {
 		return android.os.Build.VERSION.SDK_INT;

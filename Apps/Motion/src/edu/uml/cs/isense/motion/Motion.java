@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -89,7 +90,9 @@ public class Motion extends ActionBarActivity {
 	private Button projNumB;
 	private Button nameB;
 	private Button rateB;
-	private Button lengthB;
+    private Button leftChevronB;
+    private Button rightChevronB;
+    private Button lengthB;
 	public static Boolean running = false;
 
 	//saved pref keys
@@ -198,11 +201,18 @@ public class Motion extends ActionBarActivity {
         tvName = (TextView) findViewById(R.id.tv_name);
 		rateB = (Button) findViewById(R.id.b_rate);
 		lengthB = (Button) findViewById(R.id.b_length);
+        leftChevronB = (Button) findViewById(R.id.leftChevron);
+        rightChevronB = (Button) findViewById(R.id.rightChevron);
         fields = (ViewPager) findViewById(R.id.viewpager_fields);
         fieldAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         fields.setAdapter(fieldAdapter);
 
-		if (RecordingService.running) {
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        leftChevronB.setTypeface(typeface);
+        rightChevronB.setTypeface(typeface);
+
+
+        if (RecordingService.running) {
 			startStop.setBackgroundResource(R.drawable.button_rsense_green);
 			startStop.setText("Recording");
 		} else {
@@ -412,9 +422,28 @@ public class Motion extends ActionBarActivity {
 				Intent i = new Intent(mContext, DurationDialog.class);
 				startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
 
-            }
+                  }
 
 		});
+
+
+        leftChevronB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int current = fields.getCurrentItem();
+                if (current-1 > 0)
+                    fields.setCurrentItem(current - 1);
+            }
+        });
+
+        rightChevronB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int current = fields.getCurrentItem();
+                if (current+1 < fieldAdapter.getCount())
+                    fields.setCurrentItem(current + 1);
+            }
+        });
 
 
 	}

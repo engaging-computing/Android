@@ -2,38 +2,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:keepScreenOn="true"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/leftChevron"
-            android:layout_width="40dp"
-            android:layout_height="60dp"
-            android:layout_toLeftOf="@+id/leftChevron"
-            android:layout_alignParentLeft="true"
-            android:text="@string/font_awesome_icon_left_chevron"
-            android:background="@drawable/chevron"/>
+    <Button
+        android:id="@+id/leftChevron"
+        android:layout_width="40dp"
+        android:layout_height="60dp"
+        style="?android:borderlessButtonStyle"
+        android:layout_toLeftOf="@+id/leftChevron"
+        android:layout_alignParentLeft="true"
+        android:text="@string/font_awesome_icon_left_chevron"
+        android:textColor="@android:color/white"
+        android:background="@drawable/chevron"/>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager_fields"
-            android:layout_width="match_parent"
-            android:layout_toRightOf="@+id/leftChevron"
-            android:layout_toLeftOf="@+id/rightChevron"
-            android:layout_height= "60dp"/>
+   <android.support.v4.view.ViewPager
+       android:id="@+id/viewpager_fields"
+       android:layout_width="match_parent"
+       android:layout_toRightOf="@+id/leftChevron"
+       android:layout_toLeftOf="@+id/rightChevron"
+       android:layout_height= "60dp"/>
 
-        <Button
-            android:id="@+id/rightChevron"
-            android:layout_width="40dp"
-            android:layout_height="60dp"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/chevron"
-            android:text="@string/font_awesome_icon_right_chevron" />
-    </RelativeLayout>
+    <Button
+        android:id="@+id/rightChevron"
+        android:layout_width="40dp"
+        android:layout_height="60dp"
+        style="?android:borderlessButtonStyle"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/chevron"
+        android:textColor="@android:color/white"
+        android:text="@string/font_awesome_icon_right_chevron" />
 
+</RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ll_rateanddurationbuttons"
@@ -45,14 +48,15 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_marginRight="5dp"
-            android:text="Rate:" />
+            android:text="Rate:" /> 
         
 	        <Button
 	            android:id="@+id/b_rate"
 	            android:layout_width="match_parent"
 	            android:layout_height="40dp"
-	            android:background="@drawable/button_rsense"
-	            android:text="Rate"
+                style="?android:selectableItemBackground"
+                android:background="@drawable/button_rsense"
+                android:text="Rate"
 	            android:layout_weight="1"
 	            android:textColor="#0066FF"
 	            android:textSize="14sp"
@@ -81,18 +85,18 @@
     <Button
         android:id="@+id/startStop"
         android:layout_width="fill_parent"
+        android:background="@drawable/button_rsense_ripple_green"
         android:layout_height="0dp"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:layout_weight="0.79"
-        android:background="@drawable/button_rsense_ripple_green"
         android:text="@string/holdToStart"
         android:textColor="#0066FF"
         android:textSize="30sp" />
-    
-     <RelativeLayout
+
+    <RelativeLayout
         android:id="@+id/rl_nameandlogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -119,7 +123,7 @@
 
     </RelativeLayout>
     
-    <LinearLayout
+     <LinearLayout
         android:id="@+id/ll_project"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -127,6 +131,7 @@
 
         <Button
             android:id="@+id/b_upload"
+            style="?android:selectableItemBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -138,6 +143,7 @@
 
         <Button
             android:id="@+id/b_project"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"

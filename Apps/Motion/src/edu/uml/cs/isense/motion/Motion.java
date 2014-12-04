@@ -211,14 +211,16 @@ public class Motion extends ActionBarActivity {
         leftChevronB.setTypeface(typeface);
         rightChevronB.setTypeface(typeface);
 
-
         if (RecordingService.running) {
 			startStop.setBackgroundResource(R.drawable.button_rsense_green);
 			startStop.setText("Recording");
-		} else {
+		} else if(getApiLevel() < 21) {
 			startStop.setBackgroundResource(R.drawable.button_rsense);
 			startStop.setText("Hold to Start");
-		}
+		} else if(getApiLevel() >= 21) {
+            startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+            startStop.setText("Hold to Start");
+        }
 
 		SharedPreferences namePrefs = getSharedPreferences(
 				EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
@@ -328,7 +330,11 @@ public class Motion extends ActionBarActivity {
 						invalidateOptionsMenu();
 
                 } else if(intent.hasExtra("BUTTONSTOP")) {
-					startStop.setBackgroundResource(R.drawable.button_rsense);
+                    if(getApiLevel() < 21) {
+                        startStop.setBackgroundResource(R.drawable.button_rsense);
+                    } else {
+                        startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+                    }
                     startStop.setText("Hold to Start");
 
         			useMenu = true;
@@ -346,8 +352,12 @@ public class Motion extends ActionBarActivity {
 			public boolean onLongClick(View arg0) {
 
                 if (RecordingService.running) {
-					startStop.setBackgroundResource(R.drawable.button_rsense);
-					startStop.setText("Hold to Start");
+                    if(getApiLevel() < 21) {
+                        startStop.setBackgroundResource(R.drawable.button_rsense);
+                    } else {
+                        startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+                    }
+                    startStop.setText("Hold to Start");
 					useMenu = true;
 					if (android.os.Build.VERSION.SDK_INT >= 11)
 						invalidateOptionsMenu();
@@ -431,8 +441,8 @@ public class Motion extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 int current = fields.getCurrentItem();
-                if (current-1 > 0)
-                    fields.setCurrentItem(current - 1);
+                if (current > 0)
+                    fields.setCurrentItem(current-1);
             }
         });
 
@@ -484,8 +494,12 @@ public class Motion extends ActionBarActivity {
 		//this sets the layout the correct layout for when it is not recording
 		//this is relevant if recording finishes while the app is in the background
 		if(!RecordingService.running) {
-			startStop.setBackgroundResource(R.drawable.button_rsense);
-	        startStop.setText("Hold to Start");
+            if(getApiLevel() < 21) {
+                startStop.setBackgroundResource(R.drawable.button_rsense);
+            } else {
+                startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+            }
+            startStop.setText("Hold to Start");
 
 			useMenu = true;
 			if (android.os.Build.VERSION.SDK_INT >= 11)

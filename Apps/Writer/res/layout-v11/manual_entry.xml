@@ -62,7 +62,6 @@
 
     <LinearLayout
         android:id="@+id/buttons"
-        style="?android:attr/buttonBarStyle"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -84,6 +83,8 @@
         <Button
             android:id="@+id/adddatapoint"
             style="?android:attr/borderlessButtonStyle"
+            android:background="@drawable/button_bar_rsense"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"

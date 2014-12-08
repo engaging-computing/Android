@@ -8,8 +8,8 @@
 
     <!--Material design colors, these are default colors, each app should overide these by having
         its own colors with the same name in values/colors.xml-->
-    <color name="primary">#113</color>
-    <color name="primary_dark">#000000</color>
+    <color name="primary">#ff3636a3</color>
+    <color name="primary_dark">#ff28286b</color>
     <color name="accent">#000000</color>
 
 </resources>

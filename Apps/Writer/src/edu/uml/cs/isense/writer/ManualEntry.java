@@ -260,6 +260,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                         addField.setVisibility(View.GONE);
                 		save.setVisibility(View.GONE);
 	            	}
+                    
 					scrollY = scrollView.getScrollY();
 	            }
             }

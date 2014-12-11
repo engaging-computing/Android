@@ -456,7 +456,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     EditText et = (EditText) singlefield.findViewById(R.id.field_et);
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm MM/dd/yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
                     String currentDateandTime = sdf.format(new Date());
 
                     et.setText(currentDateandTime);

@@ -255,11 +255,12 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 	            		addField.setVisibility(View.VISIBLE);
 	            		save.setVisibility(View.VISIBLE);
 
-	            	} else if ( datapointsLayout.getHeight() > (scrollView.getHeight() + bottomButtons.getHeight())) {
+	            	} else if ( datapointsLayout.getHeight() - 10 > (scrollView.getHeight() + bottomButtons.getHeight())) {
 	            		//hide Buttons
                         addField.setVisibility(View.GONE);
                 		save.setVisibility(View.GONE);
 	            	}
+                    
 					scrollY = scrollView.getScrollY();
 	            }
             }
@@ -455,7 +456,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     EditText et = (EditText) singlefield.findViewById(R.id.field_et);
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm MM/dd/yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
                     String currentDateandTime = sdf.format(new Date());
 
                     et.setText(currentDateandTime);
@@ -507,11 +508,11 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     datapoint.addView(singlefield, i + 1);
 
                 } else if (field.type == RProjectField.TYPE_LON) {
-                    ViewGroup singlefield = new RelativeLayout(mContext);
-                    inflater.inflate(R.layout.field, singlefield);
+                    ViewGroup singleField = new RelativeLayout(mContext);
+                    inflater.inflate(R.layout.field, singleField);
 
-                    EditText et = (EditText) singlefield.findViewById(R.id.field_et);
-                    TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
+                    EditText et = (EditText) singleField.findViewById(R.id.field_et);
+                    TextView tv = (TextView) singleField.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
                     if (this.getLocation() != null) {
@@ -521,14 +522,14 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     }
 
                     tv.setText(field.name + ":");
-                    datapoint.addView(singlefield, i + 1);
+                    datapoint.addView(singleField, i + 1);
 
                 } else if (field.type == RProjectField.TYPE_LAT) {
-                    ViewGroup singlefield = new RelativeLayout(mContext);
-                    inflater.inflate(R.layout.field, singlefield);
+                    ViewGroup singleField = new RelativeLayout(mContext);
+                    inflater.inflate(R.layout.field, singleField);
 
-                    EditText et = (EditText) singlefield.findViewById(R.id.field_et);
-                    TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
+                    EditText et = (EditText) singleField.findViewById(R.id.field_et);
+                    TextView tv = (TextView) singleField.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
                     if (this.getLocation() != null) {
@@ -537,7 +538,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                         et.setHint("No GPS Signal");
                     }
                     tv.setText(field.name + ":");
-                    datapoint.addView(singlefield, i + 1);
+                    datapoint.addView(singleField, i + 1);
                 }
             }
 

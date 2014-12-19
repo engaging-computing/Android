@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/leftChevron"
+        android:layout_width="40dp"
+        android:layout_height="60dp"
+        style="?android:borderlessButtonStyle"
+        android:layout_toLeftOf="@+id/leftChevron"
+        android:layout_alignParentLeft="true"
+        android:text="@string/font_awesome_icon_left_chevron"
+        android:textColor="@android:color/white"
+        android:background="@drawable/chevron"/>
+
+   <android.support.v4.view.ViewPager
+       android:id="@+id/viewpager_fields"
+       android:layout_width="match_parent"
+       android:layout_toRightOf="@+id/leftChevron"
+       android:layout_toLeftOf="@+id/rightChevron"
+       android:layout_height= "60dp"/>
+
+    <Button
+        android:id="@+id/rightChevron"
+        android:layout_width="40dp"
+        android:layout_height="60dp"
+        style="?android:borderlessButtonStyle"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/chevron"
+        android:textColor="@android:color/white"
+        android:text="@string/font_awesome_icon_right_chevron" />
+
+</RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_rateanddurationbuttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp">
+          <TextView
+            android:id="@+id/tv_rate"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginRight="5dp"
+            android:text="Rate:" /> 
+        
+	        <Button
+	            android:id="@+id/b_rate"
+	            android:layout_width="match_parent"
+	            android:layout_height="40dp"
+                style="?android:selectableItemBackground"
+                android:background="@drawable/button_rsense"
+                android:text="Rate"
+	            android:layout_weight="1"
+	            android:textColor="#0066FF"
+	            android:textSize="14sp"
+	            android:textStyle="bold" />
+	        
+	        <TextView
+            android:id="@+id/tv_length"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:text="Length:" />
+	        
+	        <Button
+	            android:id="@+id/b_length"
+	            android:layout_width="match_parent"
+	            android:layout_height="40dp"
+	            android:layout_weight="1"
+	            android:background="@drawable/button_rsense"
+	            android:text="Length"
+	            android:textColor="#0066FF"
+	            android:textSize="14sp"
+	            android:textStyle="bold" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/startStop"
+        android:layout_width="fill_parent"
+        android:background="@drawable/button_rsense_ripple_green"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0.79"
+        android:text="@string/holdToStart"
+        android:textColor="#0066FF"
+        android:textSize="30sp" />
+
+    <RelativeLayout
+        android:id="@+id/rl_nameandlogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginRight="10dp"
+            android:gravity="left|center_vertical"
+            android:text="@string/nameWithColon" />
+
+        <Button
+            android:id="@+id/b_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@id/tv_name"
+            android:background="@drawable/button_rsense"
+            android:text="@string/john_smith"
+	        android:textColor="#0066FF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+    
+     <LinearLayout
+        android:id="@+id/ll_project"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/b_upload"
+            style="?android:selectableItemBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/button_bar_green"
+            android:text="@string/upload"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/b_project"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/button_bar_rsense"
+            android:text="@string/genericproj"
+	        android:textColor="#0066FF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

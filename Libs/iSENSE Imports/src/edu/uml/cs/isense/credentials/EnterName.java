@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,7 +23,7 @@ import edu.uml.cs.isense.waffle.Waffle;
  * 
  * @author iSENSE Android Dev Team
  */
-public class EnterName extends Activity {
+public class EnterName extends ActionBarActivity {
     public static boolean isOpen = false;
 
 	/* Use these to access the name and last initial from preferences. */

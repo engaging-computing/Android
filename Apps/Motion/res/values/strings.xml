@@ -87,6 +87,11 @@ Light\n\n
     <string name="john_smith">John S.</string>
     
     <string name="gps">GPS</string>
-     <string name="acceleration">Acceleration</string>
+    <string name="acceleration">Acceleration</string>
+
+    <string name="font_awesome_icon_right_chevron">&#xf054;</string>
+    <string name="font_awesome_icon_left_chevron">&#xf053;</string>
+
+
 
 </resources>

@@ -2,11 +2,12 @@ package edu.uml.cs.isense.motion.dialogs;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import edu.uml.cs.isense.motion.R;
 
-public class SaveModeDialog extends Activity {
+public class SaveModeDialog extends ActionBarActivity {
 
 	Button ok, cancel;
 

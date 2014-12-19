@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -26,7 +27,7 @@ import edu.uml.cs.isense.supplements.OrientationManager;
  *
  * @author iSENSE Android Development Team
  */
-public class FieldMatching extends Activity {
+public class FieldMatching extends ActionBarActivity {
 
 	/**
 	 * The hard-coded String key that the implementor should pair with a String[] of their

@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -24,7 +25,7 @@ import edu.uml.cs.isense.supplements.OrientationManager;
  * @author iSENSE Android Development Team
  *
  */
-public class ProjectFieldDialog extends Activity {
+public class ProjectFieldDialog extends ActionBarActivity {
 
 	private EditText nameInput;
 	private Button ok,cancel, selectAll;

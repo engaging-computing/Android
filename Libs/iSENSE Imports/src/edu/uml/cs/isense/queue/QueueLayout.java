@@ -187,6 +187,18 @@ public class QueueLayout extends ActionBarActivity implements OnClickListener {
 		scrollQueue = (LinearLayout) findViewById(R.id.scrollqueue);
 		fillScrollQueue();
 
+        //check to see if none of the datasets are selected, if none are selected change text to select all
+        boolean noneSelected = true;
+        for (int i = 0; i < scrollQueue.getChildCount(); i++) {
+            View view = scrollQueue.getChildAt(i);
+            if (view.getTag() == Integer.valueOf(QUEUE_BOX_SELECTED)) {
+                noneSelected = false;
+                break;
+            }
+        }
+        if (noneSelected)
+            select.setText(getResources().getString(R.string.select_all));
+
         if (android.os.Build.VERSION.SDK_INT >= 11) {
             ActionBar bar = getSupportActionBar();
 

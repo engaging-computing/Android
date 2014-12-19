@@ -115,6 +115,64 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
         save = (Button) findViewById(R.id.upload);
         datasetName = (EditText) findViewById(R.id.dataset_name);
         bottomButtons = (LinearLayout) findViewById(R.id.buttons);
+        TextView devswitch = (TextView) findViewById(R.id.tv_dataset_name);
+        devswitch.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CountDownTimer cdt = null;
+
+                // Give user 10 seconds to switch dev/prod mode
+                if (actionBarTapCount == 0) {
+                    cdt = new CountDownTimer(5000, 5000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            actionBarTapCount = 0;
+                        }
+                    }.start();
+                }
+
+                String mode = (useDev) ? "production" : "dev";
+
+                switch (++actionBarTapCount) {
+                    case 5:
+                        w.make(getResources().getString(R.string.two_more_taps) + mode
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 6:
+                        w.make(getResources().getString(R.string.one_more_tap) + mode
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 7:
+                        w.make(getResources().getString(R.string.now_in_mode) + mode
+                                + getResources().getString(R.string.mode_type));
+                        useDev = !useDev;
+
+                        if (cdt != null)
+                            cdt.cancel();
+
+                        if (api.getCurrentUser() != null) {
+                            Runnable r = new Runnable() {
+                                @Override
+                                public void run() {
+                                    api.deleteSession();
+                                    api.useDev(useDev);
+                                }
+                            };
+                            new Thread(r).start();
+                        } else {
+                            api.useDev(useDev);
+                        }
+                        CredentialManager.login(mContext, api);
+                        actionBarTapCount = 0;
+
+                        break;
+                }
+            }
+        });
 
         datasetName.setOnClickListener(new OnClickListener() {
 
@@ -183,18 +241,26 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
             @Override
             public void onScrollChanged() {
+
+                //remove focus so that we don't have a twitching affect when adding buttons when bottom edit text is current view
+                //added here as apposed to before buttons are added so view is unfocused when scrolling up or down to make behavior more consistent
+                View current = getCurrentFocus();
+                if (current != null) current.clearFocus();
+
             	//if you scoll fast the values would jump below 0 when it got to the top and above the max height when you got scroll to the bottom
             	//this was causing the buttons to flicker, the check below prevents this behavior
-            	if (scrollView.getScrollY() > 0 && scrollView.getScrollY() < (datapointsLayout.getHeight() -scrollView.getHeight())) {
+            	if (scrollView.getScrollY() > 0 && scrollView.getScrollY() < (datapointsLayout.getHeight() - scrollView.getHeight())) {
 	            	if (scrollY > scrollView.getScrollY()) { //scrolling up
-	            		//HIDE Buttons
+	            		//show Buttons
 	            		addField.setVisibility(View.VISIBLE);
 	            		save.setVisibility(View.VISIBLE);
-	            	} else if (addField.isShown() || save.isShown()) { //scrolling down and buttons are not already visible
-	            		//Show Buttons
+
+	            	} else if ( datapointsLayout.getHeight() - 10 > (scrollView.getHeight() + bottomButtons.getHeight())) {
+	            		//hide Buttons
                         addField.setVisibility(View.GONE);
                 		save.setVisibility(View.GONE);
 	            	}
+                    
 					scrollY = scrollView.getScrollY();
 	            }
             }
@@ -390,7 +456,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     EditText et = (EditText) singlefield.findViewById(R.id.field_et);
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm MM/dd/yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
                     String currentDateandTime = sdf.format(new Date());
 
                     et.setText(currentDateandTime);
@@ -442,11 +508,11 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     datapoint.addView(singlefield, i + 1);
 
                 } else if (field.type == RProjectField.TYPE_LON) {
-                    ViewGroup singlefield = new RelativeLayout(mContext);
-                    inflater.inflate(R.layout.field, singlefield);
+                    ViewGroup singleField = new RelativeLayout(mContext);
+                    inflater.inflate(R.layout.field, singleField);
 
-                    EditText et = (EditText) singlefield.findViewById(R.id.field_et);
-                    TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
+                    EditText et = (EditText) singleField.findViewById(R.id.field_et);
+                    TextView tv = (TextView) singleField.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
                     if (this.getLocation() != null) {
@@ -456,14 +522,14 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     }
 
                     tv.setText(field.name + ":");
-                    datapoint.addView(singlefield, i + 1);
+                    datapoint.addView(singleField, i + 1);
 
                 } else if (field.type == RProjectField.TYPE_LAT) {
-                    ViewGroup singlefield = new RelativeLayout(mContext);
-                    inflater.inflate(R.layout.field, singlefield);
+                    ViewGroup singleField = new RelativeLayout(mContext);
+                    inflater.inflate(R.layout.field, singleField);
 
-                    EditText et = (EditText) singlefield.findViewById(R.id.field_et);
-                    TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
+                    EditText et = (EditText) singleField.findViewById(R.id.field_et);
+                    TextView tv = (TextView) singleField.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
                     if (this.getLocation() != null) {
@@ -472,7 +538,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                         et.setHint("No GPS Signal");
                     }
                     tv.setText(field.name + ":");
-                    datapoint.addView(singlefield, i + 1);
+                    datapoint.addView(singleField, i + 1);
                 }
             }
 

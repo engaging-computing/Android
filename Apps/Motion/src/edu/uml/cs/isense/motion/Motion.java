@@ -660,13 +660,13 @@ private void setRateText() {
 
 	switch (rate) {
 	case 50:
-		rateB.setText("50 mili");
+		rateB.setText("50 ms");
 		break;
 	case 100:
-		rateB.setText("100 mili");
+		rateB.setText("100 ms");
 		break;
 	case 500:
-		rateB.setText("500 mili");
+		rateB.setText("500 ms");
 		break;
 	case 1000:
 		rateB.setText("1 sec");

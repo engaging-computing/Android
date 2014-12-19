@@ -92,6 +92,7 @@ public class ProjectFieldDialog extends Activity {
 						time.type = RProjectField.TYPE_TIMESTAMP;
 						fields.add(time);
 					}
+
 					if (acceleration.isChecked()) {
 						RProjectField accelx = new RProjectField();
 						accelx.name = "Accel-x";
@@ -105,22 +106,19 @@ public class ProjectFieldDialog extends Activity {
 						accely.unit = "m/s^2";
 						fields.add(accely);
 
-
 						RProjectField accelz = new RProjectField();
 						accelz.name = "Accel-z";
 						accelz.type = RProjectField.TYPE_NUMBER;
 						accelz.unit = "m/s^2";
 						fields.add(accelz);
 
-
 						RProjectField accelmag = new RProjectField();
 						accelmag.name = "Accel-magnitude";
 						accelmag.type = RProjectField.TYPE_NUMBER;
 						accelmag.unit = "m/s^2";
 						fields.add(accelmag);
-
-
 					}
+
 					if (magnetic.isChecked()) {
 						RProjectField magx = new RProjectField();
 						magx.name = "Magnetic-x";
@@ -128,13 +126,11 @@ public class ProjectFieldDialog extends Activity {
 						magx.unit = "μT";
 						fields.add(magx);
 
-
 						RProjectField magy = new RProjectField();
 						magy.name = "Magnetic-y";
 						magy.type = RProjectField.TYPE_NUMBER;
 						magy.unit = "μT";
 						fields.add(magy);
-
 
 						RProjectField magz = new RProjectField();
 						magz.name = "Magnetic-z";
@@ -142,14 +138,13 @@ public class ProjectFieldDialog extends Activity {
 						magz.unit = "μT";
 						fields.add(magz);
 
-
 						RProjectField magmag = new RProjectField();
 						magmag.name = "Magnetic-magnitude";
 						magmag.type = RProjectField.TYPE_NUMBER;
 						magmag.unit = "μT";
 						fields.add(magmag);
-
 					}
+
 					if (location.isChecked()) {
 						RProjectField lat = new RProjectField();
 						lat.name = "Latitude";
@@ -157,54 +152,53 @@ public class ProjectFieldDialog extends Activity {
 						lat.unit = "Degrees";
 						fields.add(lat);
 
-
 						RProjectField lon = new RProjectField();
 						lon.name = "Longitude";
 						lon.type = RProjectField.TYPE_LON;
 						lon.unit = "Degrees";
 						fields.add(lon);
-
 					}
+
 					if (velocity.isChecked()) {
 						RProjectField velocity = new RProjectField();
 						velocity.name = "Velocity";
 						velocity.type = RProjectField.TYPE_NUMBER;
 						velocity.unit = "m/s";
 						fields.add(velocity);
-
 					}
+
 					if (distance.isChecked()) {
 						RProjectField distance = new RProjectField();
 						distance.name = "Distance";
 						distance.type = RProjectField.TYPE_NUMBER;
 						distance.unit = "meters";
 						fields.add(distance);
-
 					}
+
 					if (altitude.isChecked()) {
 						RProjectField alt = new RProjectField();
 						alt.name = "Altitude";
 						alt.type = RProjectField.TYPE_NUMBER;
 						alt.unit = "meters above sea level";
 						fields.add(alt);
-
 					}
+
 					if (pressure.isChecked()) {
 						RProjectField pres = new RProjectField();
 						pres.name = "Pressure";
 						pres.type = RProjectField.TYPE_NUMBER;
 						pres.unit = "hPa or mbar";
 						fields.add(pres);
-
 					}
+
 					if (humidity.isChecked()) {
 						RProjectField hum = new RProjectField();
 						hum.name = "Humidity";
 						hum.type = RProjectField.TYPE_NUMBER;
 						hum.unit = "%";
 						fields.add(hum);
-
 					}
+
 					if (heading.isChecked()) {
 						RProjectField headingdeg = new RProjectField();
 						headingdeg.name = "Heading Degrees";
@@ -212,14 +206,13 @@ public class ProjectFieldDialog extends Activity {
 						headingdeg.unit = "Deg";
 						fields.add(headingdeg);
 
-
 						RProjectField headingrad = new RProjectField();
 						headingrad.name = "Heading Radians";
 						headingrad.type = RProjectField.TYPE_NUMBER;
 						headingrad.unit = "Rad";
 						fields.add(headingrad);
-
 					}
+
 					if (temp.isChecked()) {
 						RProjectField tempf = new RProjectField();
 						tempf.name = "Temperature F";
@@ -227,28 +220,19 @@ public class ProjectFieldDialog extends Activity {
 						tempf.unit = "Fahrenheit";
 						fields.add(tempf);
 
-
 						RProjectField tempc = new RProjectField();
 						tempc.name = "Temperature C";
 						tempc.type = RProjectField.TYPE_NUMBER;
 						tempc.unit = "Celsius";
 						fields.add(tempc);
-
-
-						RProjectField tempk = new RProjectField();
-						tempk.name = "Temperature K";
-						tempk.type = RProjectField.TYPE_NUMBER;
-						tempk.unit = "Kelvin";
-						fields.add(tempk);
-
 					}
+
 					if (light.isChecked()) {
 						RProjectField l = new RProjectField();
 						l.name = "Light";
 						l.type = RProjectField.TYPE_NUMBER;
 						l.unit = "lx";
 						fields.add(l);
-
 					}
 
 					nameInput.setError(null);

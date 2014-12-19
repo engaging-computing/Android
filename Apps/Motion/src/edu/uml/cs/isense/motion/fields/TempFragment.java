@@ -87,8 +87,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 						+ (event.values[0] * 1.8) + 32);
 				tempC.setText("C: "
 						+ event.values[0]);
-				tempK.setText("K: "
-						+ event.values[0] + 273.15);
 
 			} catch (Exception e){
 				e.printStackTrace();

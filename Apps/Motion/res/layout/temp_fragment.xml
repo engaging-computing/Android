@@ -21,7 +21,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="#444"
-    android:weightSum="3">
+    android:weightSum="2">
 
         <TextView
             android:id="@+id/tempf"
@@ -43,15 +43,6 @@
             android:textStyle="bold"
             android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/tempk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_weight="1" />
 
     </LinearLayout>
 </LinearLayout>

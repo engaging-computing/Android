@@ -83,8 +83,8 @@ public class TempFragment extends Fragment implements SensorEventListener {
 		if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE ) {
             DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
 			try {
-				tempF.setText(oneDigit.format(((event.values[0] * 1.8) + 32)) +  " \u00b0" + "F");
-				tempC.setText(oneDigit.format(event.values[0]) +  " \u00b0" + "C");
+				tempF.setText(oneDigit.format(((event.values[0] * 1.8) + 32)) +  " \u2109");
+				tempC.setText(oneDigit.format(event.values[0]) +  " \u2103");
 
 			} catch (Exception e){
 				e.printStackTrace();

@@ -70,8 +70,4 @@ public class Fields {
 	public static final int VELOCITY = 19;
 	public static final int DISTANCE = 20;
 	public static final int HUMIDITY = 21;
-
-
-	
-	
 }

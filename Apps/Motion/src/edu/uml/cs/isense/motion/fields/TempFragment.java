@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.text.DecimalFormat;
+
 import edu.uml.cs.isense.motion.Motion;
 import edu.uml.cs.isense.motion.R;
 
@@ -78,11 +81,10 @@ public class TempFragment extends Fragment implements SensorEventListener {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE ) {
+            DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
 			try {
-				tempF.setText("F: "
-						+ (event.values[0] * 1.8) + 32);
-				tempC.setText("C: "
-						+ event.values[0]);
+				tempF.setText(oneDigit.format(((event.values[0] * 1.8) + 32)) +  " \u00b0" + "F");
+				tempC.setText(oneDigit.format(event.values[0]) +  " \u00b0" + "C");
 
 			} catch (Exception e){
 				e.printStackTrace();
@@ -93,6 +95,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
+
 	}
 }

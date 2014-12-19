@@ -1439,11 +1439,14 @@ public class DataFieldManager extends Application {
                 f.timeMillis = System.currentTimeMillis();
         if (enabledFields[Fields.TEMPERATURE_C])
                 f.temperature_c = temperature;
-        if (enabledFields[Fields.TEMPERATURE_F])
-                if (temperature.equals(""))
-                    f.temperature_f = temperature;
-                else
-                    f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
+        if (enabledFields[Fields.TEMPERATURE_F]) {
+            DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
+            if (temperature.equals("")) {
+                f.temperature_f = "" + oneDigit.format(Double.parseDouble(temperature));
+            } else {
+                f.temperature_f = "" + oneDigit.format( ((Double.parseDouble(temperature) * 1.8) + 32) );
+            }
+        }
         if (enabledFields[Fields.PRESSURE])
                 f.pressure = pressure;
         if (enabledFields[Fields.ALTITUDE])

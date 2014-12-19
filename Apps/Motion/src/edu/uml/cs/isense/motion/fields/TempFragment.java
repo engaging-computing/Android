@@ -23,7 +23,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 	private SensorManager mSensorManager;
     private TextView tempF;
     private TextView tempC;
-    private TextView tempK;
 
     @SuppressLint("InlinedApi")
 	@Override
@@ -34,7 +33,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 
         tempF = (TextView) rootView.findViewById(R.id.tempf);
         tempC = (TextView) rootView.findViewById(R.id.tempc);
-        tempK = (TextView) rootView.findViewById(R.id.tempk);
 
 		mSensorManager = (SensorManager) Motion.mContext.getSystemService(Context.SENSOR_SERVICE);
 
@@ -44,13 +42,11 @@ public class TempFragment extends Fragment implements SensorEventListener {
      				SensorManager.SENSOR_DELAY_UI);
 			if (mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) == null) {
 				tempC.setVisibility(View.GONE);
-				tempK.setVisibility(View.GONE);
 				tempF.setText("No Sensor");
 				tempF.setTextColor(Color.RED);
 			}
 		} else {
 			tempC.setVisibility(View.GONE);
-			tempK.setVisibility(View.GONE);
 			tempF.setText("Not supported before Android 3.0");
 			tempF.setTextColor(Color.RED);
 		}

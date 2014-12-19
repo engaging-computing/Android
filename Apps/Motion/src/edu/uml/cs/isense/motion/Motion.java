@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -32,6 +33,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -432,6 +434,39 @@ public class Motion extends ActionBarActivity {
                     fields.setCurrentItem(current + 1);
             }
         });
+
+        //dim button if we are at the end
+        if (fields.getCurrentItem() == 0) {
+            leftChevronB.setTextColor(Color.GRAY);
+        } else if (fields.getCurrentItem() == 7) {
+            rightChevronB.setTextColor(Color.GRAY);
+        }
+
+        //dim buttons if we get to either end
+        fields.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.e("here", "here " + position);
+                if (position == 0) {
+                    leftChevronB.setTextColor(Color.GRAY);
+                } else if (position == 7) {
+                    rightChevronB.setTextColor(Color.GRAY);
+                } else {
+                    leftChevronB.setTextColor(Color.WHITE);
+                    rightChevronB.setTextColor(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 	}
 
 
@@ -749,7 +784,7 @@ private void setLengthText() {
         		case 0:
             		return new AccelFragment();
         		case 1:
-        			return new LocFragment();
+                    return new LocFragment();
         		case 2:
         			return new AltFragment();
         		case 3:
@@ -759,9 +794,9 @@ private void setLengthText() {
         		case 5:
         			return new TempFragment();
         		case 6:
-        			return new HumidityFragment();
+                    return new HumidityFragment();
         		case 7:
-        			return new LightFragment();
+                    return new LightFragment();
         		default:
         			return null;
         	}

@@ -1412,7 +1412,7 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.ACCEL_TOTAL])
                 f.accel_total = toThou.format(accel[3]);
         if (enabledFields[Fields.LATITUDE])
-        	if(loc != null && f.latitude != 0)
+        	if(loc != null)
                 f.latitude = loc.getLatitude();
         if (enabledFields[Fields.LONGITUDE])
         	if(loc != null)

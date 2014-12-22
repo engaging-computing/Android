@@ -128,6 +128,9 @@ public class Motion extends ActionBarActivity {
     //Receives info from library to update ui
     BroadcastReceiver receiver;
 
+    //boolean used to display spash screen when app is first opened
+    private Boolean isFirstTime = true;
+
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
 
@@ -168,6 +171,12 @@ public class Motion extends ActionBarActivity {
 			};
 			new Thread(r).start();
 		}
+
+        if (isFirstTime) {
+            isFirstTime = false;
+            startActivityForResult(new Intent(this, PresetScreen.class),
+                    PRESETS_REQUESTED);
+        }
 
 		if (RecordingService.running)
 			useMenu = false;

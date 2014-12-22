@@ -22,7 +22,7 @@ public class Presets extends ActionBarActivity {
     private RadioButton accel;
     private RadioButton gps;
     public static final String FIELD = "field";
-    private String LAST_PRESET = "last_preset";
+    public static final String LAST_PRESET = "last_preset";
 
     public static final String ACCEL_PROJECT= "570";
     public static final int ACCEL_PROJECT_RATE= 50;

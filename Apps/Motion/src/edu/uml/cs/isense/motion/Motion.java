@@ -463,7 +463,7 @@ public class Motion extends ActionBarActivity {
                 Log.e("here", "here " + position);
                 if (position == 0) {
                     leftChevronB.setTextColor(Color.GRAY);
-                } else if (position == 7) {
+                } else if (position == (fieldAdapter.getCount()-1)) {
                     rightChevronB.setTextColor(Color.GRAY);
                 } else {
                     leftChevronB.setTextColor(Color.WHITE);

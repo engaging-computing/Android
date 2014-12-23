@@ -6,7 +6,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Acceleration Preset"
+        android:text="@string/accel_preset"
         android:layout_margin="10dp"
         android:background="@drawable/button_rsense"
         android:textColor="#0066FF"
@@ -17,7 +17,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GPS Preset"
+        android:text="@string/gps_preset"
         android:layout_margin="10dp"
         android:background="@drawable/button_rsense"
         android:textColor="#0066FF"

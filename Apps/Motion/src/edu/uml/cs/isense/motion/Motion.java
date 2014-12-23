@@ -129,7 +129,7 @@ public class Motion extends ActionBarActivity {
     BroadcastReceiver receiver;
 
     //boolean used to display spash screen when app is first opened
-    private Boolean isFirstTime = true;
+    private boolean displaySplashScreen = true;
 
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
@@ -172,8 +172,8 @@ public class Motion extends ActionBarActivity {
 			new Thread(r).start();
 		}
 
-        if (isFirstTime) {
-            isFirstTime = false;
+        if (displaySplashScreen) {
+            displaySplashScreen = false;
             startActivityForResult(new Intent(this, PresetScreen.class),
                     PRESETS_REQUESTED);
         }
@@ -447,7 +447,7 @@ public class Motion extends ActionBarActivity {
         //dim button if we are at the end
         if (fields.getCurrentItem() == 0) {
             leftChevronB.setTextColor(Color.GRAY);
-        } else if (fields.getCurrentItem() == 7) {
+        } else if (fields.getCurrentItem() == (fieldAdapter.getCount()-1) ) {
             rightChevronB.setTextColor(Color.GRAY);
         }
 

@@ -54,8 +54,7 @@
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
             android:text="@string/browse"
-            style="?android:attr/button"
-            android:textSize="18sp" />
+            style="?android:attr/button"/>
     </LinearLayout>
     
     <LinearLayout
@@ -85,8 +84,7 @@
 	        android:layout_marginLeft="8dp"
 	        android:layout_marginRight="8dp"
             style="?android:attr/button"
-            android:text="@string/projLater"
-	        android:textSize="18sp" />
+            android:text="@string/projLater"/>
     
     </LinearLayout>
     <View

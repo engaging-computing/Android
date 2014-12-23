@@ -7,25 +7,24 @@
         <!--   darker variant for the status bar and contextual app bars -->
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <!--   theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">@color/accent</item>
-
+        <!--<item name="colorAccent">@color/accent</item>-->
     </style>
 
     <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
     </style>
 
     <style name="AppThemeNoActionBarDark" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@android:color/white</item>
     </style>
 
     <style name="AppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">wrap_content</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
     </style>
 
     <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">

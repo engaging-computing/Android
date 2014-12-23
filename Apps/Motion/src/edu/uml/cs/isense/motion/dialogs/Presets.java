@@ -3,6 +3,7 @@ package edu.uml.cs.isense.motion.dialogs;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -10,7 +11,7 @@ import android.widget.RadioButton;
 
 import edu.uml.cs.isense.motion.R;
 
-public class Presets extends Activity{
+public class Presets extends ActionBarActivity {
     public static final String PROJECT = "project";
     public static final String LENGTH = "length";
     public static final String RATE = "rate";

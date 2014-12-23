@@ -22,10 +22,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.media.MediaPlayer;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -39,9 +38,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.text.DecimalFormat;
-import java.util.Timer;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
@@ -74,29 +73,23 @@ public class Motion extends ActionBarActivity {
 	public static final int DEFAULT_RATE = 50;
 	public static final int DEFAULT_LENGTH = 10;
 	public static boolean useDev = false;
-	public static boolean promptForName = true;
 
-	public static final String VIS_URL_PROD = "http://isenseproject.org/projects/";
-	public static final String VIS_URL_DEV = "http://rsense-dev.cs.uml.edu/projects/";
-	public static String baseDataSetUrl = "";
 	public static String dataSetUrl = "";
-
-	public static String RECORD_SETTINGS = "RECORD_SETTINGS";
 
 	private Button startStop;
 	private Button uploadButton;
 	private Button projNumB;
 	private Button nameB;
 	private Button rateB;
-	private Button lengthB;
+    private Button leftChevronB;
+    private Button rightChevronB;
+    private Button lengthB;
 	public static Boolean running = false;
 
 	//saved pref keys
 	public static final String MY_SAVED_PREFERENCES = "MyPrefs" ;
 	public static final String LENGTH_PREFS_KEY = "length";
 	public static final String RATE_PREFS_KEY = "rate";
-
-	private Timer timeTimer;
 
 	public API api;
 
@@ -114,10 +107,6 @@ public class Motion extends ActionBarActivity {
 
 	 ViewPager fields;
      PagerAdapter fieldAdapter;
-
-	private MediaPlayer mMediaPlayer;
-	private Vibrator vibrator;
-
 
 	static boolean inPausedState = false;
 	static boolean useMenu = true;
@@ -140,12 +129,12 @@ public class Motion extends ActionBarActivity {
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
 
+
 	/* Make sure url is updated when useDev is set. */
 	void setUseDev(boolean useDev) {
 		api.useDev(useDev);
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -155,6 +144,8 @@ public class Motion extends ActionBarActivity {
 
 		api = API.getInstance();
 		setUseDev(useDev);
+
+        TextView tvName;
 
 		//bool in resources is false in values-xlarge but true in values
 		//this only allows devices with xlarge displays to put this activity in landscape
@@ -189,29 +180,33 @@ public class Motion extends ActionBarActivity {
 
 		CredentialManager.login(mContext, api);
 
-		// Beep sound
-		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
-
-		// Vibrator for Long Click
-		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
 		startStop = (Button) findViewById(R.id.startStop);
 		uploadButton = (Button) findViewById(R.id.b_upload);
 		projNumB = (Button) findViewById(R.id.b_project);
 		nameB = (Button) findViewById(R.id.b_name);
+        tvName = (TextView) findViewById(R.id.tv_name);
 		rateB = (Button) findViewById(R.id.b_rate);
 		lengthB = (Button) findViewById(R.id.b_length);
+        leftChevronB = (Button) findViewById(R.id.leftChevron);
+        rightChevronB = (Button) findViewById(R.id.rightChevron);
         fields = (ViewPager) findViewById(R.id.viewpager_fields);
         fieldAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         fields.setAdapter(fieldAdapter);
 
-		if (RecordingService.running) {
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        leftChevronB.setTypeface(typeface);
+        rightChevronB.setTypeface(typeface);
+
+        if (RecordingService.running) {
 			startStop.setBackgroundResource(R.drawable.button_rsense_green);
 			startStop.setText("Recording");
-		} else {
+		} else if(getApiLevel() < 21) {
 			startStop.setBackgroundResource(R.drawable.button_rsense);
 			startStop.setText("Hold to Start");
-		}
+		} else if(getApiLevel() >= 21) {
+            startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+            startStop.setText("Hold to Start");
+        }
 
 		SharedPreferences namePrefs = getSharedPreferences(
 				EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
@@ -242,6 +237,66 @@ public class Motion extends ActionBarActivity {
 
 		setRateText();
 		setLengthText();
+        tvName.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CountDownTimer cdt = null;
+
+                // Give user 10 seconds to switch dev/prod mode
+                if (actionBarTapCount == 0) {
+                    cdt = new CountDownTimer(5000, 5000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            actionBarTapCount = 0;
+                        }
+                    }.start();
+                }
+
+                String mode = (useDev) ? "production" : "dev";
+
+                switch (++actionBarTapCount) {
+                    case 5:
+                        w.make(getResources().getString(R.string.two_more_taps) + mode
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 6:
+                        w.make(getResources().getString(R.string.one_more_tap) + mode
+                                + getResources().getString(R.string.mode_type));
+                        break;
+                    case 7:
+                        w.make(getResources().getString(R.string.now_in_mode) + mode
+                                + getResources().getString(R.string.mode_type));
+                        useDev = !useDev;
+
+                        if (cdt != null)
+                            cdt.cancel();
+
+                        if (api.getCurrentUser() != null) {
+                            Runnable r = new Runnable() {
+                                @Override
+                                public void run() {
+                                    api.deleteSession();
+                                    api.useDev(useDev);
+                                }
+                            };
+                            new Thread(r).start();
+                        } else {
+                            api.useDev(useDev);
+                        }
+
+                        CredentialManager.login(mContext, api);
+                        actionBarTapCount = 0;
+                        break;
+                }
+            }
+
+        });
+
+
 
 		 /* update UI with data passed back from service */
         receiver = new BroadcastReceiver() {
@@ -259,7 +314,11 @@ public class Motion extends ActionBarActivity {
 						invalidateOptionsMenu();
 
                 } else if(intent.hasExtra("BUTTONSTOP")) {
-					startStop.setBackgroundResource(R.drawable.button_rsense);
+                    if(getApiLevel() < 21) {
+                        startStop.setBackgroundResource(R.drawable.button_rsense);
+                    } else {
+                        startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+                    }
                     startStop.setText("Hold to Start");
 
         			useMenu = true;
@@ -275,18 +334,13 @@ public class Motion extends ActionBarActivity {
 
 			@Override
 			public boolean onLongClick(View arg0) {
-
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.start();
-
-				// Vibrate and beep
-				vibrator.vibrate(300);
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.start();
-
                 if (RecordingService.running) {
-					startStop.setBackgroundResource(R.drawable.button_rsense);
-					startStop.setText("Hold to Start");
+                    if(getApiLevel() < 21) {
+                        startStop.setBackgroundResource(R.drawable.button_rsense);
+                    } else {
+                        startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+                    }
+                    startStop.setText("Hold to Start");
 					useMenu = true;
 					if (android.os.Build.VERSION.SDK_INT >= 11)
 						invalidateOptionsMenu();
@@ -299,7 +353,6 @@ public class Motion extends ActionBarActivity {
 						invalidateOptionsMenu();
                     startService(service);
                 }
-
 				return running;
 		}
 	});
@@ -345,7 +398,6 @@ public class Motion extends ActionBarActivity {
 		});
 
 		rateB.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				Intent rate = new Intent(mContext, RateDialog.class);
@@ -355,25 +407,37 @@ public class Motion extends ActionBarActivity {
 		});
 
 		lengthB.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mContext, DurationDialog.class);
 				startActivityForResult(i, RECORDING_LENGTH_REQUESTED);
-
             }
-
 		});
 
 
+        leftChevronB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int current = fields.getCurrentItem();
+                if (current > 0)
+                    fields.setCurrentItem(current-1);
+            }
+        });
+
+        rightChevronB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int current = fields.getCurrentItem();
+                if (current+1 < fieldAdapter.getCount())
+                    fields.setCurrentItem(current + 1);
+            }
+        });
 	}
 
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (timeTimer != null)
-			timeTimer.cancel();
 		inPausedState = true;
 		if (running) {
 			startStop.performLongClick();
@@ -383,8 +447,6 @@ public class Motion extends ActionBarActivity {
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (timeTimer != null)
-			timeTimer.cancel();
 		inPausedState = true;
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
@@ -404,8 +466,12 @@ public class Motion extends ActionBarActivity {
 		//this sets the layout the correct layout for when it is not recording
 		//this is relevant if recording finishes while the app is in the background
 		if(!RecordingService.running) {
-			startStop.setBackgroundResource(R.drawable.button_rsense);
-	        startStop.setText("Hold to Start");
+            if(getApiLevel() < 21) {
+                startStop.setBackgroundResource(R.drawable.button_rsense);
+            } else {
+                startStop.setBackgroundResource(R.drawable.button_rsense_ripple_green);
+            }
+            startStop.setText("Hold to Start");
 
 			useMenu = true;
 			if (android.os.Build.VERSION.SDK_INT >= 11)
@@ -427,73 +493,29 @@ public class Motion extends ActionBarActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.login:
-			startActivityForResult(new Intent(this, CredentialManager.class),
-					LOGIN_STATUS_REQUESTED);
-			return true;
-		case R.id.upload:
-			manageUploadQueue();
-			return true;
-		case R.id.reset:
-			startActivityForResult(new Intent(this, ResetToDefaults.class),
-					RESET_REQUESTED);
-			return true;
-		case R.id.presets:
-			startActivityForResult(new Intent(this, Presets.class),
-					PRESETS_REQUESTED);
-		return true;
-		case R.id.helpMenuItem:
-			startActivity(new Intent(this, Help.class));
-			return true;
-		case android.R.id.home:
-			CountDownTimer cdt = null;
-
-			// Give user 10 seconds to switch dev/prod mode
-			if (actionBarTapCount == 0) {
-				cdt = new CountDownTimer(5000, 5000) {
-					@Override
-					public void onTick(long millisUntilFinished) {
-					}
-					@Override
-					public void onFinish() {
-						actionBarTapCount = 0;
-					}
-				}.start();
-			}
-
-			String other = (useDev) ? "production" : "dev";
-
-			switch (++actionBarTapCount) {
-			case 5:
-				w.make(getResources().getString(R.string.two_more_taps) + other
-						+ getResources().getString(R.string.mode_type));
-				break;
-			case 6:
-				w.make(getResources().getString(R.string.one_more_tap) + other
-						+ getResources().getString(R.string.mode_type));
-				break;
-			case 7:
-				w.make(getResources().getString(R.string.now_in_mode) + other
-						+ getResources().getString(R.string.mode_type));
-				useDev = !useDev;
-
-				if (cdt != null)
-					cdt.cancel();
-
-				setUseDev(useDev);
-
-				actionBarTapCount = 0;
-				break;
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-
+        switch (item.getItemId()) {
+            case R.id.login:
+                startActivityForResult(new Intent(this, CredentialManager.class),
+                        LOGIN_STATUS_REQUESTED);
+                return true;
+            case R.id.upload:
+                manageUploadQueue();
+                return true;
+            case R.id.reset:
+                startActivityForResult(new Intent(this, ResetToDefaults.class),
+                        RESET_REQUESTED);
+                return true;
+            case R.id.presets:
+                startActivityForResult(new Intent(this, Presets.class),
+                        PRESETS_REQUESTED);
+                return true;
+            case R.id.helpMenuItem:
+                startActivity(new Intent(this, Help.class));
+                return true;
+            default:
+                return false;
+        }
+    }
 
 	public static int getApiLevel() {
 		return android.os.Build.VERSION.SDK_INT;
@@ -554,7 +576,7 @@ public class Motion extends ActionBarActivity {
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
 				int rate = data.getExtras().getInt(Presets.RATE);
 				editor2.putInt(RATE_PREFS_KEY, rate);
-				editor2.commit();
+				editor2.apply();
 				setRateText();
 
 				/*set recording length*/
@@ -562,7 +584,7 @@ public class Motion extends ActionBarActivity {
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
 				int length = data.getExtras().getInt(Presets.LENGTH);
 				editor3.putInt(LENGTH_PREFS_KEY, length);
-				editor3.commit();
+				editor3.apply();
 				setLengthText();
 			}
 		} else if (reqCode == RESULT_GOT_NAME) {
@@ -609,14 +631,14 @@ public class Motion extends ActionBarActivity {
 				SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor2 = ratePrefs.edit();
 				editor2.putInt(RATE_PREFS_KEY, DEFAULT_RATE);
-				editor2.commit();
+				editor2.apply();
 				setRateText();
 
 				/*reset recording length*/
 				SharedPreferences lengthPrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
 				SharedPreferences.Editor editor3 = lengthPrefs.edit();
 				editor3.putInt(LENGTH_PREFS_KEY, DEFAULT_LENGTH);
-				editor3.commit();
+				editor3.apply();
 				setLengthText();
 
 				/*reset name*/

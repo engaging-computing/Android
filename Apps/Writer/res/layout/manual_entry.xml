@@ -31,9 +31,8 @@
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
             android:singleLine="true"
-	        android:ems="10" >
-
-        <requestFocus />
+	        android:ems="10"
+            android:imeOptions="actionNext">
     </EditText>
 
     </LinearLayout>

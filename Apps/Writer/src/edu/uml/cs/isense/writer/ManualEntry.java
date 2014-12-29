@@ -241,16 +241,16 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
             @Override
             public void onScrollChanged() {
-
-                //remove focus so that we don't have a twitching affect when adding buttons when bottom edit text is current view
-                //added here as apposed to before buttons are added so view is unfocused when scrolling up or down to make behavior more consistent
-                View current = getCurrentFocus();
-                if (current != null) current.clearFocus();
-
             	//if you scoll fast the values would jump below 0 when it got to the top and above the max height when you got scroll to the bottom
             	//this was causing the buttons to flicker, the check below prevents this behavior
             	if (scrollView.getScrollY() > 0 && scrollView.getScrollY() < (datapointsLayout.getHeight() - scrollView.getHeight())) {
 	            	if (scrollY > scrollView.getScrollY()) { //scrolling up
+
+                        //remove focus so that we don't have a twitching affect when adding buttons when bottom edit text is current view
+                        //added here as apposed to before buttons are added so view is unfocused when scrolling up or down to make behavior more consistent
+                        View current = getCurrentFocus();
+                        if (current != null) current.clearFocus();
+
 	            		//show Buttons
 	            		addField.setVisibility(View.VISIBLE);
 	            		save.setVisibility(View.VISIBLE);
@@ -365,6 +365,12 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
      * Removes current fields from the layout
      */
     private void clearFields() {
+
+        if (!addField.isShown() || !save.isShown()) {
+            addField.setVisibility(View.VISIBLE);
+            save.setVisibility(View.VISIBLE);
+        }
+
         datapoints = 0;
         fields = null;
         datapointsLayout.removeAllViews();
@@ -461,6 +467,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
                     et.setText(currentDateandTime);
                     et.setEnabled(false);
+                    et.setFocusable(false);
                     et.setInputType(InputType.TYPE_CLASS_DATETIME);
                     tv.setText(field.name + ":");
                     datapoint.addView(singlefield, i + 1);
@@ -515,6 +522,10 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     TextView tv = (TextView) singleField.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
+
+                    //keyboards next button will skip this edittext
+                    et.setFocusable(false);
+
                     if (this.getLocation() != null) {
                         et.setText("" + this.getLocation().getLongitude());
                     } else {
@@ -532,6 +543,10 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
                     TextView tv = (TextView) singleField.findViewById(R.id.field_tv);
 
                     et.setEnabled(false);
+
+                    //keyboards next button will skip this edittext
+                    et.setFocusable(false);
+
                     if (this.getLocation() != null) {
                         et.setText("" + this.getLocation().getLatitude());
                     } else {

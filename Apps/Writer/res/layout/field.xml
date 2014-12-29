@@ -23,8 +23,8 @@
          android:layout_alignParentTop="true"
          android:layout_toRightOf="@+id/field_tv"
          android:singleLine="true"
-         android:ems="10" >
-
-    </EditText>
+         android:ems="10"
+         android:imeOptions="actionNext">
+      </EditText>
 
 </RelativeLayout>

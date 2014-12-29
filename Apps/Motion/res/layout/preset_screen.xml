@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/accel_preset"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_rsense"
+        android:textColor="#0066FF"
+        android:id="@+id/accel_button"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/gps_preset"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_rsense"
+        android:textColor="#0066FF"
+        android:id="@+id/gps_button"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_rsense"
+        android:visibility="gone"
+        android:textColor="#0066FF"
+        android:id="@+id/continue_button"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"/>
+</LinearLayout>

@@ -53,7 +53,7 @@ Light\n\n
     <string name="changename">Change Name</string>
     <string name="reset">Reset Settings</string>
     <string name="genericproj">Generic Project</string>
-    <string name="reset_prompt">Would you like to reset iS Motion to it\'s default settings?</string>
+    <string name="reset_prompt">Reset to default settings?</string>
 
     <string-array name="lengths_array">
         <item>1 sec</item>
@@ -85,7 +85,9 @@ Light\n\n
     <string name="force">Force Values:</string>
     <string name="nameWithColon">Name: </string>
     <string name="john_smith">John S.</string>
-    
+    <string name="accel_preset">Acceleration Preset</string>
+    <string name="gps_preset">GPS Preset</string>
+
     <string name="gps">GPS</string>
     <string name="acceleration">Acceleration</string>
 

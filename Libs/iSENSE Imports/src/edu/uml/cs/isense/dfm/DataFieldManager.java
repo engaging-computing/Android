@@ -190,7 +190,6 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.altitude));
 			order.add(mContext.getString(R.string.luminous_flux));
 			order.add(mContext.getString(R.string.temperature_f));
-			order.add(mContext.getString(R.string.temperature_k));
 			order.add(mContext.getString(R.string.velocity));
 			order.add(mContext.getString(R.string.distance));
 			order.add(mContext.getString(R.string.humidity));
@@ -232,7 +231,6 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.altitude));
 			order.add(mContext.getString(R.string.luminous_flux));
 			order.add(mContext.getString(R.string.temperature_f));
-			order.add(mContext.getString(R.string.temperature_k));
 			order.add(mContext.getString(R.string.velocity));
 			order.add(mContext.getString(R.string.distance));
 			order.add(mContext.getString(R.string.humidity));
@@ -369,11 +367,6 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.TEMPERATURE_K] && f.temperature_k != null)
-				dataJSON.put(f.temperature_k);
-			else
-				dataJSON.put("");
-
 			if (enabledFields[Fields.VELOCITY])
 				dataJSON.put(f.velocity);
 			else
@@ -466,13 +459,6 @@ public class DataFieldManager extends Application {
 					b.append(f.temperature_f);
 				else
 					b.append(", ").append(f.temperature_f);
-
-			} else if (s.equals(mContext.getString(R.string.temperature_k))) {
-				firstLineWritten = true;
-				if (start)
-					b.append(f.temperature_k);
-				else
-					b.append(", ").append(f.temperature_k);
 
 			} else if (s.equals(mContext.getString(R.string.time))) {
 				firstLineWritten = true;
@@ -723,11 +709,6 @@ public class DataFieldManager extends Application {
 									row.getString(Fields.TEMPERATURE_F));
 							continue;
 						} else if (s.equals(a.getResources().getString(
-								R.string.temperature_k))) {
-							outRow.put(id + "",
-									row.getString(Fields.TEMPERATURE_K));
-							continue;
-						} else if (s.equals(a.getResources().getString(
 								R.string.time))) {
 							outRow.put(id + "", row.getString(Fields.TIME));
 							continue;
@@ -907,8 +888,6 @@ public class DataFieldManager extends Application {
 				if (field.name.toLowerCase(Locale.US).contains("temp")) {
 					if (field.unit.toLowerCase(Locale.US).contains("c")) {
 						order.add(mContext.getString(R.string.temperature_c));
-					} else if (field.unit.toLowerCase(Locale.US).contains("k")) {
-						order.add(mContext.getString(R.string.temperature_k));
 					} else {
 						order.add(mContext.getString(R.string.temperature_f));
 					}
@@ -1211,7 +1190,6 @@ public class DataFieldManager extends Application {
 		enabledFields[Fields.HEADING_RAD] = true;
 		enabledFields[Fields.TEMPERATURE_C] = true;
 		enabledFields[Fields.TEMPERATURE_F] = true;
-		enabledFields[Fields.TEMPERATURE_K] = true;
 		enabledFields[Fields.PRESSURE] = true;
 		enabledFields[Fields.ALTITUDE] = true;
 		enabledFields[Fields.LIGHT] = true;
@@ -1259,8 +1237,6 @@ public class DataFieldManager extends Application {
 				enabledFields[Fields.TEMPERATURE_C] = true;
 			if (s.equals(mContext.getString(R.string.temperature_f)))
 				enabledFields[Fields.TEMPERATURE_F] = true;
-			if (s.equals(mContext.getString(R.string.temperature_k)))
-				enabledFields[Fields.TEMPERATURE_K] = true;
 			if (s.equals(mContext.getString(R.string.pressure)))
 				enabledFields[Fields.PRESSURE] = true;
 			if (s.equals(mContext.getString(R.string.altitude)))
@@ -1370,8 +1346,7 @@ public class DataFieldManager extends Application {
 
 		} else if (event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
 			if (enabledFields[Fields.TEMPERATURE_C]
-					|| enabledFields[Fields.TEMPERATURE_F]
-					|| enabledFields[Fields.TEMPERATURE_K])
+					|| enabledFields[Fields.TEMPERATURE_F])
 				temperature = toThou.format(event.values[0]);
 		} else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
 			if (enabledFields[Fields.PRESSURE])
@@ -1437,7 +1412,7 @@ public class DataFieldManager extends Application {
         if (enabledFields[Fields.ACCEL_TOTAL])
                 f.accel_total = toThou.format(accel[3]);
         if (enabledFields[Fields.LATITUDE])
-        	if(loc != null && f.latitude != 0)
+        	if(loc != null)
                 f.latitude = loc.getLatitude();
         if (enabledFields[Fields.LONGITUDE])
         	if(loc != null)
@@ -1464,16 +1439,14 @@ public class DataFieldManager extends Application {
                 f.timeMillis = System.currentTimeMillis();
         if (enabledFields[Fields.TEMPERATURE_C])
                 f.temperature_c = temperature;
-        if (enabledFields[Fields.TEMPERATURE_F])
-                if (temperature.equals(""))
-                    f.temperature_f = temperature;
-                else
-                    f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
-        if (enabledFields[Fields.TEMPERATURE_K])
-                if (temperature.equals(""))
-                	f.temperature_k = temperature;
-                else
-                   	f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
+        if (enabledFields[Fields.TEMPERATURE_F]) {
+            DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
+            if (temperature.equals("")) {
+                f.temperature_f = "" + oneDigit.format(Double.parseDouble(temperature));
+            } else {
+                f.temperature_f = "" + oneDigit.format( ((Double.parseDouble(temperature) * 1.8) + 32) );
+            }
+        }
         if (enabledFields[Fields.PRESSURE])
                 f.pressure = pressure;
         if (enabledFields[Fields.ALTITUDE])
@@ -1643,7 +1616,6 @@ public class DataFieldManager extends Application {
 				+ appContext.getResources().getString(R.string.altitude) + ","
 				+ appContext.getResources().getString(R.string.luminous_flux) + ","
 				+ appContext.getResources().getString(R.string.temperature_f) + ","
-				+ appContext.getResources().getString(R.string.temperature_k) + ","
 				+ appContext.getResources().getString(R.string.velocity) + ","
 				+ appContext.getResources().getString(R.string.distance) + ","
 				+ appContext.getResources().getString(R.string.humidity);
@@ -1685,8 +1657,7 @@ public class DataFieldManager extends Application {
 			}
 
 			if (enabledFields[Fields.TEMPERATURE_C]
-					|| enabledFields[Fields.TEMPERATURE_F]
-					|| enabledFields[Fields.TEMPERATURE_K]) {
+					|| enabledFields[Fields.TEMPERATURE_F]) {
 				if (getApiLevel() >= 14) {
 					mSensorManager.registerListener(
 							mListener,

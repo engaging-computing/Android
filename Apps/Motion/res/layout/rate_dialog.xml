@@ -15,21 +15,21 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:onClick="onRadioButtonClicked"
-            android:text="50 miliseconds" />
+            android:text="50 milliseconds" />
 
         <RadioButton
             android:id="@+id/radio1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="100 miliseconds" />
+            android:text="100 milliseconds" />
 
         <RadioButton
             android:id="@+id/radio2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="500 miliseconds" />
+            android:text="500 milliseconds" />
 
         <RadioButton
             android:id="@+id/radio3"

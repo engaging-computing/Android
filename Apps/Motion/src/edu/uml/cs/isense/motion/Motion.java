@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -32,6 +33,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -126,6 +128,9 @@ public class Motion extends ActionBarActivity {
     //Receives info from library to update ui
     BroadcastReceiver receiver;
 
+    //boolean used to display spash screen when app is first opened
+    private boolean displaySplashScreen = true;
+
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
 
@@ -166,6 +171,12 @@ public class Motion extends ActionBarActivity {
 			};
 			new Thread(r).start();
 		}
+
+        if (displaySplashScreen) {
+            displaySplashScreen = false;
+            startActivityForResult(new Intent(this, PresetScreen.class),
+                    PRESETS_REQUESTED);
+        }
 
 		if (RecordingService.running)
 			useMenu = false;
@@ -432,6 +443,39 @@ public class Motion extends ActionBarActivity {
                     fields.setCurrentItem(current + 1);
             }
         });
+
+        //dim button if we are at the end
+        if (fields.getCurrentItem() == 0) {
+            leftChevronB.setTextColor(Color.GRAY);
+        } else if (fields.getCurrentItem() == (fieldAdapter.getCount()-1) ) {
+            rightChevronB.setTextColor(Color.GRAY);
+        }
+
+        //dim buttons if we get to either end
+        fields.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.e("here", "here " + position);
+                if (position == 0) {
+                    leftChevronB.setTextColor(Color.GRAY);
+                } else if (position == (fieldAdapter.getCount()-1)) {
+                    rightChevronB.setTextColor(Color.GRAY);
+                } else {
+                    leftChevronB.setTextColor(Color.WHITE);
+                    rightChevronB.setTextColor(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 	}
 
 
@@ -682,13 +726,13 @@ private void setRateText() {
 
 	switch (rate) {
 	case 50:
-		rateB.setText("50 mili");
+		rateB.setText("50 ms");
 		break;
 	case 100:
-		rateB.setText("100 mili");
+		rateB.setText("100 ms");
 		break;
 	case 500:
-		rateB.setText("500 mili");
+		rateB.setText("500 ms");
 		break;
 	case 1000:
 		rateB.setText("1 sec");
@@ -749,7 +793,7 @@ private void setLengthText() {
         		case 0:
             		return new AccelFragment();
         		case 1:
-        			return new LocFragment();
+                    return new LocFragment();
         		case 2:
         			return new AltFragment();
         		case 3:
@@ -759,9 +803,9 @@ private void setLengthText() {
         		case 5:
         			return new TempFragment();
         		case 6:
-        			return new HumidityFragment();
+                    return new HumidityFragment();
         		case 7:
-        			return new LightFragment();
+                    return new LightFragment();
         		default:
         			return null;
         	}

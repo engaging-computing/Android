@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.text.DecimalFormat;
+
 import edu.uml.cs.isense.motion.Motion;
 import edu.uml.cs.isense.motion.R;
 
@@ -23,7 +26,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 	private SensorManager mSensorManager;
     private TextView tempF;
     private TextView tempC;
-    private TextView tempK;
 
     @SuppressLint("InlinedApi")
 	@Override
@@ -34,7 +36,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 
         tempF = (TextView) rootView.findViewById(R.id.tempf);
         tempC = (TextView) rootView.findViewById(R.id.tempc);
-        tempK = (TextView) rootView.findViewById(R.id.tempk);
 
 		mSensorManager = (SensorManager) Motion.mContext.getSystemService(Context.SENSOR_SERVICE);
 
@@ -44,13 +45,11 @@ public class TempFragment extends Fragment implements SensorEventListener {
      				SensorManager.SENSOR_DELAY_UI);
 			if (mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) == null) {
 				tempC.setVisibility(View.GONE);
-				tempK.setVisibility(View.GONE);
 				tempF.setText("No Sensor");
 				tempF.setTextColor(Color.RED);
 			}
 		} else {
 			tempC.setVisibility(View.GONE);
-			tempK.setVisibility(View.GONE);
 			tempF.setText("Not supported before Android 3.0");
 			tempF.setTextColor(Color.RED);
 		}
@@ -82,13 +81,10 @@ public class TempFragment extends Fragment implements SensorEventListener {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE ) {
+            DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
 			try {
-				tempF.setText("F: "
-						+ (event.values[0] * 1.8) + 32);
-				tempC.setText("C: "
-						+ event.values[0]);
-				tempK.setText("K: "
-						+ event.values[0] + 273.15);
+				tempF.setText(oneDigit.format(((event.values[0] * 1.8) + 32)) +  " \u2109");
+				tempC.setText(oneDigit.format(event.values[0]) +  " \u2103");
 
 			} catch (Exception e){
 				e.printStackTrace();
@@ -99,6 +95,6 @@ public class TempFragment extends Fragment implements SensorEventListener {
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
+
 	}
 }

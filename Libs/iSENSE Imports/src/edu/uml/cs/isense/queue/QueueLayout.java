@@ -263,7 +263,6 @@ public class QueueLayout extends ActionBarActivity implements OnClickListener {
 		int id = v.getId();
 		if (id == R.id.upload) {
 			if(runUploadSanityChecks()) {
-                // TODO remove login task and replace with credential managers
                 if (api.getCurrentUser() == null) {
                     Intent askLogin = new Intent().setClass(mContext, LoginOrKeyDialog.class);
                     startActivityForResult(askLogin, ASK_KEY_OR_LOGIN);

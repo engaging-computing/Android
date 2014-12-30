@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -12,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -81,61 +82,83 @@ public class QueueEditData extends ActionBarActivity {
 	}
 
 	private void fillScrollView() {
-		
+
 		int i = 0;
-		String rawFieldData = alter.getData().replace("[", "").replace("]", "").replace("\"", "");
+		String rawFieldData = alter.getData().replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 		String[] fieldData = rawFieldData.split(",");
-		
+
+        Log.e("data: ", rawFieldData);//total data
+        int numPoints = fieldData.length / fieldOrder.size();
 		// if the data is a space, remove the spaces
 		for (int j = 0; j < fieldData.length; j++)
 			if (fieldData[j].equalsIgnoreCase(" ")) fieldData[j] = "";
 
-		for (RProjectField rpf : fieldOrder) {
-			
-			final View dataRow = View.inflate(mContext, R.layout.edit_row, null);
-			
-			TextView label = (TextView) dataRow.findViewById(R.id.edit_row_label);
-			label.setText(rpf.name);
-			label.setBackgroundColor(Color.TRANSPARENT);
-			label.setPadding(0, 10, 0, 0);
-			LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) label.getLayoutParams();
-			params.setMargins(0, 0, 0, -10);
-			label.setLayoutParams(params);
 
-			EditText data = (EditText) dataRow.findViewById(R.id.edit_row_text);
-			data.setText(fieldData[i]);
-			// See if data is a number.  If not, change input type to text
-			try {
-				Double.parseDouble(fieldData[i]);
-			} catch (NumberFormatException nfe) {
-				data.setInputType(InputType.TYPE_CLASS_TEXT);
-			}
-			
-			editDataList.addView(dataRow);
-			
-			++i;
-		}
+        for(int point=0; point < numPoints; point++) {
+            TextView pointLabel = new TextView(this);
+            pointLabel.setText("Point " + (point+1));
+            pointLabel.setTextSize(16);
+            pointLabel.setPadding(0, 20, 0, 0);
+            pointLabel.setGravity(Gravity.CENTER);
 
+            editDataList.addView(pointLabel);
+
+            for (RProjectField rpf : fieldOrder) {
+                final View dataRow = View.inflate(mContext, R.layout.edit_row, null);
+
+                TextView label = (TextView) dataRow.findViewById(R.id.edit_row_label);
+                label.setText(rpf.name);
+                label.setBackgroundColor(Color.TRANSPARENT);
+                label.setPadding(0, 10, 0, 0);
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) label.getLayoutParams();
+                params.setMargins(0, 0, 0, -10);
+                label.setLayoutParams(params);
+
+                EditText data = (EditText) dataRow.findViewById(R.id.edit_row_text);
+                data.setText(fieldData[i]);
+                // See if data is a number.  If not, change input type to text
+                try {
+                    Double.parseDouble(fieldData[i]);
+                } catch (NumberFormatException nfe) {
+                    data.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
+
+                editDataList.addView(dataRow);
+
+                ++i;
+            }
+        }
 	}
 	
 	private void getNewFields() {
-		
-		int max = editDataList.getChildCount();
-		JSONArray data = new JSONArray(),
-				  row  = new JSONArray();
-		
-		for (int i = 0; i < max; i++) {
-			
-			View v = editDataList.getChildAt(i);
-			EditText dataText = (EditText) v.findViewById(R.id.edit_row_text);
-			if (dataText.getText().toString().length() != 0)
-				row.put(dataText.getText().toString());
-			else
-				row.put(" ");
-		}
-		
-		data.put(row);
-		
+		int max = editDataList.getChildCount();//all data edit texts + field labels
+		JSONArray data = new JSONArray();
+        String rawFieldData = alter.getData();
+        String[] fieldData = rawFieldData.split(",");
+        int numPoints = fieldData.length / fieldOrder.size();
+
+        int i = 0;
+
+        for (int point = 0; point < numPoints; point++) {
+            JSONArray row = new JSONArray();
+            for (int j = 0; j < (fieldOrder.size()+1); j++) { //fields + 1 (datapoint number label)
+                    View v = editDataList.getChildAt(i);
+                try {
+                    EditText dataText = (EditText) v.findViewById(R.id.edit_row_text);
+                    if (dataText.getText().toString().length() != 0)
+                        row.put(dataText.getText().toString());
+                    else
+                        row.put(" ");
+                } catch (Exception e) { //datapoint label
+                    ++i;
+                    continue;
+                }
+                ++i;
+            }
+
+            data.put(row);
+        }
+
 		alter.setData(data.toString());
 		
 	}

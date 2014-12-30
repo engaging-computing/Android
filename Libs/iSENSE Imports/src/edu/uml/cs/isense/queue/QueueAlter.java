@@ -18,7 +18,7 @@ import edu.uml.cs.isense.R;
  */
 public class QueueAlter extends ActionBarActivity {
 
-	private Button rename, changeData, selectProj, delete, cancel;
+	private Button rename, changeData, selectProj, cancel;
 
 	protected final static String RETURN_CODE = "return_code";
 	protected final static String IS_ALTERABLE = "is_alterable";
@@ -37,13 +37,12 @@ public class QueueAlter extends ActionBarActivity {
 		rename     = (Button) findViewById(R.id.queuealter_rename     );
 		changeData = (Button) findViewById(R.id.queuealter_change_data);
 		selectProj = (Button) findViewById(R.id.queuealter_choose_proj);
-		delete     = (Button) findViewById(R.id.queuealter_delete     );
 		cancel     = (Button) findViewById(R.id.queuealter_cancel     );
 
 		Bundle extras = getIntent().getExtras();
 
 		if (extras != null) {
-			boolean isAlterable = false; //extras.getBoolean(IS_ALTERABLE); TODO editing data is broken
+			boolean isAlterable = extras.getBoolean(IS_ALTERABLE); //TODO editing data is broken
 			if (!isAlterable) {
 				changeData.setVisibility(View.GONE);
 			}
@@ -79,16 +78,6 @@ public class QueueAlter extends ActionBarActivity {
 			public void onClick(View v) {
 				Intent iRet = new Intent(QueueAlter.this, QueueLayout.class);
 				iRet.putExtra(RETURN_CODE, SELECT_PROJECT);
-				setResult(RESULT_OK, iRet);
-				finish();
-			}
-		});
-
-		delete.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent iRet = new Intent(QueueAlter.this, QueueLayout.class);
-				iRet.putExtra(RETURN_CODE, DELETE);
 				setResult(RESULT_OK, iRet);
 				finish();
 			}

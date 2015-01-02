@@ -74,7 +74,8 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueEditData"
             android:label="Edit Data"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppTheme"/>
         <activity
             android:name="edu.uml.cs.isense.queue.QueueEditRename"
             android:label="Rename Data Set"

@@ -7,7 +7,6 @@
     <LinearLayout
         android:id="@+id/dataset_name_layout"
         android:orientation="horizontal"
-        android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp">

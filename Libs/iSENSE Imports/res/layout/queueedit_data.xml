@@ -43,12 +43,11 @@
             android:text="@android:string/cancel" />
 
         <Button
-            android:id="@+id/queueedit_data_okay"
+            android:id="@+id/queueedit_data_save"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="2dp"
             android:layout_weight="1"
-            android:text="@android:string/ok" />
+            android:text="@string/save" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -14,11 +14,11 @@
     <activity
         android:name=".queue.QueueAlter"
         android:label="Alter Data Set"
-        android:theme="@style/AppThemeDialog" />
+        android:theme="@style/AppTheme" />
     <activity
         android:name=".queue.QueueEditData"
         android:label="Edit Data"
-        android:theme="@style/AppThemeDialog" />
+        android:theme="@style/AppThemeNoActionBar" />
     <activity
         android:name=".queue.QueueEditRename"
         android:label="Rename Data Set"

@@ -11,7 +11,6 @@
         android:layout_above="@+id/buttons"
         android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
-        android:padding="5dp"
         android:scrollbars="vertical" >
 
         <LinearLayout
@@ -48,12 +47,12 @@
             android:text="@android:string/cancel" />
 
         <Button
-            android:id="@+id/queueedit_data_okay"
+            android:id="@+id/queueedit_data_save"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@android:string/ok" />
+            android:text="@string/save" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -106,8 +106,6 @@ public class QDataSet implements Serializable {
 	 *            - If type is QDataSet.DATA, we look here.
 	 * @param picture
 	 *            - If type is QDataSet.PIC, we look here.
-	 * @param requestDataLabelInOrder
-	 * 			  - If data is already in the correct order and just needs to be given field IDs
 	 */
 	public QDataSet(String name, String desc, Type type, String data,
 			File picture, String projID, LinkedList<String> fields, Boolean dataAlreadyInOrder) {

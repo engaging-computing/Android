@@ -17,7 +17,6 @@
 
 package edu.uml.cs.isense.writer;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -94,7 +93,6 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
     private int scrollY = 0;
 
-    @SuppressLint("NewApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

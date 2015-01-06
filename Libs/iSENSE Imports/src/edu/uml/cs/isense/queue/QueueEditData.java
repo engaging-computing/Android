@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -108,7 +108,6 @@ public class QueueEditData extends ActionBarActivity {
 		String rawFieldData = alter.getData().replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 		String[] fieldData = rawFieldData.split(",");
 
-        Log.e("data: ", rawFieldData);//total data
         int numPoints = fieldData.length / fieldOrder.size();
 		// if the data is a space, remove the spaces
 		for (int j = 0; j < fieldData.length; j++)
@@ -153,7 +152,6 @@ public class QueueEditData extends ActionBarActivity {
 	}
 	
 	private void getNewFields() {
-		int max = editDataList.getChildCount();//all data edit texts + field labels
 		JSONArray data = new JSONArray();
         String rawFieldData = alter.getData();
         String[] fieldData = rawFieldData.split(",");

@@ -1,12 +1,12 @@
 package edu.uml.cs.isense.queue;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+
 import edu.uml.cs.isense.R;
 
 /**
@@ -42,7 +42,7 @@ public class QueueAlter extends ActionBarActivity {
 		Bundle extras = getIntent().getExtras();
 
 		if (extras != null) {
-			boolean isAlterable = extras.getBoolean(IS_ALTERABLE); //TODO editing data is broken
+			boolean isAlterable = extras.getBoolean(IS_ALTERABLE);
 			if (!isAlterable) {
 				changeData.setVisibility(View.GONE);
 			}

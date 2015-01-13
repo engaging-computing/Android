@@ -46,7 +46,7 @@ public class Fields {
 	}
 	
 	// Constants
-	public static final int NUM_FIELDS = 22;
+	public static final int NUM_FIELDS = 21;
 	
 	public static final int TIME = 0;
 	public static final int ACCEL_X = 1;
@@ -66,8 +66,7 @@ public class Fields {
 	public static final int ALTITUDE = 15;
 	public static final int LIGHT = 16;
 	public static final int TEMPERATURE_F = 17;
-	public static final int TEMPERATURE_K = 18;
-	public static final int VELOCITY = 19;
-	public static final int DISTANCE = 20;
-	public static final int HUMIDITY = 21;
+	public static final int VELOCITY = 18;
+	public static final int DISTANCE = 19;
+	public static final int HUMIDITY = 20;
 }

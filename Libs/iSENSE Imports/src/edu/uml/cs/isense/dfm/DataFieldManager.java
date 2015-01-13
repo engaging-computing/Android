@@ -239,7 +239,6 @@ public class DataFieldManager extends Application {
 			// Function is being called within an AsyncTask already, so
 			// no need to create a new task for the API call
 			projFields = api.getProjectFields(projID);
-			Log.e("DFM", "proj fields: " + projFields);
 			getProjectFieldOrder();
 
 		}
@@ -341,10 +340,9 @@ public class DataFieldManager extends Application {
 			} else {
 				dataJSON.put("");
 			}
-
-			if (enabledFields[Fields.TEMPERATURE_C] && f.temperature_c != null)
-				dataJSON.put(f.temperature_c);
-			else
+            if (enabledFields[Fields.TEMPERATURE_C] && f.temperature_c != null)
+                dataJSON.put(f.temperature_c);
+            else
 				dataJSON.put("");
 
 			if (enabledFields[Fields.PRESSURE] && f.pressure != null)
@@ -378,10 +376,10 @@ public class DataFieldManager extends Application {
 				dataJSON.put("");
 
 			if (enabledFields[Fields.HUMIDITY]) {
-				dataJSON.put(Fields.HUMIDITY);
+                Log.e("humidity being saved", "humidity:" + f.humidity);
+				dataJSON.put(f.humidity);
 			} else {
 				dataJSON.put("");
-
 			}
 
 		} catch (JSONException e) {
@@ -1348,7 +1346,7 @@ public class DataFieldManager extends Application {
 			if (enabledFields[Fields.TEMPERATURE_C]
 					|| enabledFields[Fields.TEMPERATURE_F])
 				temperature = toThou.format(event.values[0]);
-		} else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
+        } else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
 			if (enabledFields[Fields.PRESSURE])
 				pressure = toThou.format(event.values[0]);
 		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
@@ -1437,14 +1435,18 @@ public class DataFieldManager extends Application {
 		                                 + Math.pow(Double.parseDouble(f.mag_z), 2));
         if (enabledFields[Fields.TIME])
                 f.timeMillis = System.currentTimeMillis();
-        if (enabledFields[Fields.TEMPERATURE_C])
-                f.temperature_c = temperature;
-        if (enabledFields[Fields.TEMPERATURE_F]) {
-            DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
+        if (enabledFields[Fields.TEMPERATURE_C]) {
             if (temperature.equals("")) {
-                f.temperature_f = "" + oneDigit.format(Double.parseDouble(temperature));
+                f.temperature_c = "";
             } else {
-                f.temperature_f = "" + oneDigit.format( ((Double.parseDouble(temperature) * 1.8) + 32) );
+                f.temperature_c = "" + Double.parseDouble(temperature);
+            }
+        }
+        if (enabledFields[Fields.TEMPERATURE_F]) {
+            if (temperature.equals("")) {
+                f.temperature_f = "";
+            } else {
+                f.temperature_f = "" + toThou.format((Double.parseDouble(temperature) * 1.8) + 32);
             }
         }
         if (enabledFields[Fields.PRESSURE])
@@ -1473,7 +1475,8 @@ public class DataFieldManager extends Application {
 	        	f.velocity = velocity;
 	        }
         }
-        if (enabledFields[Fields.HUMIDITY] || enabledFields[Fields.HUMIDITY]) {
+
+        if (enabledFields[Fields.HUMIDITY]) {
         	f.humidity = humidity;
         }
 

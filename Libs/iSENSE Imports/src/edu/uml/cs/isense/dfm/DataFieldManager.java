@@ -19,7 +19,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -376,7 +375,6 @@ public class DataFieldManager extends Application {
 				dataJSON.put("");
 
 			if (enabledFields[Fields.HUMIDITY]) {
-                Log.e("humidity being saved", "humidity:" + f.humidity);
 				dataJSON.put(f.humidity);
 			} else {
 				dataJSON.put("");

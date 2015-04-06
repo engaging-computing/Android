@@ -17,7 +17,6 @@
 
 package edu.uml.cs.isense.writer;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -94,7 +93,6 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
     private int scrollY = 0;
 
-    @SuppressLint("NewApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -255,7 +253,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 	            		addField.setVisibility(View.VISIBLE);
 	            		save.setVisibility(View.VISIBLE);
 
-	            	} else if ( datapointsLayout.getHeight() - 10 > (scrollView.getHeight() + bottomButtons.getHeight())) {
+	            	} else if ( datapointsLayout.getHeight() - 25 > (scrollView.getHeight() + bottomButtons.getHeight())) {
 	            		//hide Buttons
                         addField.setVisibility(View.GONE);
                 		save.setVisibility(View.GONE);
@@ -509,8 +507,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
                     EditText et = (EditText) singlefield.findViewById(R.id.field_et);
                     TextView tv = (TextView) singlefield.findViewById(R.id.field_tv);
-
-                    et.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    et.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
                     tv.setText(field.name + ":");
                     datapoint.addView(singlefield, i + 1);
 

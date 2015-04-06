@@ -1,23 +1,26 @@
 package edu.uml.cs.isense.queue;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
+
 import edu.uml.cs.isense.R;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.objects.RProjectField;
@@ -34,7 +37,7 @@ import edu.uml.cs.isense.supplements.OrientationManager;
  */
 public class QueueEditData extends ActionBarActivity {
 
-	private Button okay, cancel;
+	private Button save, cancel;
 	private LinearLayout editDataList;
 	
 	public static QDataSet alter;
@@ -45,8 +48,8 @@ public class QueueEditData extends ActionBarActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.queueedit_data);
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.queueedit_data);
 
 		alter = QueueLayout.lastDataSetLongClicked;
 		
@@ -56,10 +59,17 @@ public class QueueEditData extends ActionBarActivity {
 
 		api = API.getInstance();
 
-		okay = (Button) findViewById(R.id.queueedit_data_okay);
+		save = (Button) findViewById(R.id.queueedit_data_save);
 		cancel = (Button) findViewById(R.id.queueedit_data_cancel);
 
-		okay.setOnClickListener(new OnClickListener() {
+        if (android.os.Build.VERSION.SDK_INT >= 11) {
+            ActionBar bar = getSupportActionBar();
+
+            // make the actionbar clickable
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
+
+		save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				getNewFields();
 				setResult(RESULT_OK);
@@ -80,62 +90,95 @@ public class QueueEditData extends ActionBarActivity {
 
 	}
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                setResult(RESULT_CANCELED);
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 	private void fillScrollView() {
-		
+
 		int i = 0;
-		String rawFieldData = alter.getData().replace("[", "").replace("]", "").replace("\"", "");
+		String rawFieldData = alter.getData().replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 		String[] fieldData = rawFieldData.split(",");
-		
+
+        int numPoints = fieldData.length / fieldOrder.size();
 		// if the data is a space, remove the spaces
 		for (int j = 0; j < fieldData.length; j++)
 			if (fieldData[j].equalsIgnoreCase(" ")) fieldData[j] = "";
 
-		for (RProjectField rpf : fieldOrder) {
-			
-			final View dataRow = View.inflate(mContext, R.layout.edit_row, null);
-			
-			TextView label = (TextView) dataRow.findViewById(R.id.edit_row_label);
-			label.setText(rpf.name);
-			label.setBackgroundColor(Color.TRANSPARENT);
-			label.setPadding(0, 10, 0, 0);
-			LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) label.getLayoutParams();
-			params.setMargins(0, 0, 0, -10);
-			label.setLayoutParams(params);
 
-			EditText data = (EditText) dataRow.findViewById(R.id.edit_row_text);
-			data.setText(fieldData[i]);
-			// See if data is a number.  If not, change input type to text
-			try {
-				Double.parseDouble(fieldData[i]);
-			} catch (NumberFormatException nfe) {
-				data.setInputType(InputType.TYPE_CLASS_TEXT);
-			}
-			
-			editDataList.addView(dataRow);
-			
-			++i;
-		}
+        for(int point=0; point < numPoints; point++) {
+            TextView pointLabel = new TextView(this);
+            pointLabel.setText("Point " + (point+1));
+            pointLabel.setTextSize(16);
+            pointLabel.setPadding(10, 20, 10, 0);
+            pointLabel.setGravity(Gravity.CENTER);
 
+            editDataList.addView(pointLabel);
+
+            for (RProjectField rpf : fieldOrder) {
+                final View dataRow = View.inflate(mContext, R.layout.edit_row, null);
+
+                TextView label = (TextView) dataRow.findViewById(R.id.edit_row_label);
+                label.setText(rpf.name);
+                label.setBackgroundColor(Color.TRANSPARENT);
+                label.setPadding(10, 10, 10, 0);
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) label.getLayoutParams();
+                params.setMargins(10, 0, 10, -10);
+                label.setLayoutParams(params);
+
+                EditText data = (EditText) dataRow.findViewById(R.id.edit_row_text);
+                data.setLayoutParams(params);
+                data.setText(fieldData[i]);
+                // See if data is a number.  If not, change input type to text
+                try {
+                    Double.parseDouble(fieldData[i]);
+                } catch (NumberFormatException nfe) {
+                    data.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
+
+                editDataList.addView(dataRow);
+
+                ++i;
+            }
+        }
 	}
 	
 	private void getNewFields() {
-		
-		int max = editDataList.getChildCount();
-		JSONArray data = new JSONArray(),
-				  row  = new JSONArray();
-		
-		for (int i = 0; i < max; i++) {
-			
-			View v = editDataList.getChildAt(i);
-			EditText dataText = (EditText) v.findViewById(R.id.edit_row_text);
-			if (dataText.getText().toString().length() != 0)
-				row.put(dataText.getText().toString());
-			else
-				row.put(" ");
-		}
-		
-		data.put(row);
-		
+		JSONArray data = new JSONArray();
+        String rawFieldData = alter.getData();
+        String[] fieldData = rawFieldData.split(",");
+        int numPoints = fieldData.length / fieldOrder.size();
+
+        int i = 0;
+
+        for (int point = 0; point < numPoints; point++) {
+            JSONArray row = new JSONArray();
+            for (int j = 0; j < (fieldOrder.size()+1); j++) { //fields + 1 (datapoint number label)
+                    View v = editDataList.getChildAt(i);
+                try {
+                    EditText dataText = (EditText) v.findViewById(R.id.edit_row_text);
+                    if (dataText.getText().toString().length() != 0)
+                        row.put(dataText.getText().toString());
+                    else
+                        row.put(" ");
+                } catch (Exception e) { //datapoint label
+                    ++i;
+                    continue;
+                }
+                ++i;
+            }
+
+            data.put(row);
+        }
+
 		alter.setData(data.toString());
 		
 	}

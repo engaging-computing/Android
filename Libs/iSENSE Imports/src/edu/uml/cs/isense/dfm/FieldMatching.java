@@ -144,8 +144,6 @@ public class FieldMatching extends ActionBarActivity {
 					selector.setSelection(Fields.TEMPERATURE_C + 1);
 				} else if (field.equals(getString(R.string.temperature_f))) {
 					selector.setSelection(Fields.TEMPERATURE_F + 1);
-				} else if (field.equals(getString(R.string.temperature_k))) {
-					selector.setSelection(Fields.TEMPERATURE_K + 1);
 				} else if (field.equals(getString(R.string.pressure))) {
 					selector.setSelection(Fields.PRESSURE + 1);
 				} else if (field.equals(getString(R.string.luminous_flux))) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.uml.cs.isense.writer"
-    android:versionCode="7"
+    android:versionCode="10"
     android:versionName="1.2.0" >
     
   	<uses-permission android:name="android.permission.VIBRATE" />
@@ -74,7 +74,8 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueEditData"
             android:label="Edit Data"
-            android:theme="@style/AppThemeDialog"/>
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppTheme"/>
         <activity
             android:name="edu.uml.cs.isense.queue.QueueEditRename"
             android:label="Rename Data Set"

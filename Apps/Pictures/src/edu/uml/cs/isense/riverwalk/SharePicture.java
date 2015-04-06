@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,7 +25,7 @@ import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class SharePicture extends Activity {
+public class SharePicture extends ActionBarActivity {
 
 	final int PROJECT_REQUESTED = 101;
 	final int LOGIN_REQUESTED = 102;

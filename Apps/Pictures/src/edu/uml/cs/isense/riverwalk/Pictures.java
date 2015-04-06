@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.content.CursorLoader;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -64,7 +65,7 @@ import edu.uml.cs.isense.waffle.Waffle;
 
 //import android.app.ProgressDialog;
 
-public class Pictures extends Activity implements LocationListener {
+public class Pictures extends ActionBarActivity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
@@ -134,14 +135,6 @@ public class Pictures extends Activity implements LocationListener {
 		setContentView(R.layout.main);
 
 		mContext = this;
-
-		// Initialize action bar customization for API >= 11
-		if (android.os.Build.VERSION.SDK_INT >= 11) {
-			ActionBar bar = getActionBar();
-
-			// make the actionbar clickable
-			bar.setDisplayHomeAsUpEnabled(true);
-		}
 
 		useMenu = true;
 

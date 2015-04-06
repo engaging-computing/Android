@@ -33,7 +33,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -460,7 +459,6 @@ public class Motion extends ActionBarActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.e("here", "here " + position);
                 if (position == 0) {
                     leftChevronB.setTextColor(Color.GRAY);
                 } else if (position == (fieldAdapter.getCount()-1)) {
@@ -604,7 +602,6 @@ public class Motion extends ActionBarActivity {
 
 		} else if (reqCode == PRESETS_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				//TODO presets set default field (loc for location) (accel sets field to accel)
 				/*set project*/
 				String projectNumber = data.getExtras().getString(Presets.PROJECT);
 				ProjectManager.setProject(mContext, projectNumber);

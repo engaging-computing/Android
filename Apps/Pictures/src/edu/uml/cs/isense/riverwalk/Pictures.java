@@ -13,7 +13,6 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -63,8 +62,6 @@ import edu.uml.cs.isense.riverwalk.dialogs.NoGps;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
-//import android.app.ProgressDialog;
-
 public class Pictures extends ActionBarActivity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
@@ -93,9 +90,7 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 
 	public static API api;
 	public static UploadQueue uq;
-	public static final String activityName = "genpicsmain";
 
-	public static boolean initialLoginStatus = true;
 	private static boolean showGpsDialog = true;
 
 	private EditText name;
@@ -225,7 +220,7 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 
 					OrientationManager.enableRotation(Pictures.this);
 
-					// Continuously take pictures
+				// Continuously take pictures
 				} else if (continuous == true) {
 
 					mMediaPlayer.setLooping(false);
@@ -631,10 +626,8 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 			return true;
 
 		case R.id.MENU_ITEM_CONTINUOUS:
-			Intent continuous = new Intent(getApplicationContext(),
-					Continuous.class);
-			startActivity(continuous);
-			return true;
+            startActivity(new Intent(this, Continuous.class));
+            return true;
 
 		case R.id.MENU_ITEM_ABOUT:
 			Intent about = new Intent(getApplicationContext(), About.class);

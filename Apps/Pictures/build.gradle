@@ -1,13 +1,15 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 dependencies {
-    compile fileTree(include: '*.jar', dir: 'libs')
+    compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':Libs:iSENSE Imports')
+    compile "com.android.support:support-v4:22.0.0"
+    compile "com.android.support:appcompat-v7:22.0.0"
 }
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1.1'
+    buildToolsVersion '21.1.2'
 
     sourceSets {
         main {

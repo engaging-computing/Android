@@ -1,6 +1,5 @@
 package edu.uml.cs.isense.motion.dialogs;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -9,15 +8,12 @@ import edu.uml.cs.isense.motion.R;
 
 public class About extends ActionBarActivity {
 
-	private Button okButton;
-
 	@Override
 	public void onCreate(Bundle savedInstanceBundle) {
 		super.onCreate(savedInstanceBundle);
 		setContentView(R.layout.about);
 
-		okButton = (Button) findViewById(R.id.okButton);
-
+        Button okButton = (Button) findViewById(R.id.okButton);
 		okButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override

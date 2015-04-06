@@ -1,10 +1,5 @@
 package edu.uml.cs.isense.riverwalk;
 
-
-
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -12,18 +7,18 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.view.ViewGroup;
 
 public class Continuous extends ActionBarActivity {
 
-	public static int continuous_interval;
-
-	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.continuous_shooting);
+    getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-	if (android.os.Build.VERSION.SDK_INT >= 11)
+
+        if (android.os.Build.VERSION.SDK_INT >= 11)
 		setFinishOnTouchOutside(false);
 
 	final CheckBox continuous_cb = (CheckBox) findViewById(R.id.checkContinuous);

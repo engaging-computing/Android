@@ -37,15 +37,12 @@ public class SharePicture extends ActionBarActivity {
 	UploadInfo info = new UploadInfo();
 	private String key = "";
 
-	boolean loggedIn;
-
 	Button bCredentials;
 	Button bKey;
 	Button bProject;
 
 	ArrayList<Uri> imageUris = new ArrayList<Uri>();
 	ArrayList<File> imageFiles = new ArrayList<File>();
-	Uri imageUri;
 
 	String success = "Upload Successful!";
 	String failure = "Upload Failed!";

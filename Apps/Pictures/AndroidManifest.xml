@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="21" />
+        android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,7 +25,6 @@
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
         android:targetPackage="edu.uml.cs.isense.riverwalk" />
-    
     
     <application
         android:allowBackup="false"
@@ -88,7 +87,7 @@
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.riverwalk.Continuous"
-            android:label="Continuous Photo Shooting"
+            android:label="Single input"
             android:theme="@style/AppThemeDialog" />
 
         <!-- from iSENSE imports -->

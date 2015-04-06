@@ -70,6 +70,7 @@
 	<string name="or">or</string>
     <string name="About_Title">About</string>
     <string name="Help_Title">Help</string>
+    <string name="continuouSingle">Continuous/Single Shot</string>
     
     <string name="aboutApp">About:\n\nThis app enables you to share a photo, the location and time it was taken and to upload that data online. When the app is activated, you are given the option to take a picture, upload a picture from the gallery or continuously take photos. All data that is recorded can be shared on the iSENSE web system (isenseproject.org), where it can be viewed publicly. In order to allow you to find your contributed data easily, the app asks you to enter your first name and last initial. If you are not comfortable with this information being posted on the web, please refrain from using this application.\n\n
 Instructions:\n\n

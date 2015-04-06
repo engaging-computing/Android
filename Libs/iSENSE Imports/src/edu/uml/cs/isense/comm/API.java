@@ -779,7 +779,6 @@ public class API {
 		int mstat = 0;
 		try {
 			URL url = new URL(baseURL + "/" + path + "?" + parameters);
-			System.out.println("Connect to: " + url);
 
 			HttpURLConnection urlConnection = (HttpURLConnection) url
 					.openConnection();

@@ -373,55 +373,45 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 				String state = Environment.getExternalStorageState();
 				if (Environment.MEDIA_MOUNTED.equals(state)) {
 
-					Log.d("CameraMain", "Camera is: " + mCamera.toString());
-					Log.d("CameraMain", "About to try to take a picture.");
 
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-                  				mCamera.takePicture(null, null, mPicture); // takes
-																			// a
-																			// picture
-							} catch (Exception e) {
-								Log.d("CameraMain", "Failed taking picture");
-								e.printStackTrace();
-							}
+                    try {
+                        mCamera.takePicture(null, null, mPicture); // takes
+                                                                    // a
+                                                                    // picture
+                    } catch (Exception e) {
+                        Log.d("CameraMain", "Failed taking picture");
+                        e.printStackTrace();
+                    }
 
-                            if (picture != null) {
-                                validPicture = true;
-                            } else {
-                                w.make("Picture is Null", Waffle.LENGTH_SHORT,
-                                        Waffle.IMAGE_X);
-                                validPicture = false;
-                            }
-
-                        }
-					});
+                    if (picture != null) {
+                        validPicture = true;
+                    } else {
+                        validPicture = false;
+                    }
 
                     if (validPicture) {
-        			String projId = ProjectManager.getProject(mContext);
+                        String projId = ProjectManager.getProject(mContext);
 
-        			String dataSetName;
-        			if ( Description.photo_description == null) {
-        				dataSetName = name.getText().toString();
-        			} else {
-        				dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
-        			}
+                        String dataSetName;
+                        if ( Description.photo_description == null) {
+                            dataSetName = name.getText().toString();
+                        } else {
+                            dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
+                        }
 
-        			String description = DateFormat.getDateTimeInstance().format(new Date());
+                        String description = DateFormat.getDateTimeInstance().format(new Date());
 
-        			JSONArray dataPoint = dfm.recordDataPoint();
-        			JSONArray dataSet = new JSONArray();
-        			dataSet.put(dataPoint);
+                        JSONArray dataPoint = dfm.recordDataPoint();
+                        JSONArray dataSet = new JSONArray();
+                        dataSet.put(dataPoint);
 
-        			//add image and data to upload queue
-    				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
-                	uq.buildQueueFromFile();
+                        //add image and data to upload queue
+                        uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
+                        uq.buildQueueFromFile();
 
                         runOnUiThread(new Runnable() {
                             @Override
-							public void run() {
+                            public void run() {
                                 w.make("Picture saved!", Waffle.LENGTH_SHORT,
                                         Waffle.IMAGE_CHECK);
                                 queueCount.setText(getResources().getString(
@@ -462,7 +452,6 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 
 			Log.d("CameraMain",
 					"Camera in onPostExecute is:" + mCamera.toString());
-			// mCamera.stopPreview();
 			mCamera.release();
 			mCamera = null;
 
@@ -519,8 +508,6 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 				Log.d("CameraMain", "picture is null");
 				return;
 			}
-
-			Log.d("CameraMain", "PictureCallback");
 
 			try {
 				FileOutputStream fos = new FileOutputStream(picture);
@@ -969,18 +956,18 @@ public class Pictures extends ActionBarActivity implements LocationListener {
 									+ "\nLong: " + loc.getLongitude());
 						else {
 							switch (waitingCounter % 4) {
-							case (0):
-								latLong.setText(R.string.noLocation0);
-								break;
-							case (1):
-								latLong.setText(R.string.noLocation1);
-								break;
-							case (2):
-								latLong.setText(R.string.noLocation2);
-								break;
-							case (3):
-								latLong.setText(R.string.noLocation3);
-								break;
+								case (0):
+									latLong.setText(R.string.noLocation0);
+									break;
+								case (1):
+									latLong.setText(R.string.noLocation1);
+									break;
+								case (2):
+									latLong.setText(R.string.noLocation2);
+									break;
+								case (3):
+									latLong.setText(R.string.noLocation3);
+									break;
 							}
 							waitingCounter++;
 						}

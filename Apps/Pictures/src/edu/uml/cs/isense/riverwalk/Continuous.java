@@ -18,8 +18,8 @@ public class Continuous extends ActionBarActivity {
     getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 
-        if (android.os.Build.VERSION.SDK_INT >= 11)
-		setFinishOnTouchOutside(false);
+	if (android.os.Build.VERSION.SDK_INT >= 11)
+	setFinishOnTouchOutside(false);
 
 	final CheckBox continuous_cb = (CheckBox) findViewById(R.id.checkContinuous);
 	continuous_cb.setChecked(Pictures.continuous); // if true then continuous_cb will be set to checked if not then it will not be checked
@@ -42,12 +42,6 @@ public class Continuous extends ActionBarActivity {
 			}
 		}
 	});
-
-
-
-
-
-
 
 	final Button ok = (Button) findViewById(R.id.description_okay);
 	ok.setOnClickListener(new OnClickListener() {

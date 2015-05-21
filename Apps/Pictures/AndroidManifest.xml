@@ -87,7 +87,6 @@
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.riverwalk.Continuous"
-            android:label="Single input"
             android:theme="@style/AppThemeDialog" />
 
         <!-- from iSENSE imports -->

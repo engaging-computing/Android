@@ -11,10 +11,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.API.TargetType;
@@ -25,7 +26,7 @@ import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class SharePicture extends ActionBarActivity {
+public class SharePicture extends AppCompatActivity {
 
 	final int PROJECT_REQUESTED = 101;
 	final int LOGIN_REQUESTED = 102;
@@ -58,7 +59,9 @@ public class SharePicture extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.share_picture);
-		bProject = (Button) findViewById(R.id.buttonProject);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        bProject = (Button) findViewById(R.id.buttonProject);
 		bCredentials = (Button) findViewById(R.id.buttonCredentials);
 		bKey = (Button) findViewById(R.id.buttonKey);
 

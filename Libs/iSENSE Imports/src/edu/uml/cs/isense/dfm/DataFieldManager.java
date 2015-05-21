@@ -1562,6 +1562,7 @@ public class DataFieldManager extends Application {
         	if(loc != null)
                 f.longitude = lon;
         if (enabledFields[Fields.TIME])
+			if (timePicTaken != null)
                 f.timeMillis = timePicTaken;
 
 		return putData();

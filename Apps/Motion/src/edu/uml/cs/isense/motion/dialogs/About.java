@@ -13,7 +13,7 @@ public class About extends ActionBarActivity {
 		super.onCreate(savedInstanceBundle);
 		setContentView(R.layout.about);
 
-        Button okButton = (Button) findViewById(R.id.okButton);
+		Button okButton = (Button) findViewById(R.id.okButton);
 		okButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override

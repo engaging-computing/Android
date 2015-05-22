@@ -9,12 +9,26 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RadioButton;
+import android.widget.CheckBox;
 
 import edu.uml.cs.isense.motion.dialogs.Presets;
 import edu.uml.cs.isense.proj.ProjectManager;
 
 public class PresetScreen extends ActionBarActivity {
+    CheckBox showScreen;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        SharedPreferences settings = getSharedPreferences(Motion.MY_SAVED_PREFERENCES, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(Motion.SHOW_SPLASH_SCREEN,  showScreen.isChecked());
+
+        // Commit the edits!
+        editor.commit();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,19 +38,18 @@ public class PresetScreen extends ActionBarActivity {
 
         Button accelButton = (Button) findViewById(R.id.accel_button);
         Button gpsButton = (Button) findViewById(R.id.gps_button);
-        Button continueButton = (Button) findViewById(R.id.continue_button);
+        Button projLaterButton = (Button) findViewById(R.id.select_later_button);
+        Button lastProjButton = (Button) findViewById(R.id.last_project_button);
+
+        showScreen = (CheckBox) findViewById(R.id.show_screen);
 
         String project = ProjectManager.getProject(mContext);
 
         //if not gps or accel preset project give option to continue using last project
-        if (!(project.equals(Presets.ACCEL_PROJECT) || project.equals(Presets.GPS_PROJECT))) {
-            if (project.equals("-1")) {
-                continueButton.setText("Select a Project Later");
-            } else {
-                continueButton.setText("Continue using project: " + project);
-            }
-            continueButton.setVisibility(View.VISIBLE);
-
+        if ( project.equals(Presets.ACCEL_PROJECT) || project.equals(Presets.GPS_PROJECT) || project.equals("-1") ) {
+            lastProjButton.setVisibility(View.GONE);
+        } else {
+            lastProjButton.setText("Continue using project: " + project);
         }
 
         accelButton.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +93,7 @@ public class PresetScreen extends ActionBarActivity {
             }
         });
 
-        continueButton.setOnClickListener(new View.OnClickListener() {
+        lastProjButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent resultIntent = new Intent();
@@ -88,6 +101,26 @@ public class PresetScreen extends ActionBarActivity {
                 finish();
             }
         });
+
+        projLaterButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences settings = getSharedPreferences(Motion.MY_SAVED_PREFERENCES, 0);
+                SharedPreferences.Editor editor = settings.edit();
+
+                editor.putString(Presets.LAST_PRESET, Presets.GPS);
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(Presets.PROJECT, "-1");
+                setResult(Activity.RESULT_OK, resultIntent);
+
+                editor.commit();
+                finish();
+
+            }
+        });
+
+
 
     }
 }

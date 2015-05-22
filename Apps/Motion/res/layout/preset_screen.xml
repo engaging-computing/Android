@@ -3,6 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Preset Projects"
+        android:layout_gravity="center_horizontal" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,9 +38,28 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/button_rsense"
-        android:visibility="gone"
+        android:text="Select a project later."
         android:textColor="#0066FF"
-        android:id="@+id/continue_button"
+        android:id="@+id/select_later_button"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_rsense"
+        android:textColor="#0066FF"
+        android:id="@+id/last_project_button"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show this screen when app launches"
+        android:id="@+id/show_screen"
+        android:layout_gravity="center_horizontal"
+        android:checked="true"
+        android:layout_marginBottom="20dp"/>
 </LinearLayout>

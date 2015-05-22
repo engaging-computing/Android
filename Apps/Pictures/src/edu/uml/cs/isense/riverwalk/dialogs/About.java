@@ -12,7 +12,7 @@ public class About extends ActionBarActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceBundle) {
-		super.onCreate(savedInstanceBundle);
+        super.onCreate(savedInstanceBundle);
 		setContentView(R.layout.about);
 
         // Initialize action bar customization for API >= 11

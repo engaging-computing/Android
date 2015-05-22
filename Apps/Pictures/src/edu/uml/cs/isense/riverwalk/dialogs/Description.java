@@ -3,13 +3,14 @@ package edu.uml.cs.isense.riverwalk.dialogs;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import edu.uml.cs.isense.riverwalk.R;
 
-public class Description extends Activity {
+public class Description extends ActionBarActivity {
 
 	public static String photo_description;
 

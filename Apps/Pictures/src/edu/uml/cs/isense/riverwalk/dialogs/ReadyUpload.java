@@ -2,13 +2,14 @@ package edu.uml.cs.isense.riverwalk.dialogs;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import edu.uml.cs.isense.riverwalk.R;
 
-public class ReadyUpload extends Activity {
+public class ReadyUpload extends ActionBarActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

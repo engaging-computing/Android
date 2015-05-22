@@ -1,36 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
 
- 
-        <CheckBox
-            android:id="@+id/checkContinuous"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/continuous" />
+    <!--This view forces the dialog to match_parent without it the dialog is really small, bug with Android L?-->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding = "10dp"
-            android:text="@string/interval" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/continuouSingle"
+        android:textSize="16sp"
+        android:padding="10dp"/>
 
-        <EditText
-            android:id="@+id/etInterval"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" >
-        </EditText>
+    <CheckBox
+        android:id="@+id/checkContinuous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/continuous" />
 
-        <Button
-        android:id="@+id/description_okay"
-        style="?android:attr/buttonBarButtonStyle"
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/okay" />
-        
+        android:padding = "10dp"
+        android:text="@string/interval" />
+
+    <EditText
+        android:id="@+id/etInterval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number" />
+    <LinearLayout
+        android:id="@+id/LinearLayoutButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/dividerVertical" />
+
+        <Button
+            android:id="@+id/description_okay"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/okay" />
+    </LinearLayout>
+
 </LinearLayout>

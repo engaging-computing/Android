@@ -13,7 +13,6 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,6 +34,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.content.CursorLoader;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -62,9 +62,7 @@ import edu.uml.cs.isense.riverwalk.dialogs.NoGps;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
-//import android.app.ProgressDialog;
-
-public class Pictures extends Activity implements LocationListener {
+public class Pictures extends ActionBarActivity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
@@ -92,9 +90,7 @@ public class Pictures extends Activity implements LocationListener {
 
 	public static API api;
 	public static UploadQueue uq;
-	public static final String activityName = "genpicsmain";
 
-	public static boolean initialLoginStatus = true;
 	private static boolean showGpsDialog = true;
 
 	private EditText name;
@@ -134,14 +130,6 @@ public class Pictures extends Activity implements LocationListener {
 		setContentView(R.layout.main);
 
 		mContext = this;
-
-		// Initialize action bar customization for API >= 11
-		if (android.os.Build.VERSION.SDK_INT >= 11) {
-			ActionBar bar = getActionBar();
-
-			// make the actionbar clickable
-			bar.setDisplayHomeAsUpEnabled(true);
-		}
 
 		useMenu = true;
 
@@ -232,7 +220,7 @@ public class Pictures extends Activity implements LocationListener {
 
 					OrientationManager.enableRotation(Pictures.this);
 
-					// Continuously take pictures
+				// Continuously take pictures
 				} else if (continuous == true) {
 
 					mMediaPlayer.setLooping(false);
@@ -385,55 +373,45 @@ public class Pictures extends Activity implements LocationListener {
 				String state = Environment.getExternalStorageState();
 				if (Environment.MEDIA_MOUNTED.equals(state)) {
 
-					Log.d("CameraMain", "Camera is: " + mCamera.toString());
-					Log.d("CameraMain", "About to try to take a picture.");
 
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-                  				mCamera.takePicture(null, null, mPicture); // takes
-																			// a
-																			// picture
-							} catch (Exception e) {
-								Log.d("CameraMain", "Failed taking picture");
-								e.printStackTrace();
-							}
+                    try {
+                        mCamera.takePicture(null, null, mPicture); // takes
+                                                                    // a
+                                                                    // picture
+                    } catch (Exception e) {
+                        Log.d("CameraMain", "Failed taking picture");
+                        e.printStackTrace();
+                    }
 
-                            if (picture != null) {
-                                validPicture = true;
-                            } else {
-                                w.make("Picture is Null", Waffle.LENGTH_SHORT,
-                                        Waffle.IMAGE_X);
-                                validPicture = false;
-                            }
-
-                        }
-					});
+                    if (picture != null) {
+                        validPicture = true;
+                    } else {
+                        validPicture = false;
+                    }
 
                     if (validPicture) {
-        			String projId = ProjectManager.getProject(mContext);
+                        String projId = ProjectManager.getProject(mContext);
 
-        			String dataSetName;
-        			if ( Description.photo_description == null) {
-        				dataSetName = name.getText().toString();
-        			} else {
-        				dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
-        			}
+                        String dataSetName;
+                        if ( Description.photo_description == null) {
+                            dataSetName = name.getText().toString();
+                        } else {
+                            dataSetName = name.getText().toString() + " Description: " + Description.photo_description;
+                        }
 
-        			String description = DateFormat.getDateTimeInstance().format(new Date());
+                        String description = DateFormat.getDateTimeInstance().format(new Date());
 
-        			JSONArray dataPoint = dfm.recordDataPoint();
-        			JSONArray dataSet = new JSONArray();
-        			dataSet.put(dataPoint);
+                        JSONArray dataPoint = dfm.recordDataPoint();
+                        JSONArray dataSet = new JSONArray();
+                        dataSet.put(dataPoint);
 
-        			//add image and data to upload queue
-    				uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
-                	uq.buildQueueFromFile();
+                        //add image and data to upload queue
+                        uq.addToQueue(dataSetName, description, Type.BOTH, dataSet, picture, projId, null, false);
+                        uq.buildQueueFromFile();
 
                         runOnUiThread(new Runnable() {
                             @Override
-							public void run() {
+                            public void run() {
                                 w.make("Picture saved!", Waffle.LENGTH_SHORT,
                                         Waffle.IMAGE_CHECK);
                                 queueCount.setText(getResources().getString(
@@ -474,7 +452,6 @@ public class Pictures extends Activity implements LocationListener {
 
 			Log.d("CameraMain",
 					"Camera in onPostExecute is:" + mCamera.toString());
-			// mCamera.stopPreview();
 			mCamera.release();
 			mCamera = null;
 
@@ -531,8 +508,6 @@ public class Pictures extends Activity implements LocationListener {
 				Log.d("CameraMain", "picture is null");
 				return;
 			}
-
-			Log.d("CameraMain", "PictureCallback");
 
 			try {
 				FileOutputStream fos = new FileOutputStream(picture);
@@ -638,10 +613,8 @@ public class Pictures extends Activity implements LocationListener {
 			return true;
 
 		case R.id.MENU_ITEM_CONTINUOUS:
-			Intent continuous = new Intent(getApplicationContext(),
-					Continuous.class);
-			startActivity(continuous);
-			return true;
+            startActivity(new Intent(this, Continuous.class));
+            return true;
 
 		case R.id.MENU_ITEM_ABOUT:
 			Intent about = new Intent(getApplicationContext(), About.class);
@@ -983,18 +956,18 @@ public class Pictures extends Activity implements LocationListener {
 									+ "\nLong: " + loc.getLongitude());
 						else {
 							switch (waitingCounter % 4) {
-							case (0):
-								latLong.setText(R.string.noLocation0);
-								break;
-							case (1):
-								latLong.setText(R.string.noLocation1);
-								break;
-							case (2):
-								latLong.setText(R.string.noLocation2);
-								break;
-							case (3):
-								latLong.setText(R.string.noLocation3);
-								break;
+								case (0):
+									latLong.setText(R.string.noLocation0);
+									break;
+								case (1):
+									latLong.setText(R.string.noLocation1);
+									break;
+								case (2):
+									latLong.setText(R.string.noLocation2);
+									break;
+								case (3):
+									latLong.setText(R.string.noLocation3);
+									break;
 							}
 							waitingCounter++;
 						}

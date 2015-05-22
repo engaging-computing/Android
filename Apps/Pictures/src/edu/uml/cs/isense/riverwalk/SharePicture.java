@@ -11,9 +11,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.comm.API.TargetType;
@@ -24,7 +26,7 @@ import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class SharePicture extends Activity {
+public class SharePicture extends AppCompatActivity {
 
 	final int PROJECT_REQUESTED = 101;
 	final int LOGIN_REQUESTED = 102;
@@ -36,15 +38,12 @@ public class SharePicture extends Activity {
 	UploadInfo info = new UploadInfo();
 	private String key = "";
 
-	boolean loggedIn;
-
 	Button bCredentials;
 	Button bKey;
 	Button bProject;
 
 	ArrayList<Uri> imageUris = new ArrayList<Uri>();
 	ArrayList<File> imageFiles = new ArrayList<File>();
-	Uri imageUri;
 
 	String success = "Upload Successful!";
 	String failure = "Upload Failed!";
@@ -60,7 +59,9 @@ public class SharePicture extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.share_picture);
-		bProject = (Button) findViewById(R.id.buttonProject);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        bProject = (Button) findViewById(R.id.buttonProject);
 		bCredentials = (Button) findViewById(R.id.buttonCredentials);
 		bKey = (Button) findViewById(R.id.buttonKey);
 

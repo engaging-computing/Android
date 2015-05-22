@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Looper;
+import android.util.Log;
 
 import org.json.JSONArray;
 
@@ -326,9 +328,14 @@ public class UploadQueue implements Serializable {
 	 */
 	public void addToQueue(String name, String description, Type type, JSONArray dataSet, File picture, String projID, LinkedList<String>fields, Boolean dataAlreadyInOrder) {
 		ds = new QDataSet(name + appendedTimeStamp(), description, type, dataSet.toString(), picture, projID, fields, dataAlreadyInOrder);
-
-		//Add data to Queue to be uploaded
-		new AddToQueueTask().execute();
+		Log.e("what thread",""+ Thread.currentThread());
+        if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+            //On main thread, Add data to Queue to be uploaded
+		    new AddToQueueTask().execute();
+        } else {
+            //Not on main thread, no async task necessary
+            uploader.run();
+        }
 	}
 
 	/**
@@ -367,9 +374,10 @@ public class UploadQueue implements Serializable {
 
 		@Override
 		protected void onPostExecute(String sdFileName) {
-			Intent i = new Intent().setClass(mContext, QueueLayout.class);
-			i.putExtra(QueueLayout.PARENT_NAME, getParentName());
-			mContext.startActivity(i);
+            // On UI thread so show queue
+            Intent i = new Intent().setClass(mContext, QueueLayout.class);
+            i.putExtra(QueueLayout.PARENT_NAME, getParentName());
+            mContext.startActivity(i);
 		}
 	}
 

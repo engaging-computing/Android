@@ -90,7 +90,8 @@ public class Motion extends ActionBarActivity {
 
 	//saved pref keys
 	public static final String MY_SAVED_PREFERENCES = "MyPrefs" ;
-	public static final String LENGTH_PREFS_KEY = "length";
+    public static final String SHOW_SPLASH_SCREEN = "ShowSplash" ;
+    public static final String LENGTH_PREFS_KEY = "length";
 	public static final String RATE_PREFS_KEY = "rate";
 
 	public API api;
@@ -172,7 +173,11 @@ public class Motion extends ActionBarActivity {
 			new Thread(r).start();
 		}
 
-        if (displaySplashScreen) {
+        SharedPreferences settings = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+        boolean splashEnabled = settings.getBoolean(SHOW_SPLASH_SCREEN, true);
+
+		// Display splash screen for presets
+        if (displaySplashScreen && splashEnabled ) {
             displaySplashScreen = false;
             startActivityForResult(new Intent(this, PresetScreen.class),
                     PRESETS_REQUESTED);
@@ -460,7 +465,6 @@ public class Motion extends ActionBarActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.e("here", "here " + position);
                 if (position == 0) {
                     leftChevronB.setTextColor(Color.GRAY);
                 } else if (position == (fieldAdapter.getCount()-1)) {
@@ -604,13 +608,16 @@ public class Motion extends ActionBarActivity {
 
 		} else if (reqCode == PRESETS_REQUESTED) {
 			if (resultCode == RESULT_OK) {
-				//TODO presets set default field (loc for location) (accel sets field to accel)
 				/*set project*/
 				String projectNumber = data.getExtras().getString(Presets.PROJECT);
 				ProjectManager.setProject(mContext, projectNumber);
-				projNumB.setText("Project: " + projectNumber);
-				w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
-
+                if ( projectNumber.equals("-1") ) {
+                    projNumB.setText("Generic Project");
+                    w.make("All Sensors Enabled", Waffle.IMAGE_CHECK);
+                } else{
+                    projNumB.setText("Project: " + projectNumber);
+                    w.make("Sensors Needed for Project " + projectNumber + " are Enabled", Waffle.IMAGE_CHECK);
+                }
 				/*change sensor field*/
 				int field = data.getExtras().getInt(Presets.FIELD);
 				fields.setCurrentItem(field);
@@ -670,6 +677,12 @@ public class Motion extends ActionBarActivity {
 				/*reset project*/
 				ProjectManager.setProject(mContext, DEFAULT_PROJ);
 				projNumB.setText("Generic Project");
+
+                /* Show splash screen again */
+                SharedPreferences settings = getSharedPreferences(Motion.MY_SAVED_PREFERENCES, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean(SHOW_SPLASH_SCREEN, true);
+                editor.apply();
 
 				/*reset rate*/
 				SharedPreferences ratePrefs = getSharedPreferences(MY_SAVED_PREFERENCES, 0);

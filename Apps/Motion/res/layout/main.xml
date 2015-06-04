@@ -13,7 +13,6 @@
             android:id="@+id/leftChevron"
             android:layout_width="40dp"
             android:layout_height="60dp"
-            android:layout_toLeftOf="@+id/leftChevron"
             android:layout_alignParentLeft="true"
             android:text="@string/font_awesome_icon_left_chevron"
             android:background="@drawable/chevron"/>

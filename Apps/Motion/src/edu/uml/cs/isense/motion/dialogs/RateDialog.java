@@ -1,23 +1,18 @@
 package edu.uml.cs.isense.motion.dialogs;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 
 import edu.uml.cs.isense.motion.Motion;
 import edu.uml.cs.isense.motion.R;
 
-public class RateDialog extends ActionBarActivity {
+public class RateDialog extends AppCompatActivity {
 
 	Button ok, cancel;
-	EditText input;
-	Spinner spinner;
 	int rate;
 
 	@Override

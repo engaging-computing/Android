@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.uml.cs.isense.riverwalk"
-    android:versionCode="13"
-    android:versionName="2.2.3">
+    android:versionCode="14"
+    android:versionName="3.0">
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -28,7 +28,7 @@
     
     <application
         android:allowBackup="false"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name" >
  
         <uses-library android:name="android.test.runner" />
@@ -87,6 +87,7 @@
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.riverwalk.Continuous"
+            android:label="Continuous/Single Shot"
             android:theme="@style/AppThemeDialog" />
 
         <!-- from iSENSE imports -->
@@ -98,6 +99,10 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueAlter"
             android:label="Alter Data Set"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.LoginOrKeyDialog"
+            android:label="Login or Key"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.queue.QueueEditData"
@@ -126,6 +131,7 @@
         <activity
             android:name="edu.uml.cs.isense.proj.ProjectManager"
             android:label="Select a Project"
+            android:screenOrientation="portrait"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.supplements.FileBrowser"

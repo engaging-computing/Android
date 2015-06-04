@@ -1,16 +1,15 @@
 package edu.uml.cs.isense.motion.dialogs;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import edu.uml.cs.isense.motion.R;
 
-public class RecordSettings extends ActionBarActivity {
+public class RecordSettings extends AppCompatActivity {
 
 	private boolean Xchecked = false, Ychecked = true, Zchecked = false,
 			Magchecked = false;

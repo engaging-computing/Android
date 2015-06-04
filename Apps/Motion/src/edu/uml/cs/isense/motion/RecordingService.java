@@ -1,6 +1,5 @@
 package edu.uml.cs.isense.motion;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,7 +21,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
@@ -38,24 +36,12 @@ public class RecordingService extends Service {
 
     public static boolean running = false;
 
-    /* Distance and Velocity */
-    float distance = 0;
-    float velocity = 0;
-    float deltaTime = 0;
-    boolean bFirstPoint = true;
-    float totalDistance = 0;
-    long startTime;
-
     private MediaPlayer mMediaPlayer;
     private Vibrator vibrator;
 
 
-    Intent intent;
     Context serviceContext;
 
-    Timer recordLength;
-
-    private String dataSetName = "";
     CountDownTimer mTimer;
 
     LocalBroadcastManager broadcaster;
@@ -93,7 +79,7 @@ public class RecordingService extends Service {
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
             builder.setSmallIcon(R.drawable.ic_stat_name);
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.isense_graph);
             builder.setLargeIcon(bm);
             builder.setContentIntent(pendingIntent);
             builder.setOngoing(true);
@@ -214,14 +200,14 @@ public class RecordingService extends Service {
 
             updateButtonStop("Stop");
 
+
             // Create the name of the session using the entered name
-            dataSetName = Motion.firstName + " " + Motion.lastInitial;
 			String description = "Number of Data Points: " + dataSet.length();
 			Type type = Type.DATA;
 
 			//add new dataset to queue
 			Motion.uq.buildQueueFromFile();
-			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, ProjectManager.getProject(this), null, false);
+			Motion.uq.addToQueue(Motion.dataSetName, description, type, dataSet, null, ProjectManager.getProject(this), null, false);
         }
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -18,7 +18,6 @@
 /***************************************************************************************************/
 package edu.uml.cs.isense.motion;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +34,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +48,7 @@ import java.text.DecimalFormat;
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
-import edu.uml.cs.isense.credentials.EnterName;
+import edu.uml.cs.isense.motion.dialogs.EnterName;
 import edu.uml.cs.isense.motion.dialogs.DurationDialog;
 import edu.uml.cs.isense.motion.dialogs.Help;
 import edu.uml.cs.isense.motion.dialogs.MessageDialogTemplate;
@@ -63,14 +63,13 @@ import edu.uml.cs.isense.motion.fields.LocFragment;
 import edu.uml.cs.isense.motion.fields.MagFragment;
 import edu.uml.cs.isense.motion.fields.PressureFragment;
 import edu.uml.cs.isense.motion.fields.TempFragment;
-import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class Motion extends ActionBarActivity {
+public class Motion extends AppCompatActivity {
 
     public static final String DEFAULT_PROJ = "-1";
     public static final int DEFAULT_RATE = 50;
@@ -97,9 +96,6 @@ public class Motion extends ActionBarActivity {
 
     public API api;
 
-    static String firstName = "";
-    static String lastInitial = "";
-
     public static final int RESULT_GOT_NAME = 1000;
     public static final int LOGIN_STATUS_REQUESTED = 1002;
     public static final int RECORDING_LENGTH_REQUESTED = 1003;
@@ -124,6 +120,8 @@ public class Motion extends ActionBarActivity {
     public static Bundle saved;
 
     public static Menu menu;
+
+    public static String dataSetName;
 
     Intent service;
 
@@ -225,24 +223,9 @@ public class Motion extends ActionBarActivity {
             startStop.setText("Hold to Start");
         }
 
-        SharedPreferences namePrefs = getSharedPreferences(
-                EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
-        firstName = namePrefs.getString(
-                EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME,
-                "");
-        lastInitial = namePrefs
-                .getString(
-                        EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
-                        "");
+        dataSetName = settings.getString(EnterName.Name_Key, "Motion");
 
-        if (firstName.length() == 0) {
-            Intent iEnterName = new Intent(this, EnterName.class);
-            iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-                    true);
-            startActivityForResult(iEnterName, RESULT_GOT_NAME);
-        } else {
-            nameB.setText(firstName + " " + lastInitial);
-        }
+        nameB.setText(dataSetName);
 
         String projId = ProjectManager.getProject(mContext);
 
@@ -399,16 +382,9 @@ public class Motion extends ActionBarActivity {
 
             @Override
             public void onClick(View v) {
-                // Launch the dialog that allows users to enter his/her
-                // firstname
-                // and last initial
                 Intent iEnterName = new Intent(mContext, EnterName.class);
                 SharedPreferences classPrefs = getSharedPreferences(
                         ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
-                iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-                        classPrefs.getBoolean(
-                                ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE,
-                                true));
                 startActivityForResult(iEnterName, RESULT_GOT_NAME);
             }
 
@@ -508,7 +484,6 @@ public class Motion extends ActionBarActivity {
         inPausedState = false;
     }
 
-    @SuppressLint("NewApi")
     @Override
     public void onResume() {
         super.onResume();
@@ -641,33 +616,9 @@ public class Motion extends ActionBarActivity {
             }
         } else if (reqCode == RESULT_GOT_NAME) {
             if (resultCode == RESULT_OK) {
-                SharedPreferences namePrefs = getSharedPreferences(
-                        EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
-
-                if (namePrefs
-                        .getBoolean(
-                                EnterName.PREFERENCES_USER_INFO_SUBKEY_USE_ACCOUNT_NAME,
-                                true)) {
-                    RPerson user = api.getCurrentUser();
-
-                    firstName = user.name;
-                    lastInitial = "";
-
-                    nameB.setText(firstName + " " + lastInitial);
-
-
-                } else {
-                    firstName = namePrefs.getString(
-                            EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME,
-                            "");
-                    lastInitial = namePrefs
-                            .getString(
-                                    EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
-                                    "");
-
-                    nameB.setText(firstName + " " + lastInitial);
-
-                }
+                SharedPreferences settings = getSharedPreferences(MY_SAVED_PREFERENCES, 0);
+                dataSetName = settings.getString(EnterName.Name_Key, "");
+                nameB.setText(dataSetName);
             }
 
         } else if (reqCode == RESET_REQUESTED) {
@@ -701,11 +652,6 @@ public class Motion extends ActionBarActivity {
 
 				/*reset name*/
                 Intent iEnterName = new Intent(mContext, EnterName.class);
-                SharedPreferences classPrefs = getSharedPreferences(
-                        ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
-                iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-                        classPrefs.getBoolean(
-                                ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE, true));
                 startActivityForResult(iEnterName, RESULT_GOT_NAME);
 
             }

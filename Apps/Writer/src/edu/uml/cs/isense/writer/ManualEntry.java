@@ -26,8 +26,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -65,7 +64,7 @@ import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class ManualEntry extends ActionBarActivity implements LocationListener {
+public class ManualEntry extends AppCompatActivity implements LocationListener {
     public static Context mContext;
     private API api;
     private Boolean useDev = false;
@@ -181,10 +180,6 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
         });
 
-        // Initialize action bar customization for API >= 11
-        if (android.os.Build.VERSION.SDK_INT >= 11) {
-            ActionBar bar = getSupportActionBar();
-        }
 
         datapointsLayout = (LinearLayout) findViewById(R.id.datapoints_ll);
         scrollView = (ScrollView) findViewById(R.id.datapoints_sv);
@@ -472,7 +467,7 @@ public class ManualEntry extends ActionBarActivity implements LocationListener {
 
                 } else if (field.type == RProjectField.TYPE_TEXT) {
                     //if no restrictions we get back a string "null"
-                    if (field.restrictions == "null") {
+                    if (field.restrictions.equals("[]")) {
                         ViewGroup singlefield = new RelativeLayout(mContext);
                         inflater.inflate(R.layout.field, singlefield);
 

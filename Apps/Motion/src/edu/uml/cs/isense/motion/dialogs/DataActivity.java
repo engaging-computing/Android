@@ -4,12 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import edu.uml.cs.isense.comm.Connection;
 import edu.uml.cs.isense.motion.R;
 
-public class DataActivity extends ActionBarActivity {
+public class DataActivity extends AppCompatActivity {
 
 	private Button iSENSE_Button;
 	private Button discard_Button;

@@ -14,7 +14,6 @@
         android:layout_width="40dp"
         android:layout_height="60dp"
         style="?android:borderlessButtonStyle"
-        android:layout_toLeftOf="@+id/leftChevron"
         android:layout_alignParentLeft="true"
         android:text="@string/font_awesome_icon_left_chevron"
         android:textColor="@android:color/white"
@@ -117,7 +116,7 @@
             android:layout_height="40dp"
             android:layout_toRightOf="@id/tv_name"
             android:background="@drawable/button_rsense"
-            android:text="@string/john_smith"
+            android:text="@string/data_name"
 	        android:textColor="#0066FF"
             android:textSize="14sp"
             android:textStyle="bold" />

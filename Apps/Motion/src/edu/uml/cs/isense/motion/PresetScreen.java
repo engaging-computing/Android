@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,7 +14,7 @@ import android.widget.CheckBox;
 import edu.uml.cs.isense.motion.dialogs.Presets;
 import edu.uml.cs.isense.proj.ProjectManager;
 
-public class PresetScreen extends ActionBarActivity {
+public class PresetScreen extends AppCompatActivity {
     CheckBox showScreen;
 
     @Override
@@ -111,6 +111,9 @@ public class PresetScreen extends ActionBarActivity {
                 editor.putString(Presets.LAST_PRESET, Presets.GPS);
 
                 Intent resultIntent = new Intent();
+
+                resultIntent.putExtra(Presets.RATE, Presets.GPS_PROJECT_RATE);
+                resultIntent.putExtra(Presets.LENGTH, Presets.GPS_PROJECT_LENGTH);
                 resultIntent.putExtra(Presets.PROJECT, "-1");
                 setResult(Activity.RESULT_OK, resultIntent);
 

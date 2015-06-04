@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +16,7 @@ import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.motion.R;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class ContributorKeyDialog extends ActionBarActivity {
+public class ContributorKeyDialog extends AppCompatActivity {
 
 	Button ok, cancel;
 	EditText keyField;

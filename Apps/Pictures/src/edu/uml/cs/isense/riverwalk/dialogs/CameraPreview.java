@@ -63,7 +63,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     		int h = size.height, w = size.width;
 
     		// If this height/width is better, use it
-    		if (h >= mHeight || w >= mWidth) {
+    		if (w * h > mHeight * mWidth) {
     			mHeight = h;
     			mWidth  = w;
     			continue;

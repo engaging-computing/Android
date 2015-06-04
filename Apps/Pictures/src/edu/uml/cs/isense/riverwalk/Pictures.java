@@ -35,6 +35,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -62,7 +63,7 @@ import edu.uml.cs.isense.riverwalk.dialogs.NoGps;
 import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
 
-public class Pictures extends ActionBarActivity implements LocationListener {
+public class Pictures extends AppCompatActivity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;

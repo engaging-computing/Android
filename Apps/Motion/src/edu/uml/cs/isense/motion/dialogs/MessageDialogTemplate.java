@@ -5,12 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import edu.uml.cs.isense.motion.R;
 
-public class MessageDialogTemplate extends ActionBarActivity {
+public class MessageDialogTemplate extends AppCompatActivity {
 
 	Button pos, neg;
 

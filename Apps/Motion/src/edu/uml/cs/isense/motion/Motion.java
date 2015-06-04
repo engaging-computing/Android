@@ -34,6 +34,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,7 +69,7 @@ import edu.uml.cs.isense.queue.UploadQueue;
 import edu.uml.cs.isense.waffle.Waffle;
 
 
-public class Motion extends ActionBarActivity {
+public class Motion extends AppCompatActivity {
 
     public static final String DEFAULT_PROJ = "-1";
     public static final int DEFAULT_RATE = 50;
@@ -222,14 +223,9 @@ public class Motion extends ActionBarActivity {
             startStop.setText("Hold to Start");
         }
 
-        dataSetName = settings.getString(EnterName.Name_Key, "");
+        dataSetName = settings.getString(EnterName.Name_Key, "Motion");
 
-        if (dataSetName.length() == 0) {
-            Intent iEnterName = new Intent(this, EnterName.class);
-            startActivityForResult(iEnterName, RESULT_GOT_NAME);
-        } else {
-            nameB.setText(dataSetName);
-        }
+        nameB.setText(dataSetName);
 
         String projId = ProjectManager.getProject(mContext);
 

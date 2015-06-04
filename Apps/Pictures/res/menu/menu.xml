@@ -8,7 +8,7 @@
           android:title="@string/project"
           app:showAsAction="ifRoom"/>
     <item android:id="@+id/MENU_ITEM_LOGIN"
-          android:title="@string/login"
+          android:title="@string/account"
           app:showAsAction="ifRoom"/>
     <item android:id="@+id/MENU_ITEM_CONTINUOUS"
           android:title="@string/continuous"

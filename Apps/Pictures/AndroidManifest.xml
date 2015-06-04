@@ -28,7 +28,7 @@
     
     <application
         android:allowBackup="false"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name" >
  
         <uses-library android:name="android.test.runner" />
@@ -99,6 +99,10 @@
         <activity
             android:name="edu.uml.cs.isense.queue.QueueAlter"
             android:label="Alter Data Set"
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="edu.uml.cs.isense.credentials.LoginOrKeyDialog"
+            android:label="Login or Key"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.queue.QueueEditData"

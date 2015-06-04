@@ -1,6 +1,5 @@
 package edu.uml.cs.isense.motion;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,11 +21,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.motion.dialogs.EnterName;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
@@ -82,7 +79,7 @@ public class RecordingService extends Service {
             builder.setContentText("Recording Data");
             builder.setTicker("Started Recording");
             builder.setSmallIcon(R.drawable.ic_stat_name);
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.isense_graph);
             builder.setLargeIcon(bm);
             builder.setContentIntent(pendingIntent);
             builder.setOngoing(true);

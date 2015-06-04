@@ -111,6 +111,9 @@ public class PresetScreen extends AppCompatActivity {
                 editor.putString(Presets.LAST_PRESET, Presets.GPS);
 
                 Intent resultIntent = new Intent();
+
+                resultIntent.putExtra(Presets.RATE, Presets.GPS_PROJECT_RATE);
+                resultIntent.putExtra(Presets.LENGTH, Presets.GPS_PROJECT_LENGTH);
                 resultIntent.putExtra(Presets.PROJECT, "-1");
                 setResult(Activity.RESULT_OK, resultIntent);
 

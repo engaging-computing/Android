@@ -52,7 +52,7 @@
         </activity>
         <activity
             android:name="edu.uml.cs.isense.proj.ProjectManager"
-            android:label="@string/choose_project_title"
+            android:label="@string/select_proj"
             android:theme="@style/AppThemeDialog"
             tools:ignore="MissingRegistered" >
         </activity>
@@ -102,10 +102,9 @@
             android:theme="@style/AppThemeDialog"
             tools:ignore="MissingRegistered" />
         <activity
-            android:name="edu.uml.cs.isense.credentials.EnterName"
-            android:label="@string/enter_name_prompt"
-            android:theme="@style/AppThemeDialog"
-            tools:ignore="MissingRegistered" />
+            android:name="edu.uml.cs.isense.motion.dialogs.EnterName"
+            android:label="Enter Data Set Name"
+            android:theme="@style/AppThemeDialog"/>
         <activity
             android:name="edu.uml.cs.isense.motion.dialogs.MessageDialogTemplate"
             android:label="Output a message"
@@ -167,11 +166,11 @@
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.motion.dialogs.DurationDialog"
-            android:label="Single input"
+            android:label="Duration"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name=".dialogs.RateDialog"
-            android:label="Single input"
+            android:label="Rate"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.motion.dialogs.Help"

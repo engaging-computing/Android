@@ -26,6 +26,7 @@ import java.util.Timer;
 
 import edu.uml.cs.isense.comm.API;
 import edu.uml.cs.isense.dfm.DataFieldManager;
+import edu.uml.cs.isense.motion.dialogs.EnterName;
 import edu.uml.cs.isense.proj.ProjectManager;
 import edu.uml.cs.isense.queue.QDataSet.Type;
 
@@ -38,24 +39,12 @@ public class RecordingService extends Service {
 
     public static boolean running = false;
 
-    /* Distance and Velocity */
-    float distance = 0;
-    float velocity = 0;
-    float deltaTime = 0;
-    boolean bFirstPoint = true;
-    float totalDistance = 0;
-    long startTime;
-
     private MediaPlayer mMediaPlayer;
     private Vibrator vibrator;
 
 
-    Intent intent;
     Context serviceContext;
 
-    Timer recordLength;
-
-    private String dataSetName = "";
     CountDownTimer mTimer;
 
     LocalBroadcastManager broadcaster;
@@ -214,14 +203,14 @@ public class RecordingService extends Service {
 
             updateButtonStop("Stop");
 
+
             // Create the name of the session using the entered name
-            dataSetName = Motion.firstName + " " + Motion.lastInitial;
 			String description = "Number of Data Points: " + dataSet.length();
 			Type type = Type.DATA;
 
 			//add new dataset to queue
 			Motion.uq.buildQueueFromFile();
-			Motion.uq.addToQueue(dataSetName, description, type, dataSet, null, ProjectManager.getProject(this), null, false);
+			Motion.uq.addToQueue(Motion.dataSetName, description, type, dataSet, null, ProjectManager.getProject(this), null, false);
         }
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

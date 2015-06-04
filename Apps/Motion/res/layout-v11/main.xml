@@ -117,7 +117,7 @@
             android:layout_height="40dp"
             android:layout_toRightOf="@id/tv_name"
             android:background="@drawable/button_rsense"
-            android:text="@string/john_smith"
+            android:text="@string/data_name"
 	        android:textColor="#0066FF"
             android:textSize="14sp"
             android:textStyle="bold" />

@@ -87,6 +87,7 @@
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.riverwalk.Continuous"
+            android:label="Continuous/Single Shot"
             android:theme="@style/AppThemeDialog" />
 
         <!-- from iSENSE imports -->
@@ -126,6 +127,7 @@
         <activity
             android:name="edu.uml.cs.isense.proj.ProjectManager"
             android:label="Select a Project"
+            android:screenOrientation="portrait"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.supplements.FileBrowser"

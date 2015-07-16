@@ -323,7 +323,7 @@ public class API {
 
 		try {
 			String reqResult = makeRequest(baseURL, "projects/" + projectId,
-					"?recur=true", "GET", null);
+					"recur=true", "GET", null);
 
 			JSONObject j = new JSONObject(reqResult);
 			JSONArray j2 = j.getJSONArray("fields");

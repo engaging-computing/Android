@@ -47,7 +47,7 @@ public class API {
 	private static API instance = null;
 
 	private String baseURL = "";
-	private final String publicURL = "http://isenseproject.org/api/v1";
+	private final String publicURL = "https://isenseproject.org/api/v1";
 	private final String devURL = "http://rsense-dev.cs.uml.edu/api/v1";
 
 	String authToken = "";

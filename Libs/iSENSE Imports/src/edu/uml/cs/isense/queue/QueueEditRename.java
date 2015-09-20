@@ -23,8 +23,8 @@ public class QueueEditRename extends ActionBarActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.queueedit_rename);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.queueedit_rename);
 
 		rename = (EditText) findViewById(R.id.queueedit_edit);
 

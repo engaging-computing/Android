@@ -1,8 +1,7 @@
 package edu.uml.cs.isense.queue;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -10,7 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import edu.uml.cs.isense.R;
 
-public class QueueSummary extends ActionBarActivity {
+public class QueueSummary extends AppCompatActivity {
 	
 	public static final String SUMMARY_ARRAY = "summary_array";
 	

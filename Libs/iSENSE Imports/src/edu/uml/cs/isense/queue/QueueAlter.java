@@ -3,6 +3,7 @@ package edu.uml.cs.isense.queue;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -31,8 +32,8 @@ public class QueueAlter extends ActionBarActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.queueblock_alter);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.queueblock_alter);
 
 		rename     = (Button) findViewById(R.id.queuealter_rename     );
 		changeData = (Button) findViewById(R.id.queuealter_change_data);
@@ -43,7 +44,7 @@ public class QueueAlter extends ActionBarActivity {
 
 		if (extras != null) {
 			boolean isAlterable = extras.getBoolean(IS_ALTERABLE);
-			if (!isAlterable) {
+			if (!isAlterable || !extras.getBoolean("hasProj")) {
 				changeData.setVisibility(View.GONE);
 			}
 

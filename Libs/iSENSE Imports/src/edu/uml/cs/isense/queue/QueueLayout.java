@@ -534,7 +534,8 @@ public class QueueLayout extends ActionBarActivity implements OnClickListener {
 				case QueueAlter.CHANGE_DATA:
 
 					Intent iData = new Intent(mContext, QueueEditData.class);
-					startActivityForResult(iData, ALTER_DATA_DATA_REQUESTED);
+					iData.putExtra("hasProj", !lastDataSetLongClicked.getProjID().equals("-1"));
+                    startActivityForResult(iData, ALTER_DATA_DATA_REQUESTED);
 
 					break;
 

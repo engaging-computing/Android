@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +45,7 @@ public class QueueEditData extends ActionBarActivity {
 	private API api;
 	
 	private Context mContext;
-	private ArrayList<RProjectField> fieldOrder;
+	private ArrayList<RProjectField> fields;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,7 @@ public class QueueEditData extends ActionBarActivity {
 		
 		mContext = this;
 		
-		fieldOrder = new ArrayList<RProjectField>();
+		fields = new ArrayList<RProjectField>();
 
 		api = API.getInstance();
 
@@ -105,13 +106,16 @@ public class QueueEditData extends ActionBarActivity {
 	private void fillScrollView() {
 
 		int i = 0;
-		String rawFieldData = alter.getData().replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-		String[] fieldData = rawFieldData.split(",");
-
-        int numPoints = fieldData.length / fieldOrder.size();
+		String rawData = alter.getData().replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
+		String[] Data = rawData.split(",");
+		int numPoints = 0;
+        Log.e("DATATATATATATAT:",  rawData);
+		if (fields.size() != 0) {
+			numPoints = Data.length / fields.size();
+		}
 		// if the data is a space, remove the spaces
-		for (int j = 0; j < fieldData.length; j++)
-			if (fieldData[j].equalsIgnoreCase(" ")) fieldData[j] = "";
+		for (int j = 0; j < Data.length; j++)
+			if (Data[j].equalsIgnoreCase(" ")) Data[j] = "";
 
 
         for(int point=0; point < numPoints; point++) {
@@ -123,7 +127,7 @@ public class QueueEditData extends ActionBarActivity {
 
             editDataList.addView(pointLabel);
 
-            for (RProjectField rpf : fieldOrder) {
+            for (RProjectField rpf : fields) {
                 final View dataRow = View.inflate(mContext, R.layout.edit_row, null);
 
                 TextView label = (TextView) dataRow.findViewById(R.id.edit_row_label);
@@ -136,10 +140,10 @@ public class QueueEditData extends ActionBarActivity {
 
                 EditText data = (EditText) dataRow.findViewById(R.id.edit_row_text);
                 data.setLayoutParams(params);
-                data.setText(fieldData[i]);
+                data.setText(Data[i]);
                 // See if data is a number.  If not, change input type to text
                 try {
-                    Double.parseDouble(fieldData[i]);
+                    Double.parseDouble(Data[i]);
                 } catch (NumberFormatException nfe) {
                     data.setInputType(InputType.TYPE_CLASS_TEXT);
                 }
@@ -153,15 +157,15 @@ public class QueueEditData extends ActionBarActivity {
 	
 	private void getNewFields() {
 		JSONArray data = new JSONArray();
-        String rawFieldData = alter.getData();
-        String[] fieldData = rawFieldData.split(",");
-        int numPoints = fieldData.length / fieldOrder.size();
+        String rawData = alter.getData();
+        String[] Data = rawData.split(",");
+        int numPoints = Data.length / fields.size();
 
         int i = 0;
 
         for (int point = 0; point < numPoints; point++) {
             JSONArray row = new JSONArray();
-            for (int j = 0; j < (fieldOrder.size()+1); j++) { //fields + 1 (datapoint number label)
+            for (int j = 0; j < (fields.size()+1); j++) { //fields + 1 (datapoint number label)
                     View v = editDataList.getChildAt(i);
                 try {
                     EditText dataText = (EditText) v.findViewById(R.id.edit_row_text);
@@ -183,8 +187,7 @@ public class QueueEditData extends ActionBarActivity {
 		
 	}
 
-	private class LoadProjectFieldsTask extends
-			AsyncTask<Void, Integer, Void> {
+	private class LoadProjectFieldsTask extends AsyncTask<Void, Integer, Void> {
 		ProgressDialog dia;
 		private boolean error = false;
 
@@ -207,7 +210,7 @@ public class QueueEditData extends ActionBarActivity {
 
 			int projID = Integer.parseInt(alter.getProjID());
 			if (projID != -1) {
-				fieldOrder = api.getProjectFields(projID);
+				fields = api.getProjectFields(projID);
 			}
 
 			return null;

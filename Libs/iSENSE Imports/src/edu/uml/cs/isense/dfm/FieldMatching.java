@@ -150,7 +150,15 @@ public class FieldMatching extends ActionBarActivity {
 					selector.setSelection(Fields.LIGHT + 1);
 				} else if (field.equals(getString(R.string.altitude))) {
 					selector.setSelection(Fields.ALTITUDE + 1);
+				} else if (field.equals(getString(R.string.speed))) {
+					selector.setSelection(Fields.SPEED + 1);
+				} else if (field.equals(getString(R.string.distance))) {
+					selector.setSelection(Fields.DISTANCE + 1);
+				} else if (field.equals(getString(R.string.humidity))) {
+					selector.setSelection(Fields.HUMIDITY + 1);
 				}
+
+
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 					     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

@@ -32,7 +32,7 @@ public class LocFragment extends Fragment implements LocationListener{
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         mLocManager = (LocationManager) Motion.mContext.getSystemService(Context.LOCATION_SERVICE);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(c, true), 0, 0, this);
+        mLocManager.requestLocationUpdates(mLocManager.NETWORK_PROVIDER, 0, 0, this);
 
         return rootView;
     }
@@ -54,12 +54,13 @@ public class LocFragment extends Fragment implements LocationListener{
 		super.onResume();
 		Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(c, true), 0, 0, this);
+        mLocManager.requestLocationUpdates(mLocManager.NETWORK_PROVIDER, 0, 0, this);
+		mLocManager.requestLocationUpdates(mLocManager.GPS_PROVIDER, 0, 0, this);
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		Log.e("here", "loc");
+		Log.e("here", location.getProvider());
 		try {
 			lat.setText("Lat: "+ location.getLatitude());
 			lon.setText("Lon: "+ location.getLongitude());

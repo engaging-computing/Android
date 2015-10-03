@@ -67,7 +67,7 @@
         android:text="@string/loc" />
      
      <CheckBox
-        android:id="@+id/cbVelocity"
+        android:id="@+id/cbSpeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"

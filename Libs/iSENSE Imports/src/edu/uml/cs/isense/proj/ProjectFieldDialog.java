@@ -36,7 +36,7 @@ public class ProjectFieldDialog extends ActionBarActivity {
 	private CheckBox acceleration;
 	private CheckBox magnetic;
 	private CheckBox location;
-	private CheckBox velocity;
+	private CheckBox speed;
 	private CheckBox distance;
 	private CheckBox altitude;
 	private CheckBox pressure;
@@ -67,7 +67,7 @@ public class ProjectFieldDialog extends ActionBarActivity {
 		acceleration = (CheckBox) findViewById(R.id.cbAcceleration);
 		magnetic = (CheckBox) findViewById(R.id.cbMagnetic);
 		location = (CheckBox) findViewById(R.id.cbLocation);
-		velocity = (CheckBox) findViewById(R.id.cbVelocity);
+		speed = (CheckBox) findViewById(R.id.cbSpeed);
 		distance = (CheckBox) findViewById(R.id.cbDistance);
 		altitude = (CheckBox) findViewById(R.id.cbAltitude);
 		pressure = (CheckBox) findViewById(R.id.cbPressure);
@@ -160,12 +160,12 @@ public class ProjectFieldDialog extends ActionBarActivity {
 						fields.add(lon);
 					}
 
-					if (velocity.isChecked()) {
-						RProjectField velocity = new RProjectField();
-						velocity.name = "Velocity";
-						velocity.type = RProjectField.TYPE_NUMBER;
-						velocity.unit = "m/s";
-						fields.add(velocity);
+					if (speed.isChecked()) {
+						RProjectField speed = new RProjectField();
+						speed.name = "Speed";
+						speed.type = RProjectField.TYPE_NUMBER;
+						speed.unit = "m/s";
+						fields.add(speed);
 					}
 
 					if (distance.isChecked()) {
@@ -264,7 +264,7 @@ public class ProjectFieldDialog extends ActionBarActivity {
 					acceleration.setChecked(false);
 					magnetic.setChecked(false);
 					location.setChecked(false);
-					velocity.setChecked(false);
+					speed.setChecked(false);
 					distance.setChecked(false);
 					altitude.setChecked(false);
 					pressure.setChecked(false);
@@ -279,7 +279,7 @@ public class ProjectFieldDialog extends ActionBarActivity {
 					acceleration.setChecked(true);
 					magnetic.setChecked(true);
 					location.setChecked(true);
-					velocity.setChecked(true);
+					speed.setChecked(true);
 					distance.setChecked(true);
 					altitude.setChecked(true);
 					pressure.setChecked(true);

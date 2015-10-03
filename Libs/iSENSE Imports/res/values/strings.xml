@@ -97,7 +97,9 @@
         <item>Altitude</item>
         <item>Light</item>
         <item>Temp. (Fahrenheit)</item>
-        <item>Temp. (Kelvin)</item>
+        <item>Speed</item>
+        <item>Distance</item>
+        <item>Humidity</item>
     </string-array>
 
     <string name="field_matching_text">Match the project\'s fields (left) with fields that this app can record data for 
@@ -172,7 +174,7 @@
     <string name="timestamp">Timestamp</string>
     <string name="accel">Acceleration</string>
     <string name="loc">Location</string>
-    <string name="vel">Velocity (Calculated from GPS)</string>
+    <string name="vel">Speed (Calculated from GPS)</string>
     <string name="dis">Distance (Calculated from GPS)</string>
     <string name="mag">Magnetic</string>
     <string name="temp">Temperature</string>

@@ -34,7 +34,7 @@ public class Fields {
 	public String mag_x, mag_y, mag_z, mag_total;
 	public double altitude;
 	public String pressure;
-	public float velocity, distance;
+	public float speed, distance;
 	public double humidity;
 	
 
@@ -66,7 +66,7 @@ public class Fields {
 	public static final int ALTITUDE = 15;
 	public static final int LIGHT = 16;
 	public static final int TEMPERATURE_F = 17;
-	public static final int VELOCITY = 18;
+	public static final int SPEED = 18;
 	public static final int DISTANCE = 19;
 	public static final int HUMIDITY = 20;
 }

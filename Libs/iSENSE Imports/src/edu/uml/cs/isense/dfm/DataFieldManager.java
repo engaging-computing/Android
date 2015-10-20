@@ -62,7 +62,7 @@ public class DataFieldManager extends Application {
 	private Location prevLoc;
 	private float distance = 0;
 	private float totalDistance = 0;
-	private float velocity = 0;
+	private float speed = 0;
 	private float humidity = 0;
 
     private SensorManager mSensorManager;
@@ -189,7 +189,7 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.altitude));
 			order.add(mContext.getString(R.string.luminous_flux));
 			order.add(mContext.getString(R.string.temperature_f));
-			order.add(mContext.getString(R.string.velocity));
+			order.add(mContext.getString(R.string.speed));
 			order.add(mContext.getString(R.string.distance));
 			order.add(mContext.getString(R.string.humidity));
 
@@ -230,7 +230,7 @@ public class DataFieldManager extends Application {
 			order.add(mContext.getString(R.string.altitude));
 			order.add(mContext.getString(R.string.luminous_flux));
 			order.add(mContext.getString(R.string.temperature_f));
-			order.add(mContext.getString(R.string.velocity));
+			order.add(mContext.getString(R.string.speed));
 			order.add(mContext.getString(R.string.distance));
 			order.add(mContext.getString(R.string.humidity));
 
@@ -364,8 +364,8 @@ public class DataFieldManager extends Application {
 			else
 				dataJSON.put("");
 
-			if (enabledFields[Fields.VELOCITY])
-				dataJSON.put(f.velocity);
+			if (enabledFields[Fields.SPEED])
+				dataJSON.put(f.speed);
 			else
 				dataJSON.put("");
 
@@ -540,12 +540,12 @@ public class DataFieldManager extends Application {
 				else
 					b.append(", ").append(f.pressure);
 
-			} else if (s.equals(mContext.getString(R.string.velocity))) {
+			} else if (s.equals(mContext.getString(R.string.speed))) {
 				firstLineWritten = true;
 				if (start)
-					b.append(f.velocity);
+					b.append(f.speed);
 				else
-					b.append(", ").append(f.velocity);
+					b.append(", ").append(f.speed);
 
 			} else if (s.equals(mContext.getString(R.string.distance))) {
 				firstLineWritten = true;
@@ -755,8 +755,8 @@ public class DataFieldManager extends Application {
 							outRow.put(id + "", row.getString(Fields.PRESSURE));
 							continue;
 						} else if (s.equals(a.getResources().getString(
-								R.string.velocity))) {
-							outRow.put(id + "", row.getString(Fields.VELOCITY));
+								R.string.speed))) {
+							outRow.put(id + "", row.getString(Fields.SPEED));
 							continue;
 						} else if (s.equals(a.getResources().getString(
 								R.string.distance))) {
@@ -951,9 +951,9 @@ public class DataFieldManager extends Application {
 					break;
 				}
 
-				// velocity
-				else if (field.name.toLowerCase(Locale.US).contains("vel")) {
-					order.add(mContext.getString(R.string.velocity));
+				// speed
+				else if (field.name.toLowerCase(Locale.US).contains("vel") || field.name.toLowerCase(Locale.US).contains("speed")) {
+					order.add(mContext.getString(R.string.speed));
 					break;
 				}
 
@@ -1189,7 +1189,7 @@ public class DataFieldManager extends Application {
 		enabledFields[Fields.PRESSURE] = true;
 		enabledFields[Fields.ALTITUDE] = true;
 		enabledFields[Fields.LIGHT] = true;
-		enabledFields[Fields.VELOCITY]= true;
+		enabledFields[Fields.SPEED]= true;
 		enabledFields[Fields.DISTANCE] = true;
 		enabledFields[Fields.HUMIDITY] = true;
 	}
@@ -1239,8 +1239,8 @@ public class DataFieldManager extends Application {
 				enabledFields[Fields.ALTITUDE] = true;
 			if (s.equals(mContext.getString(R.string.luminous_flux)))
 				enabledFields[Fields.LIGHT] = true;
-			if (s.equals(mContext.getString(R.string.velocity)))
-				enabledFields[Fields.VELOCITY] = true;
+			if (s.equals(mContext.getString(R.string.speed)))
+				enabledFields[Fields.SPEED] = true;
 			if (s.equals(mContext.getString(R.string.distance)))
 				enabledFields[Fields.DISTANCE] = true;
 			if (s.equals(mContext.getString(R.string.humidity)))
@@ -1454,8 +1454,8 @@ public class DataFieldManager extends Application {
                 f.altitude = loc.getAltitude();
         if (enabledFields[Fields.LIGHT])
                 f.lux = light;
-        if (enabledFields[Fields.DISTANCE] || enabledFields[Fields.VELOCITY]) {
-        	//calculations required for distance and velocity
+        if (enabledFields[Fields.DISTANCE] || enabledFields[Fields.SPEED]) {
+        	//calculations required for distance and speed
         	if (prevLoc != null && loc != null) {
         		distance = loc.distanceTo((prevLoc));
         		totalDistance += distance;
@@ -1468,9 +1468,9 @@ public class DataFieldManager extends Application {
 	        	f.distance = totalDistance;
 	        }
 
-	        if (enabledFields[Fields.VELOCITY]) {
-	        	velocity = distance/dataSetRate;
-	        	f.velocity = velocity;
+	        if (enabledFields[Fields.SPEED]) {
+	        	speed = distance/dataSetRate;
+	        	f.speed = speed;
 	        }
         }
 
@@ -1618,7 +1618,7 @@ public class DataFieldManager extends Application {
 				+ appContext.getResources().getString(R.string.altitude) + ","
 				+ appContext.getResources().getString(R.string.luminous_flux) + ","
 				+ appContext.getResources().getString(R.string.temperature_f) + ","
-				+ appContext.getResources().getString(R.string.velocity) + ","
+				+ appContext.getResources().getString(R.string.speed) + ","
 				+ appContext.getResources().getString(R.string.distance) + ","
 				+ appContext.getResources().getString(R.string.humidity);
 
@@ -1699,10 +1699,10 @@ public class DataFieldManager extends Application {
 
                 mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
-				mLocationManager.requestLocationUpdates(
-			                mLocationManager.getBestProvider(criteria, true), 0, 0,
-			                mListener);
-		    }
+				mLocationManager.requestLocationUpdates(mLocationManager.NETWORK_PROVIDER, 0, 0, mListener);
+				mLocationManager.requestLocationUpdates(mLocationManager.GPS_PROVIDER, 0, 0, mListener);
+
+			}
 			if (enabledFields[Fields.HUMIDITY]) {
 				mSensorManager.registerListener(mListener,
 						mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
